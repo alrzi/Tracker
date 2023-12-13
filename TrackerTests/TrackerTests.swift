@@ -73,7 +73,7 @@ final class MockDataProvider: DataProviderProtocol {
 
     func deleteTracker(at indexPath: IndexPath) throws {}
 
-    func isTrackerAt(_ indexPath: IndexPath, completedForDate date: String) -> Bool {
+    func isTrackerAt(indexPath: IndexPath, completedForDate date: String) -> Bool {
         false
     }
 

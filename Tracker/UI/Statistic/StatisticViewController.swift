@@ -85,18 +85,8 @@ extension StatisticViewController: UITableViewDataSource {
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell: StatisticTableViewCell = tableView.dequeueReusableCell(for: indexPath)
-        let statistic = viewModel.statisticData[indexPath.row]
-        cell.configure(with: statistic.title)        
-        switch statistic {
-        case .bestPeriod(let viewModel):
-            cell.bind(to: viewModel)
-        case .idealDays(let viewModel):
-            cell.bind(to: viewModel)
-        case .completedTrackers(let viewModel):
-            cell.bind(to: viewModel)
-        case .averageValue(let viewModel):
-            cell.bind(to: viewModel)
-        }
+        cell.configure(with: viewModel.statisticData[indexPath.row].title)
+        cell.bind(to: viewModel.statisticData[indexPath.row].viewModel)
         return cell
     }
 }

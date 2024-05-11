@@ -88,14 +88,19 @@ enum StatisticTableData {
 
     var title: String {
         switch self {
-        case .bestPeriod:
-            return Strings.Localizable.Statistic.bestPeriod
-        case .idealDays:
-            return Strings.Localizable.Statistic.idealDays
-        case .completedTrackers:
-            return Strings.Localizable.Statistic.completed
-        case .averageValue:
-            return Strings.Localizable.Statistic.avarageValue
+        case .bestPeriod: Strings.Localizable.Statistic.bestPeriod
+        case .idealDays: Strings.Localizable.Statistic.idealDays
+        case .completedTrackers: Strings.Localizable.Statistic.completed
+        case .averageValue: Strings.Localizable.Statistic.avarageValue
+        }
+    }
+    
+    var viewModel: StatisticCellViewModel {
+        switch self {
+        case .bestPeriod(let viewModel): viewModel
+        case .idealDays(let viewModel): viewModel
+        case .completedTrackers(let viewModel): viewModel
+        case .averageValue(let viewModel): viewModel
         }
     }
 }

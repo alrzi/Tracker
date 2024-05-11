@@ -30,7 +30,7 @@ final class OnboardingPageViewController: UIPageViewController {
     // MARK: - Init
    
     init() {
-        super.init(transitionStyle: .scroll, navigationOrientation: .horizontal)
+        super.init(transitionStyle: .scroll, navigationOrientation: .vertical)
     }
     
     required init?(coder: NSCoder) {

@@ -10,12 +10,11 @@ protocol TrackerPredicateBuilderProtocol {
 }
 
 protocol TrackerRecordPredicateBuilderProtocol {
-    func buildPredicateIsCompletedFor(selectedDate date: String, trackerWithId id: String) -> NSPredicate
+    func buildPredicateIsCompletedFor(selectedDate date: String, trackerWithId id: UUID) -> NSPredicate
 }
 
 protocol TrackerCategoryPredicateBuilderProtocol {
     func buildPredicateCategory(name: String) -> NSPredicate
-    func buildPredicateCategoryIsLastSelected() -> NSPredicate
 }
 
 final class PredicateBuilder {}
@@ -86,7 +85,7 @@ extension PredicateBuilder: TrackerPredicateBuilderProtocol {
 }
 
 extension PredicateBuilder: TrackerRecordPredicateBuilderProtocol {
-    func buildPredicateIsCompletedFor(selectedDate date: String, trackerWithId id: String) -> NSPredicate {
+    func buildPredicateIsCompletedFor(selectedDate date: String, trackerWithId id: UUID) -> NSPredicate {
         let idPredicate = predicate(id: id)
         let datePredicate = predicate(date: date)
 
@@ -100,25 +99,17 @@ extension PredicateBuilder: TrackerCategoryPredicateBuilderProtocol {
     func buildPredicateCategory(name: String) -> NSPredicate {
         NSPredicate(
             format: "%K == %@",
-            #keyPath(TrackerCategoryCD.header),
+            #keyPath(CategoryObject.title),
             name)
-    }
-
-    func buildPredicateCategoryIsLastSelected() -> NSPredicate {
-        NSPredicate(
-            format: "%K == %@",
-            #keyPath(TrackerCategoryCD.isLastSelected),
-            NSNumber(value: true)
-        )
     }
 }
 
 private extension PredicateBuilder {
-    // MARK: - TrackerCD
+    // MARK: - TrackerObject
     func predicate(weekDay: String) -> NSPredicate {
         NSPredicate(
             format: "%K CONTAINS[cd] %@",
-            #keyPath(TrackerCD.schedule),
+            #keyPath(TrackerObject.weekDays),
             weekDay
         )
     }
@@ -126,7 +117,7 @@ private extension PredicateBuilder {
     func predicate(name: String) -> NSPredicate {
         NSPredicate(
             format: "%K CONTAINS[cd] %@",
-            #keyPath(TrackerCD.name),
+            #keyPath(TrackerObject.name),
             name
         )
     }
@@ -134,15 +125,15 @@ private extension PredicateBuilder {
     func predicateNeverTrackedTracker() -> NSPredicate {
         NSPredicate(
             format: "%K.@count == 0",
-            #keyPath(TrackerCD.trackerRecord)
+            #keyPath(TrackerObject.trackerRecord)
         )
     }
 
     func predicateUncompletedTrackersFor(date: String) -> NSPredicate {
         NSPredicate(
             format: "SUBQUERY(%K, $record, $record.%K == %@).@count == 0",
-            #keyPath(TrackerCD.trackerRecord),
-            #keyPath(TrackerRecordCD.date),
+            #keyPath(TrackerObject.trackerRecord),
+            #keyPath(RecordObject.date),
             date
         )
     }
@@ -150,25 +141,25 @@ private extension PredicateBuilder {
     func predicateCompletedTrackersFor(date: String) -> NSPredicate {
         NSPredicate(
             format: "ANY %K.%K == %@",
-            #keyPath(TrackerCD.trackerRecord),
-            #keyPath(TrackerRecordCD.date),
+            #keyPath(TrackerObject.trackerRecord),
+            #keyPath(RecordObject.date),
             date
         )
     }
 
-    // MARK: - TrackerRecordCD
-    func predicate(id: String) -> NSPredicate {
+    // MARK: - RecordObject
+    func predicate(id: UUID) -> NSPredicate {
         NSPredicate(
             format: "%K == %@",
-            #keyPath(TrackerRecordCD.identifier),
-            id
+            #keyPath(RecordObject.id),
+            id as CVarArg
         )
     }
 
     func predicate(date: String) -> NSPredicate {
         NSPredicate(
             format: "%K == %@",
-            #keyPath(TrackerRecordCD.date),
+            #keyPath(RecordObject.date),
             date
         )
     }

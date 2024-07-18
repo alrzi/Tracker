@@ -1,20 +1,16 @@
 import CoreData
 
 protocol TrackerCategoryStoreProtocol {
-    func addCategory(with name: String) throws -> TrackerCategoryCD?
-    func addTracker(toCategoryWithName name: String, tracker: TrackerCD) throws
-    func remove(tracker: TrackerCD, fromCategoryWithName name: String)
+    func addCategory(with name: String) throws -> CategoryObject?
+    func addTracker(toCategoryWithName name: String, tracker: TrackerObject) throws
+    func remove(tracker: TrackerObject, fromCategoryWithName name: String)
     func getAllCategories() -> [TrackerCategory]
-    func putToAttachedCategory(tracker: TrackerCD)
-    func putBackToOriginalCategory(tracker: TrackerCD)
     func getNameOfLastSelectedCategory() -> String?
 }
 
 protocol TrackerCategoryListProtocol {
-    func addCategory(with name: String) throws -> TrackerCategoryCD?
+    func addCategory(with name: String) throws -> CategoryObject?
     func isNameAvailable(name: String) throws -> Bool
-    func removeMarkFromLastSelectedCategory()
-    func markCategoryAsLastSelected(categoryName: String)
     func getAllCategories() -> [TrackerCategory]
     func removeCategoryWith(name: String)
     func update(category: TrackerCategory, withNewName name: String)
@@ -22,7 +18,7 @@ protocol TrackerCategoryListProtocol {
 }
 
 struct TrackerCategoryStore: Store {
-    typealias EntityType = TrackerCategoryCD
+    typealias EntityType = CategoryObject
             
     let context: NSManagedObjectContext
     var predicateBuilder: TrackerCategoryPredicateBuilderProtocol
@@ -36,44 +32,44 @@ struct TrackerCategoryStore: Store {
     }
 
     init() {
-        let context = Context.shared.context
+        let context = ManagedObjectContext.shared.context
         self.init(context: context)
     }
 }
 
 // MARK: - TrackerCategoryStoreProtocol
 extension TrackerCategoryStore: TrackerCategoryStoreProtocol {
-    func addTracker(toCategoryWithName name: String, tracker: TrackerCD) throws {
+    func addTracker(toCategoryWithName name: String, tracker: TrackerObject) throws {
         if let category = getCategoryWith(name: name) {
-            category.addToTrackers(tracker)
+//            category.addToTrackers(tracker)
         } else {
-            let category = TrackerCategoryCD(context: context)
-            category.header = name
-            category.addToTrackers(tracker)
+            let category = CategoryObject(context: context)
+            category.title = name
+//            category.addToTrackers(tracker)
         }
         save()
     }
 
     func addCategory(name: String) {
-        let trackerCategory = TrackerCategory(id: UUID().uuidString, header: name, trackers: [], isLastSelected: false)
-        TrackerCategoryCD(trackerCategory: trackerCategory, context: context)
+        let trackerCategory = TrackerCategory(id: UUID(), header: name, trackers: [])
+        CategoryObject(trackerCategory: trackerCategory, context: context)
         save()
     }
     
-    func addCategory(with name: String) throws -> TrackerCategoryCD? {
+    func addCategory(with name: String) throws -> CategoryObject? {
         if let category = getCategoryWith(name: name) {
             return category
         } else {
-            let category = TrackerCategoryCD(context: context)
-            category.header = name
+            let category = CategoryObject(context: context)
+            category.title = name
             save()
             return category
         }
     }
     
-    func remove(tracker: TrackerCD, fromCategoryWithName name: String) {
+    func remove(tracker: TrackerObject, fromCategoryWithName name: String) {
         if let category = getCategoryWith(name: name) {
-            category.removeFromTrackers(tracker)
+//            category.removeFromTrackers(tracker)
             save()
         }
     }
@@ -94,20 +90,12 @@ extension TrackerCategoryStore: TrackerCategoryStoreProtocol {
     }
     
     func getNameOfLastSelectedCategory() -> String? {
-        getLastSelectedCategory()?.header
+        nil
     }
     
-    func putToAttachedCategory(tracker: TrackerCD) {
-        tracker.isAttached = true
-        tracker.lastCategory = tracker.category?.header
+    func putToAttachedCategory(tracker: TrackerObject) {
+        tracker.isPinned = true
         try? addTracker(toCategoryWithName: Strings.Localizable.Main.pinned, tracker: tracker)
-    }
-    
-    func putBackToOriginalCategory(tracker: TrackerCD) {
-        guard let lastCategory = tracker.lastCategory else { return }
-        tracker.isAttached = false
-        tracker.lastCategory = nil
-        try? addTracker(toCategoryWithName: lastCategory, tracker: tracker)
     }
 }
 
@@ -117,23 +105,15 @@ extension TrackerCategoryStore: TrackerCategoryListProtocol {
         return (getCategoryWith(name: name) != nil) ? false : true
     }
     
-    func removeMarkFromLastSelectedCategory() {
-        if let category = getLastSelectedCategory() {
-            category.isLastSelected = false
-            save()
-        }
-    }
-    
     func markCategoryAsLastSelected(categoryName: String) {
         if let category = getCategoryWith(name: categoryName) {
-            category.isLastSelected = true
             save()
         }
     }
       
     func update(category: TrackerCategory, withNewName name: String) {
         if let category = getObjectBy(id: category.id)?.first {
-            category.header = name
+            
             save()
         }
     }
@@ -144,44 +124,37 @@ private extension TrackerCategoryStore {
     func fetchTrackerCategories(
         context: NSManagedObjectContext,
         withPredicate predicateClosure: (() -> NSPredicate)? = nil
-    ) throws -> [TrackerCategoryCD] {
-        let fetchRequest = TrackerCategoryCD.fetchRequest()
+    ) throws -> [CategoryObject] {
+        let categoryRequest = NSFetchRequest<CategoryObject>(entityName: CategoryObject.entityName)
         if let predicateClosure = predicateClosure {
-            fetchRequest.predicate = predicateClosure()
+            categoryRequest.predicate = predicateClosure()
         }
         
-        let results = try context.fetch(fetchRequest)
+        let results = try context.fetch(categoryRequest)
         return results
     }
 
-    func getCategoryWith(name: String) -> TrackerCategoryCD? {
+    func getCategoryWith(name: String) -> CategoryObject? {
         return try? fetchTrackerCategories(context: context) {
             predicateBuilder.buildPredicateCategory(name: name)
         }.first
     }
-    
-    func getLastSelectedCategory() -> TrackerCategoryCD? {
-        return try? fetchTrackerCategories(context: context) {
-            predicateBuilder.buildPredicateCategoryIsLastSelected()
-        }.first
-    }
 }
 
-extension TrackerCategoryCD: Identible {
+extension CategoryObject {
     convenience init(trackerCategory: TrackerCategory, context: NSManagedObjectContext) {
         self.init(context: context)
         update(with: trackerCategory)
     }
 
     func update(with trackerCategory: TrackerCategory) {
-        self.identifier = trackerCategory.id
-        self.header = trackerCategory.header
-        self.trackers = NSSet(array: trackerCategory.trackers)
-        self.isLastSelected = trackerCategory.isLastSelected
+        self.id = trackerCategory.id
+        self.title = trackerCategory.header
+        self.trackers = NSOrderedSet(array: trackerCategory.trackers)
     }
 }
 
-extension Array where Element == TrackerCategoryCD {
+extension Array where Element == CategoryObject {
     func toTrackerCategories() -> [TrackerCategory] {
         return self.compactMap { category in
             TrackerCategory(coreData: category)

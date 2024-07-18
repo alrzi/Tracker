@@ -1,16 +1,15 @@
 import CoreData
 
 protocol TrackerRecordStoreProtocol {
-    func getTrackedDaysNumberFor(trackerWithId id: String?) throws -> Int
-    func isCompletedFor(_ selectedDay: String, trackerWithId id: String?) throws -> Bool
-    func removeOrAddRecordOf(tracker: TrackerCD, forParticularDay day: String) throws
+    func getTrackedDaysNumberFor(trackerWithId id: UUID?) throws -> Int
+    func isCompletedFor(_ selectedDay: String, trackerWithId id: UUID?) throws -> Bool
+    func removeOrAddRecordOf(tracker: TrackerObject, forParticularDay day: String) throws
     func getNumberOfCompletedTrackers() -> Int
-    func getAllRecords() -> [TrackerRecordCD]?
+    func getAllRecords() -> [RecordObject]?
 }
 
-extension TrackerRecordCD: Identible {}
 struct TrackerRecordStore: Store {
-    typealias EntityType = TrackerRecordCD
+    typealias EntityType = RecordObject
         
     let context: NSManagedObjectContext
     var predicateBuilder: TrackerRecordPredicateBuilderProtocol
@@ -24,53 +23,53 @@ struct TrackerRecordStore: Store {
     }
 
     init() {
-        let context = Context.shared.context
+        let context = ManagedObjectContext.shared.context
         self.init(context: context)
     }
 }
 
 // MARK: - Public
 extension TrackerRecordStore: TrackerRecordStoreProtocol {
-    func getTrackedDaysNumberFor(trackerWithId id: String?) throws -> Int {
+    func getTrackedDaysNumberFor(trackerWithId id: UUID?) throws -> Int {
         guard let id = id else { return .zero }
-        return getObjectBy(id: id)?.count ?? .zero
+        return getObjectBy(id: UUID())?.count ?? .zero
     }
 
     func getNumberOfCompletedTrackers() -> Int {
-        let fetchRequest = TrackerRecordCD.fetchRequest()
+        let fetchRequest = RecordObject.fetchRequest()
         let trackerRecordsCoreData = try? context.fetch(fetchRequest)
         return trackerRecordsCoreData?.count ?? .zero
     }
     
-    func isCompletedFor(_ selectedDay: String, trackerWithId id: String?) throws -> Bool {
+    func isCompletedFor(_ selectedDay: String, trackerWithId id: UUID?) throws -> Bool {
         guard let id = id else { return false }
-        let fetchRequest = TrackerRecordCD.fetchRequest()
+        let fetchRequest = RecordObject.fetchRequest()
         let predicate = predicateBuilder.buildPredicateIsCompletedFor(selectedDate: selectedDay, trackerWithId: id)
         fetchRequest.predicate = predicate
         let trackerRecordsCoreData = try context.fetch(fetchRequest)
         return trackerRecordsCoreData.first != nil ? true : false
     }
     
-    func removeOrAddRecordOf(tracker: TrackerCD, forParticularDay day: String) throws {
-        let fetchRequest = TrackerRecordCD.fetchRequest()
-        let trackerRecordCoreData = try context.fetch(fetchRequest)
+    func removeOrAddRecordOf(tracker: TrackerObject, forParticularDay day: String) throws {
+        let recordRequest = NSFetchRequest<RecordObject>(entityName: RecordObject.entityName)
+        let trackerRecordCoreData = try context.fetch(recordRequest)
         
         if let trackerToRemoveIndex = trackerRecordCoreData.firstIndex(
-            where: { $0.date == day && $0.id == tracker.id }) {
+            where: { $0.date == .now && $0.id == tracker.id }) {
             // Remove the tracker record from the array
             context.delete(trackerRecordCoreData[trackerToRemoveIndex])
         } else {
             // Create new record
-            let trackerRecord = TrackerRecordCD(context: context)
-            trackerRecord.identifier = tracker.identifier
-            trackerRecord.date = day
+            let trackerRecord = RecordObject(context: context)
+            trackerRecord.id = tracker.id
+            trackerRecord.date = .now
             trackerRecord.tracker = tracker
         }
         save()
     }
 
-    func getAllRecords() -> [TrackerRecordCD]? {
-        let request = TrackerRecordCD.fetchRequest()
-        return try? context.fetch(request)
+    func getAllRecords() -> [RecordObject]? {
+        let recordRequest = NSFetchRequest<RecordObject>(entityName: RecordObject.entityName)
+        return try? context.fetch(recordRequest)
     }
 }

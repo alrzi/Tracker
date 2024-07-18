@@ -21,7 +21,7 @@ final class AuthService {
     }
     
     func login(completion: @escaping (Bool) -> Void) {
-        DispatchQueue.main.asyncAfter(deadline: .now()) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
             self.isLoggedIn = true
             completion(true)
         }

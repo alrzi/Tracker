@@ -11,13 +11,76 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     var window: UIWindow?
 
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
-        guard let windowScene = (scene as? UIWindowScene) else { return }
-        let window = UIWindow(windowScene: windowScene)
-       
-        let viewModel = SplashViewModel(authService: AuthService())
-        window.rootViewController = SplashViewController(viewModel: viewModel)
-        self.window = window
-        window.makeKeyAndVisible()
+        guard let windowScene = (scene as? UIWindowScene) else {
+            return
+        }
+        
+        let windowFromScene = UIWindow(windowScene: windowScene)
+        
+        // MARK: - Servises
+        
+        let context = ManagedObjectContext.shared.context
+        
+        let categoryStore = TrackerCategoryStore(context: context)
+        let trackerStore = TrackerStore(context: context)
+        let trackerRecordStore = TrackerRecordStore(context: context)
+        
+        let trackerManager = TrackerManagerImpl(
+            trackerCategoryStore: categoryStore,
+            trackerStore: trackerStore,
+            trackerRecordStore: trackerRecordStore
+        )
+        
+        let dataProvider = DataProvider(context: context)
+        
+        let authService = AuthService()
+        let analyticsService = AnalyticsService()
+        
+        // MARK: - Assembly
+        
+        let filtersAssembly = FiltersAssembly()
+        let chooseScheduleAssembly = ChooseScheduleAssembly()
+        let createNewCategoryAssembly = CreateNewCategoryAssembly(categoryStore: categoryStore)
+        let categoryListAssembly = CategoryListAssembly(categoryStore: categoryStore)
+        
+        let categoryFlowCoordinatorAssembly = CategoryFlowCoordinatorAssembly(
+            categoryListAssembly: categoryListAssembly,
+            createCategory: createNewCategoryAssembly
+        )
+        
+        let createTrackerAssembly = CreateTrackerAssembly(
+            trackerManager: trackerManager,
+            categoryFlowCoordinatorAssembly: categoryFlowCoordinatorAssembly,
+            chooseScheduleAssembly: chooseScheduleAssembly
+        )
+        
+        let chooseTrackerAssembly = ChooseTrackerAssembly(
+            createTrackerAssembly: createTrackerAssembly
+        )
+                      
+        let trackerCreationFlowCoordinatorAssembly = TrackerCreationFlowCoordinatorAssembly(
+            chooseTrackerAssembly: chooseTrackerAssembly,
+            createTrackerAssembly: createTrackerAssembly,
+            chooseScheduleAssembly: chooseScheduleAssembly,
+            categoryFlowCoordinatorAssembly: categoryFlowCoordinatorAssembly
+        )
+        
+        let trackersAssembly = TrackersAssembly(
+            analyticsService: analyticsService,
+            dataProvider: dataProvider,
+            trackerCreationFlowCoordinatorAssembly: trackerCreationFlowCoordinatorAssembly,
+            createTrackerAssembly: createTrackerAssembly,
+            filtersAssembly: filtersAssembly
+        )
+        
+        let tabBarAssembly = TabBarAssembly(trackersAssembly: trackersAssembly)
+        let splash = SplashViewAssembly(tabBarAssembly: tabBarAssembly, authService: authService)
+        
+        let viewController = splash.assemble(windowFromScene)
+        windowFromScene.rootViewController = viewController
+        
+        self.window = windowFromScene
+        windowFromScene.makeKeyAndVisible()
     }
 
     func sceneDidDisconnect(_ scene: UIScene) {

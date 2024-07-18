@@ -1,28 +1,18 @@
 import UIKit
 
-final class MainTabBarController: UITabBarController {
-    // MARK: - Init
-    init() {
+final class TabBarViewController: UITabBarController {
+    private let trackersAssembly: TrackersAssembly
+    
+    private let viewModel: TabBarViewModel
+    
+    init(
+        trackersAssembly: TrackersAssembly,
+        viewModel: TabBarViewModel
+    ) {
+        self.viewModel = viewModel
+        self.trackersAssembly = trackersAssembly
+        
         super.init(nibName: nil, bundle: nil)
-
-        viewControllers = [
-            generateViewController(
-                TrackersViewController(
-                    dataProvider: DataProvider(context: Context.shared.context)
-                ),
-                image: Asset.Assets._01leftTabBar.image,
-                title: Strings.Localizable.TabBar.trackers),
-            generateViewController(
-                UINavigationController(rootViewController: StatisticViewController(
-                    viewModel: StatisticViewModel(
-                        trackerRecordStore: TrackerRecordStore(),
-                        trackerStore: TrackerStore()
-                        )
-                    )
-                ),
-                image: Asset.Assets._02rightTabBar.image,
-                title: Strings.Localizable.TabBar.statistics)
-        ]
     }
     
     required init?(coder: NSCoder) {
@@ -31,27 +21,28 @@ final class MainTabBarController: UITabBarController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        setAppearance()
+        
+        viewControllers = [
+            trackersAssembly.assemble(),
+            trackersAssembly.assemble()
+        ]
+        
+        TabItem.allCases.enumerated().forEach { index, item in
+            viewControllers?[index].tabBarItem = .init(tabItem: item)
+        }
+        
+        let standardAppearance = UITabBarAppearance()
+        UITabBar.appearance().standardAppearance = standardAppearance
+        UITabBar.appearance().scrollEdgeAppearance = standardAppearance
     }
 }
 
-// MARK: - Private methods
-private extension MainTabBarController {
-    func generateViewController(_ rootViewController: UIViewController, image: UIImage?, title: String) -> UIViewController {
-        let viewController = rootViewController
-        viewController.tabBarItem.image = image
-        viewController.tabBarItem.title = title
-        return viewController
-    }
-    
-    func setAppearance() {
-        let appearance = UITabBarAppearance()
-        appearance.configureWithOpaqueBackground()
-        appearance.backgroundColor = Asset.Colors.myWhite.color
-        tabBar.standardAppearance = appearance
-        if #available(iOS 15.0, *) {
-            tabBar.scrollEdgeAppearance = appearance
-        }
-        tabBar.tintColor = Asset.Colors.myBlue.color
+private extension UITabBarItem {
+    convenience init(tabItem: TabItem) {
+        self.init(title: tabItem.title, image: tabItem.image, selectedImage: tabItem.selectedImage)
+        
+        tag = tabItem.rawValue
+        imageInsets = .zero
+        accessibilityIdentifier = "Tab_\(tabItem)"
     }
 }

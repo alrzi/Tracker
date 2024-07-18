@@ -3,8 +3,8 @@ import Foundation
 protocol DataSourceProtocol {
     mutating func addCategoryHeader(_ header: String)
     mutating func addSchedule(_ schedule: String)
-    func numberOfTableViewRows(ofKind kind: Tracker.Kind) -> Int
-    func dataForTablView(ofKind kind: Tracker.Kind) -> [TableData]
+    func numberOfTableViewRows(ofKind kind: TrackerKind) -> Int
+    func dataForTablView(ofKind kind: TrackerKind) -> [TableData]
     func numberOfItemsInSection(_ section: Int) -> Int
     func numberOfCollectionSections() -> Int
     func getSection(_ indexPath: IndexPath) -> CollectionViewData
@@ -58,18 +58,18 @@ extension DataSourceImpl: DataSourceProtocol {
         collectionViewData.count
     }
         
-    func dataForTablView(ofKind kind: Tracker.Kind) -> [TableData] {
+    func dataForTablView(ofKind kind: TrackerKind) -> [TableData] {
         switch kind {
-        case .ocasional:
+        case .occasional:
             return firstRowData
         case .habit:
             return secondRowData
         }
     }
     
-    func numberOfTableViewRows(ofKind kind: Tracker.Kind) -> Int {
+    func numberOfTableViewRows(ofKind kind: TrackerKind) -> Int {
         switch kind {
-        case .ocasional:
+        case .occasional:
             return firstRowData.count
         case .habit:
             return secondRowData.count

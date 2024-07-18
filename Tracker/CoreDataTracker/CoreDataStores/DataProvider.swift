@@ -56,22 +56,22 @@ final class DataProvider: NSObject {
     weak var delegate: DataProviderDelegate?
     
     // Fetch controller
-    private lazy var fetchedResultsController: NSFetchedResultsController<TrackerCD> = {
-        let fetchRequest = TrackerCD.fetchRequest()
+    private lazy var fetchedResultsController: NSFetchedResultsController<TrackerObject> = {
+        let fetchRequest = NSFetchRequest<TrackerObject>(entityName: TrackerObject.entityName)
         fetchRequest.fetchBatchSize = 20
         fetchRequest.fetchLimit = 50
         let weekDay = Date().weekDayString
         fetchRequest.predicate = predicateBuilder.buildPredicateTrackersFor(weekDay: weekDay)
         fetchRequest.sortDescriptors = [
-            NSSortDescriptor(key: #keyPath(TrackerCD.isAttached), ascending: false),
-            NSSortDescriptor(key: #keyPath(TrackerCD.category.header), ascending: true),
-            NSSortDescriptor(key: #keyPath(TrackerCD.name), ascending: true)
+            NSSortDescriptor(key: #keyPath(TrackerObject.isPinned), ascending: false),
+            NSSortDescriptor(key: #keyPath(TrackerObject.category.title), ascending: true),
+            NSSortDescriptor(key: #keyPath(TrackerObject.name), ascending: true)
         ]
 
         let fetchedResultsController = NSFetchedResultsController(
             fetchRequest: fetchRequest,
             managedObjectContext: context,
-            sectionNameKeyPath: #keyPath(TrackerCD.category.header),
+            sectionNameKeyPath: #keyPath(TrackerObject.category.title),
             cacheName: nil
         )
         
@@ -121,7 +121,7 @@ extension DataProvider: DataProviderProtocol {
     func daysTracked(for indexPath: IndexPath) -> Int {
         let tracker = fetchedResultsController.object(at: indexPath)
         do {
-            return try trackerRecordStore.getTrackedDaysNumberFor(trackerWithId: tracker.identifier)
+            return try trackerRecordStore.getTrackedDaysNumberFor(trackerWithId: tracker.id)
         } catch {
             return .zero
         }
@@ -130,7 +130,7 @@ extension DataProvider: DataProviderProtocol {
     func isTrackerAt(indexPath: IndexPath, completedForDate date: String) -> Bool {
         let tracker = fetchedResultsController.object(at: indexPath)
         do {
-            return try trackerRecordStore.isCompletedFor(date, trackerWithId: tracker.identifier)
+            return try trackerRecordStore.isCompletedFor(date, trackerWithId: tracker.id)
         } catch {
             return false
         }
@@ -148,12 +148,10 @@ extension DataProvider: DataProviderProtocol {
 
     func pinTrackerAt(indexPath: IndexPath) {
         let trackerCoreData = fetchedResultsController.object(at: indexPath)
-        trackerCategoryStore.putToAttachedCategory(tracker: trackerCoreData)
     }
     
     func unPinTrackerAt(indexPath: IndexPath) {
         let trackerCoreData = fetchedResultsController.object(at: indexPath)
-        trackerCategoryStore.putBackToOriginalCategory(tracker: trackerCoreData)
     }
     
     // MARK: - Filtering

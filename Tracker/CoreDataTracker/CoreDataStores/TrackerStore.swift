@@ -1,22 +1,22 @@
 import CoreData
 
 protocol TrackerStoreManagerProtocol {
-    func createTrackerCoreData(_ tracker: Tracker) throws -> TrackerCD
-    func save(tracker: Tracker, andUpdateItsCategory category: TrackerCategoryCD) throws
-    func getCategoryHeaderForTrackerWith(id: String) -> String?
-    func getTrackedDaysNumberFor(id: String) -> Int?
-    func getObjectBy(id: String) -> [TrackerCD]?
-    func delete(_ entity: TrackerCD) throws
+    func createTrackerCoreData(_ tracker: Tracker) throws -> TrackerObject
+    func save(tracker: Tracker, andUpdateItsCategory category: CategoryObject) throws
+    func getCategoryHeaderForTrackerWith(id: UUID) -> String?
+    func getTrackedDaysNumberFor(id: UUID) -> Int?
+    func getObjectBy(id: UUID) -> [TrackerObject]?
+    func delete(_ entity: TrackerObject) throws
 }
 
 protocol TrackerStoreDataProviderProtocol {
-    func createTrackerCoreData(_ tracker: Tracker) throws -> TrackerCD
-    func delete(_ record: TrackerCD) throws
+    func createTrackerCoreData(_ tracker: Tracker) throws -> TrackerObject
+    func delete(_ record: TrackerObject) throws
     var isAnyTrackers: Bool { get }
 }
 
 struct TrackerStore: Store {
-    typealias EntityType = TrackerCD
+    typealias EntityType = TrackerObject
     
     let context: NSManagedObjectContext
 
@@ -25,30 +25,26 @@ struct TrackerStore: Store {
     }
 
     init() {
-        let context = Context.shared.context
+        let context = ManagedObjectContext.shared.context
         self.init(context: context)
     }
 }
 
 // MARK: - TrackerStoreManagerProtocol
 extension TrackerStore: TrackerStoreManagerProtocol {
-    func getCategoryHeaderForTrackerWith(id: String) -> String? {
-        let trackerCoreData = getObjectBy(id: id)?.first
-        return trackerCoreData?.lastCategory ?? trackerCoreData?.category?.header
+    func getCategoryHeaderForTrackerWith(id: UUID) -> String? {
+//        let trackerCoreData = getObjectBy(id: UUID())?.first
+//        return trackerCoreData?.lastCategory ?? trackerCoreData?.category?.title
+        nil
     }
     
-    func getTrackedDaysNumberFor(id: String) -> Int? {
+    func getTrackedDaysNumberFor(id: UUID) -> Int? {
         getObjectBy(id: id)?.first?.trackerRecord?.count
     }
     
-    func save(tracker: Tracker, andUpdateItsCategory category: TrackerCategoryCD) throws {
+    func save(tracker: Tracker, andUpdateItsCategory category: CategoryObject) throws {
         if let trackerCoreData = getObjectBy(id: tracker.id)?.first {
             trackerCoreData.update(with: tracker)
-            if trackerCoreData.lastCategory != nil {
-                trackerCoreData.lastCategory = category.header
-            } else {
-                trackerCoreData.category = category
-            }
             save()
         }
     }
@@ -56,12 +52,12 @@ extension TrackerStore: TrackerStoreManagerProtocol {
 
 // MARK: - TrackerStoreDataProviderProtocol
 extension TrackerStore: TrackerStoreDataProviderProtocol {
-    func createTrackerCoreData(_ tracker: Tracker) -> TrackerCD {
-        return TrackerCD(from: tracker, context: context)
+    func createTrackerCoreData(_ tracker: Tracker) -> TrackerObject {
+        return TrackerObject(from: tracker, context: context)
     }
 
     var isAnyTrackers: Bool {
-        let fetchRequest = TrackerCD.fetchRequest()
+        let fetchRequest = TrackerObject.fetchRequest()
         let trackers = try? context.fetch(fetchRequest)
         if let trackers {
             return trackers.isEmpty ? false : true
@@ -70,19 +66,19 @@ extension TrackerStore: TrackerStoreDataProviderProtocol {
     }
 }
 
-extension TrackerCD: Identible {
+extension TrackerObject {
     convenience init(from tracker: Tracker, context: NSManagedObjectContext) {
         self.init(context: context)
         update(with: tracker)
     }
     
     func update(with tracker: Tracker) {
-        self.identifier = tracker.id
+        self.id = tracker.id
         self.name = tracker.name
         self.emoji = tracker.emoji
         self.color = tracker.color
-        self.schedule = tracker.schedule.toNumbersString()
-        self.isAttached = tracker.isAttached
-        self.type = tracker.kind.rawValue
+        self.weekDays = tracker.schedule.toNumbersString()
+        self.isPinned = tracker.isAttached
+        self.kind = tracker.kind
     }
 }

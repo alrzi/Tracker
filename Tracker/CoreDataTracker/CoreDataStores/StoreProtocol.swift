@@ -1,18 +1,14 @@
 import CoreData
 import UIKit
 
-protocol Identible {
-    var identifier: String? { get set }
-}
-
 protocol Store {
-    associatedtype EntityType: NSManagedObject & Identible
+    associatedtype EntityType: NSManagedObject
     
     var context: NSManagedObjectContext { get }
         
     func save()
     func delete(_ entity: EntityType) throws
-    func getObjectBy(id: String) -> [EntityType]?
+    func getObjectBy(id: UUID) -> [EntityType]?
 }
 
 extension Store {
@@ -29,15 +25,15 @@ extension Store {
         save()
     }
 
-    func getObjectBy(id: String) -> [EntityType]? {
+    func getObjectBy(id: UUID) -> [EntityType]? {
         let fetchRequest = EntityType.fetchRequest()
-        fetchRequest.predicate = NSPredicate(format: "identifier == %@", id)
+        fetchRequest.predicate = NSPredicate(format: "id == %@", id as CVarArg)
         return try? context.fetch(fetchRequest) as? [EntityType]
     }
 }
 
-final class Context {
-    static let shared = Context()
+final class ManagedObjectContext {
+    static let shared = ManagedObjectContext()
 
     var context: NSManagedObjectContext {
         persistentContainer.viewContext

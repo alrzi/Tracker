@@ -1,8 +1,8 @@
-enum WeekDay: Int, CaseIterable {
+@objc public enum WeekDay: Int64, CaseIterable {
     case monday, tuesday, wednesday, thursday, friday, saturday, sunday
     
     // create set of ints 0..<7
-    static let allDaysOfWeek = Set(WeekDay.allCases.map { $0.rawValue })
+    static let allDaysOfWeek = Set(WeekDay.allCases.map { Int($0.rawValue) })
     
     static var count: Int {
         allDaysOfWeek.count
@@ -34,7 +34,7 @@ enum WeekDay: Int, CaseIterable {
 }
 
 extension WeekDay: Comparable {
-    static func < (lhs: WeekDay, rhs: WeekDay) -> Bool {
+    public static func < (lhs: WeekDay, rhs: WeekDay) -> Bool {
         lhs.rawValue < rhs.rawValue
     }
 }
@@ -46,7 +46,7 @@ extension Set<Int> {
         } else {
             let weekDay = WeekDay
                 .allCases // take all cases  from Mon to Sun
-                .filter { self.contains($0.rawValue) } // check if set has any of weekDays
+                .filter { self.contains(Int($0.rawValue)) } // check if set has any of weekDays
                 .map { $0.abbreviationShort } // map(transform) to string
                 .joined(separator: ", ") // joing with coma
             return weekDay

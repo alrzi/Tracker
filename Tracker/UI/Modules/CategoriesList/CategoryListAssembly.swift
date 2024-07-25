@@ -8,18 +8,29 @@
 import UIKit
 
 final class CategoryListAssembly: ViewControllerAssembly {
-    typealias Context =  LifecycleManagingContext<(), Never, ()>
+    typealias Output = CategoriesListViewModel.Output
+    typealias Context =  LifecycleManagingContext<Output, CategoriesListViewModelError, ()>
     
-    private let categoryStore: TrackerCategoryStore
+    private let categoryRepository: CategoryRepository
     
-    init(categoryStore: TrackerCategoryStore) {
-        self.categoryStore = categoryStore
+    init(categoryRepository: CategoryRepository) {
+        self.categoryRepository = categoryRepository
     }
     
     func assemble(_ context: Context) -> UIViewController {
         let presentationContext = NavigationPresentationContext()
         
-        let viewModel = CategoriesListViewModel(categoryStore: categoryStore)
+        let viewModel = CategoriesListViewModel(
+            categoryRepository: categoryRepository,
+            onAction: {
+                context.resultObserver.send($0)
+            },
+            onCategorySelected: {
+                context.resultObserver.send(completion: .failure(.onCategorySelected($0)))
+                context.closingContext.close()
+            }
+        )
+        
         let viewController = CategoriesListViewController(viewModel: viewModel)
         
         return viewController

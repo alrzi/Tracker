@@ -13,6 +13,7 @@ final class SplashViewController: UIViewController {
     // MARK: - Init
     init(viewModel: SplashViewModel) {
         self.viewModel = viewModel
+        
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -23,11 +24,13 @@ final class SplashViewController: UIViewController {
     // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
+        
         setLayout()
     }
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
+        
         start()
     }
     

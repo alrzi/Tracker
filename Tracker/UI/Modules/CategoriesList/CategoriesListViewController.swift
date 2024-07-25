@@ -2,10 +2,9 @@ import UIKit
 import Combine
 
 final class CategoriesListViewController: FrameViewController {
-    // MARK: - Private properties
     private let placeholder = PlaceholderView(state: .recomendation)
     
-    private let tableView: UITableView = {
+    private lazy var tableView: UITableView = {
         let view = UITableView(frame: .zero, style: .insetGrouped)
         view.contentInset.top = UIConstants.topInset
         view.separatorInset.left = 16
@@ -14,8 +13,20 @@ final class CategoriesListViewController: FrameViewController {
         view.backgroundColor = .clear
         view.showsVerticalScrollIndicator = false
         view.register(cellClass: CategoryTableViewCell.self)
+        view.delegate = self
         return view
     }()
+    
+    private lazy var dataSource: UITableViewDiffableDataSource<Int, CategoryViewModel> = {
+        .init(tableView: tableView) { tableView, indexPath, categoryViewModel in
+            let cell: CategoryTableViewCell = tableView.dequeueReusableCell(for: indexPath)
+            cell.viewModel = categoryViewModel
+            cell.interactionDelegate = self
+            return cell
+        }
+    }()
+    
+    private lazy var alertPresenter = AlertPresenter(presentingViewController: self)
     
     // MARK: UIConstants
     private enum UIConstants {
@@ -24,32 +35,22 @@ final class CategoriesListViewController: FrameViewController {
     }
     
     // MARK: - Dependencies
-    private var dataSource: UITableViewDiffableDataSource<Int, CategoryViewModel>?
-    private var viewModel: CategoriesListViewModel
+    
+    private let viewModel: CategoriesListViewModel
     private var cancellables = Set<AnyCancellable>()
-    lazy var alertPresenter = AlertPresenter(presentingViewController: self)
     
-    func bind() {
-        viewModel.$categories
-            .dropFirst()
-            .sink { [weak self] categories in
-                guard let self = self else { return }
-                self.handleCategories(categories)
-                self.setPlaceholder(for: categories)
-            }
-            .store(in: &cancellables)
-    }
-    
+       
     // MARK: - Init
+    
     init(viewModel: CategoriesListViewModel) {
         self.viewModel = viewModel
+        
         super.init(
             title: Strings.Localizable.Category.category,
             buttonCenter: ActionButton(
                 colorType: .black,
                 title: Strings.Localizable.Category.addNew)
         )
-        bind()
     }
     
     required init?(coder: NSCoder) {
@@ -60,20 +61,30 @@ final class CategoriesListViewController: FrameViewController {
         super.viewDidLoad()
         setupUI()
         setupLayout()
-        setDataSource()
+        
+        bind(viewModel: viewModel)
         viewModel.getAllCategories()
     }
     
-    // MARK: - Private @objc target action methods
+    func bind(viewModel: CategoriesListViewModel) {
+        viewModel.$categoryViewModels
+            .dropFirst()
+            .sink { [weak self] categories in
+                guard let self = self else { return }
+                self.handleCategories(categories)
+                self.setPlaceholder(for: categories)
+            }
+            .store(in: &cancellables)
+    }
+    
     override internal func handleButtonCenterTap() {
-        pushCreateNewCategoryVC(indexPath: nil)
+        viewModel.onPrimary()
     }
 }
 
 // MARK: - Private Methods
 private extension CategoriesListViewController {
     func setupUI() {
-        tableView.delegate = self
         container.addSubviews(tableView, placeholder)
     }
     
@@ -98,32 +109,11 @@ private extension CategoriesListViewController {
         }
     }
     
-    func setDataSource() {
-        dataSource = UITableViewDiffableDataSource(tableView: tableView) { tableView, indexPath, categoryViewModel in
-            let cell: CategoryTableViewCell = tableView.dequeueReusableCell(for: indexPath)
-            cell.viewModel = categoryViewModel
-            cell.interactionDelegate = self
-            return cell
-        }
-    }
-    
     func handleCategories(_ categories: [CategoryViewModel]) {
         var snapshot = NSDiffableDataSourceSnapshot<Int, CategoryViewModel>()
         snapshot.appendSections([.zero])
         snapshot.appendItems(categories)
-        dataSource?.apply(snapshot, animatingDifferences: true)
-    }
-    
-    func pushCreateNewCategoryVC(indexPath: IndexPath?) {
-        let selectedCategory: CategoryViewModel?
-        if let indexPath = indexPath {
-            selectedCategory = viewModel.getCategoryAt(indexPath: indexPath)
-        } else {
-            selectedCategory = nil
-        }
-//        let viewModel = CreateNewCategoryViewModel(trackerCategory: selectedCategory, delegate: viewModel)
-//        let createNewCategoryVC = CreateNewCategoryViewController(viewModel: viewModel)
-//        present(createNewCategoryVC, animated: true)
+        dataSource.apply(snapshot, animatingDifferences: true)
     }
 }
 
@@ -135,7 +125,6 @@ extension CategoriesListViewController: UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         viewModel.categorySelected(at: indexPath)
-        dismiss(animated: true)
     }
     
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
@@ -156,8 +145,12 @@ extension CategoriesListViewController: UITableViewDelegate {
 }
 
 extension CategoriesListViewController: UIContextMenuInteractionDelegate {
-    func contextMenuInteraction(_ interaction: UIContextMenuInteraction, configurationForMenuAtLocation location: CGPoint) -> UIContextMenuConfiguration? {
-        guard let location = interaction.view?.convert(location, to: tableView),
+    func contextMenuInteraction(
+        _ interaction: UIContextMenuInteraction,
+        configurationForMenuAtLocation location: CGPoint
+    ) -> UIContextMenuConfiguration? {
+        guard 
+            let location = interaction.view?.convert(location, to: tableView),
             let indexPath = tableView.indexPathForRow(at: location)
         else {
             return UIContextMenuConfiguration()
@@ -169,7 +162,7 @@ extension CategoriesListViewController: UIContextMenuInteractionDelegate {
 
         let updateAction = UIAction(title: Strings.Localizable.Context.update) { [weak self] _ in
             guard let self = self else { return }
-            pushCreateNewCategoryVC(indexPath: indexPath)
+            self.viewModel.onUpdateCategory(at: indexPath)
         }
         
         let deleteAction = UIAction(title: Strings.Localizable.Context.delete, attributes: .destructive) { [weak self] _ in
@@ -182,12 +175,18 @@ extension CategoriesListViewController: UIContextMenuInteractionDelegate {
         let menu = UIMenu(title: "", children: [updateAction, deleteAction])
         
         return UIContextMenuConfiguration(
-            identifier: nil, previewProvider: nil) { _ in
+            identifier: nil,
+            previewProvider: nil
+        ) { _ in
                 return menu
         }
     }
 
-    func contextMenuInteraction(_ interaction: UIContextMenuInteraction, willEndFor configuration: UIContextMenuConfiguration, animator: UIContextMenuInteractionAnimating?) {
+    func contextMenuInteraction(
+        _ interaction: UIContextMenuInteraction,
+        willEndFor configuration: UIContextMenuConfiguration,
+        animator: UIContextMenuInteractionAnimating?
+    ) {
         UIView.animate(withDuration: 0.3) {
             self.tableView.separatorColor = Asset.Colors.myGray.color
         }

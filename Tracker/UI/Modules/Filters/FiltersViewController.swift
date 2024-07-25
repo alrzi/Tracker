@@ -91,7 +91,6 @@ private extension FiltersViewController {
 extension FiltersViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         onFilterSelected(TrackerFilters.allCases[indexPath.row])
-        dismiss(animated: true)
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {

@@ -14,9 +14,19 @@ struct CategoryFlowCoordinator: ReactiveFlowCoordinator {
         self.router = router
     }
     
-    func makeFlow() -> AnyPublisher<(), Never> {
+    func makeFlow() -> AnyPublisher<(), CategoriesListViewModelError> {
         router.showCategoryList()
-            .flatMap { _ in router.showCreateCategory() }
+            .flatMap { router.showCreateCategory(mode: $0.toMode()) }
+            .handleEvents(receiveOutput: { _ in router.goBackTwoScreen() })
             .eraseToAnyPublisher()
+    }
+}
+
+private extension CategoryListAssembly.Output {
+    func toMode() -> CreateNewCategoryViewModel.Mode {
+        switch self {
+        case .onUpdateCategory(let id): .update(id)
+        case .onPrimary: .create
+        }
     }
 }

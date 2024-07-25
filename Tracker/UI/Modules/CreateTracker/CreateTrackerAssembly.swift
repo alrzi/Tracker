@@ -8,49 +8,45 @@
 import UIKit
 
 final class CreateTrackerAssembly: ViewControllerAssembly {
-    typealias Context =  LifecycleManagingContext<CreateTrackerViewModelImpl.Destination, Never, ()>
+    typealias Context = LifecycleManagingContext<CreateTrackerViewModelImpl.Action, Never, ()>
     
-    private let trackerManager: any TrackerManagerProtocol
+    private let trackerManager: any TrackerManaging
+    private let userInputCollector: UserInputCollector
     
     private let categoryFlowCoordinatorAssembly: CategoryFlowCoordinatorAssembly
     private let chooseScheduleAssembly: ChooseScheduleAssembly
     
     init(
-        trackerManager: any TrackerManagerProtocol,
+        trackerManager: any TrackerManaging,
+        userInputCollector: UserInputCollector,
         categoryFlowCoordinatorAssembly: CategoryFlowCoordinatorAssembly,
         chooseScheduleAssembly: ChooseScheduleAssembly
     ) {
         self.trackerManager = trackerManager
+        self.userInputCollector = userInputCollector
         self.categoryFlowCoordinatorAssembly = categoryFlowCoordinatorAssembly
         self.chooseScheduleAssembly = chooseScheduleAssembly
     }
     
-    func assemble(_ context: Context) -> UIViewController {
-        let presentationContext = NavigationPresentationContext()
-        
-        let router = CreateTrackerViewRouter(
-            categoryFlowCoordinatorAssembly: categoryFlowCoordinatorAssembly,
-            chooseScheduleAssembly: chooseScheduleAssembly,
-            presentationContext: presentationContext
-        )                
+    func assemble(_ context: Context) -> UIViewController {        
+//        let router = CreateTrackerViewRouter(
+//            categoryFlowCoordinatorAssembly: categoryFlowCoordinatorAssembly,
+//            chooseScheduleAssembly: chooseScheduleAssembly,
+//            presentationContext: presentationContext
+//        )
         
         let viewModel = CreateTrackerViewModelImpl(
-            trackerKind: .habit,
-            tracker: nil,
-            date: "ds",
+            userInputCollector: userInputCollector,
             trackerManager: trackerManager,
-            resultObserver: context.resultObserver,
-            router: router
+            resultObserver: context.resultObserver, 
+            mode: .create(.habit)
+//            router: router
         )
         
-        let viewController = CreateTrackerViewController(viewModel: viewModel)             
+        let viewController = CreateTrackerViewController(viewModel: viewModel)
         
-        if let navigationController = UIApplication.topMostViewController()?.navigationController {
-            presentationContext.navigationController = navigationController
-        } else {
-            assertionFailure()
-        }
+        let navigationController = UINavigationController(rootViewController: viewController)
         
-        return viewController
+        return navigationController
     }
 }

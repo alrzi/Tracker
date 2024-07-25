@@ -1,15 +1,7 @@
 import UIKit
 
-protocol ChooseScheduleViewControllerDelegate: AnyObject {
-    var weekDaysToShow: ((Set<Int>) -> Void)? { get }
-}
-
 final class ChooseScheduleViewController: FrameViewController {
-    // MARK: - Call Back
-    var weekDaysToShow: ((Set<Int>) -> Void)?
-    
-    // MARK: - Private properties        
-    private let tableView: UITableView = {
+    private lazy var tableView: UITableView = {
         let view = UITableView()
         view.contentInset.top = UIConstants.topInset
         view.separatorColor = Asset.Colors.myGray.color
@@ -18,21 +10,27 @@ final class ChooseScheduleViewController: FrameViewController {
         view.separatorStyle = .singleLine
         view.showsVerticalScrollIndicator = false
         view.register(cellClass: ScheduleTableViewCell.self)
+        view.delegate = self
+        view.dataSource = self
         return view
     }()
-    
-    // MARK: UIConstants
+        
     private enum UIConstants {
         static let topInset: CGFloat = 24
         static let bottomInsetInset: CGFloat = -16
         static let cellHeight: CGFloat = 75
     }
     
-    // MARK: - DataToChangeStatesOfSwitchesAndGiveTextToLabels
+    private let weekDaysToShow: (Set<Int>) -> Void
     private var selectedWeekDays: Set<Int> = []
     
-    init(weekDays: Set<Int>) {
+    init(
+        weekDays: Set<Int>,
+        weekDaysToShow: @escaping (Set<Int>) -> Void
+    ) {
         self.selectedWeekDays = weekDays
+        self.weekDaysToShow = weekDaysToShow
+        
         super.init(
             title: Strings.Localizable.schedule,
             buttonCenter: ActionButton(colorType: .black, title: Strings.Localizable.Schedule.ready)
@@ -52,19 +50,13 @@ final class ChooseScheduleViewController: FrameViewController {
     
     // MARK: - Private @objc target action methods
     override func handleButtonCenterTap() {
-        weekDaysToShow?(selectedWeekDays)
-        dismiss(animated: true)
+        weekDaysToShow(selectedWeekDays)
     }
 }
 
 // MARK: - Private Methods
 private extension ChooseScheduleViewController {
     func setupUI() {
-        // Table in container:
-        tableView.delegate = self
-        tableView.dataSource = self
-        
-        // Add all to container and constraint to it
         container.addSubviews(tableView)
     }
     

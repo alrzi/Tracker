@@ -1,50 +1,70 @@
 import CoreData
 import Combine
 
-protocol CategoriesListViewModelProtocol {
-    var categories: [CategoryViewModel] { get }
-    func getAllCategories()
-    func categorySelected(at indexPath: IndexPath)
-    func deleteCategoryAt(indexPath: IndexPath)
-    func getCategoryAt(indexPath: IndexPath) -> CategoryViewModel
-}
-
-extension CategoriesListViewModel: CreateNewCategoryViewModelDelegate {
-    func categoryUpdatedOrCreated() {
-        getAllCategories()
-    }
-}
-
 final class CategoriesListViewModel: ObservableObject {
-    private let categoryStore: TrackerCategoryListProtocol
+    private let categoryRepository: CategoryRepository
     
-    var categoryHeader: ((String) -> Void)?
+    let onAction: (Output) -> ()
+    let onCategorySelected: (TrackerCategory) -> ()
     
-    @Published var categories: [CategoryViewModel] = []
+    @Published private(set) var categoryViewModels: [CategoryViewModel] = []
     
-    init(categoryStore: TrackerCategoryStore) {
-        self.categoryStore = categoryStore
+    init(
+        categoryRepository: CategoryRepository,
+        onAction: @escaping (Output) -> (),
+        onCategorySelected: @escaping (TrackerCategory) -> ()
+    ) {
+        self.categoryRepository = categoryRepository
+        self.onAction = onAction
+        self.onCategorySelected = onCategorySelected
     }
 }
 
-extension CategoriesListViewModel: CategoriesListViewModelProtocol {
+extension CategoriesListViewModel {
     func getAllCategories() {
-        let categories = categoryStore.getAllCategories().filter({ $0.header != Strings.Localizable.Main.pinned })
-        self.categories = categories.map { CategoryViewModel(trackerCategory: $0) }
+        let categories = categoryRepository.getAllCategories()
+        
+        categoryViewModels = categories.map(CategoryViewModel.init)
     }
     
     func categorySelected(at indexPath: IndexPath) {
-        let categoryName = categories[indexPath.row].header
-        categoryHeader?(categoryName)       
+        let selectedCategory = categoryViewModels[indexPath.row]
+                
+        onCategorySelected(selectedCategory.trackerCategory)
+    }
+    
+    func onUpdateCategory(at indexPath: IndexPath) {
+        let category = categoryViewModels[indexPath.row]
+        
+        onAction(.onUpdateCategory(category.id))
     }
     
     func deleteCategoryAt(indexPath: IndexPath) {
-        let header = categories[indexPath.row].header
-        categoryStore.removeCategoryWith(name: header)
+        let category = categoryViewModels[indexPath.row]
+        
+        do {
+            try categoryRepository.deleteCategory(with: category.id)
+        }
+        catch {
+            debugPrint("Can not deleteCategory")
+            preconditionFailure()
+        }
+        
         getAllCategories()
     }
     
     func getCategoryAt(indexPath: IndexPath) -> CategoryViewModel {
-        categories[indexPath.row]
+        categoryViewModels[indexPath.row]
+    }
+    
+    func onPrimary() {
+        onAction(.onPrimary)
+    }
+}
+
+extension CategoriesListViewModel {
+    enum Output {
+        case onUpdateCategory(UUID)
+        case onPrimary
     }
 }

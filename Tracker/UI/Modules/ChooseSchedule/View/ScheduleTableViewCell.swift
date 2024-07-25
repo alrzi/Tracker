@@ -10,8 +10,10 @@ final class ScheduleTableViewCell: UITableViewCell {
     func configure(with indexPath: IndexPath, for set: Set<Int>) {
         // set tag same as indexPath
         weakDaySwitch.tag = indexPath.row
+        
         // set static text
         weakDayLabel.text = WeekDay(rawValue: Int64(indexPath.row))?.abbreviationLong
+        
         // set switch to on or off position
         weakDaySwitch.isOn = set.contains(indexPath.row)
     }
@@ -20,33 +22,35 @@ final class ScheduleTableViewCell: UITableViewCell {
     weak var delegate: ScheduleTableViewCellDelegate?
     
     // MARK: - Private properties
-    private let weakDayLabel: UILabel = {
+    private lazy var weakDayLabel: UILabel = {
         let view = UILabel()
         view.textColor = Asset.Colors.myBlack.color
         view.font = .regular17
         return view
     }()
     
-    private let weakDaySwitch: UISwitch = {
+    private lazy var weakDaySwitch: UISwitch = {
         let weakDaySwitch = UISwitch()
         weakDaySwitch.onTintColor = Asset.Colors.myBlue.color
         weakDaySwitch.backgroundColor = Asset.Colors.myLightGrey.color
         weakDaySwitch.layer.cornerRadius = .cornerRadius
         weakDaySwitch.layer.masksToBounds = true
+        weakDaySwitch.addTarget(self, action: #selector(handleWeakDaySwitch), for: .touchUpInside)
         return weakDaySwitch
     }()
     
-    private let stackView: UIStackView = {
+    private lazy var stackView: UIStackView = {
         let view = UIStackView()
         view.alignment = .center
         view.distribution = .fill
         return view
     }()
-    
-    
+        
     // MARK: - Init
+    
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
+        
         setupUI()
     }
     
@@ -55,6 +59,7 @@ final class ScheduleTableViewCell: UITableViewCell {
     }
     
     // MARK: - Private @objc target action methods
+    
     @objc private func handleWeakDaySwitch(_ sender: UISwitch) {
         if sender.isOn {
             delegate?.weekDaySelected(weakDaySwitch.tag)
@@ -65,9 +70,9 @@ final class ScheduleTableViewCell: UITableViewCell {
 }
 
 // MARK: - Private methods
+
 private extension ScheduleTableViewCell {
     func setupUI() {
-        weakDaySwitch.addTarget(self, action: #selector(handleWeakDaySwitch), for: .touchUpInside)
         stackView.addSubviews(weakDayLabel, weakDaySwitch)
         contentView.addSubviews(stackView)
         contentView.backgroundColor = Asset.Colors.myBackground.color

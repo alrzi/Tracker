@@ -1,79 +1,87 @@
 import Foundation
 import Combine
 
-protocol CreateNewCategoryViewModelDelegate: AnyObject {
-    func categoryUpdatedOrCreated()
-}
-
-protocol CreateNewCategoryViewModelProtocol {
-    func createButtonTapped()
-    func categoryNameDidEnted(name: String)
-}
-
 final class CreateNewCategoryViewModel {
-    // MARK: - Public
-    weak var delegate: CreateNewCategoryViewModelDelegate?
-    @Published var categoryNameStatus: CategoryNameStatus = .empty
-    @Published var trackerCategory: CategoryViewModel?
+    private let categoryRepository: CategoryRepository
     
-    var canCreateCategory: Bool {
-        name != nil
-    }
+    private let onCreateCategory: () -> Void
+    private let onDeinit: () -> Void
     
-    enum CategoryNameStatus {
-        case empty
-        case available
-        case unavailable
-    }
+    private let mode: Mode
     
-    // MARK: - Private
-    private var name: String?
-    
-    // MARK: - Dependencies
-    private var categoryStore: TrackerCategoryListProtocol?
-    
-    // MARK: - Init
+    @Published private(set) var categoryNameStatus: CategoryNameStatus = .empty
+    @Published private(set) var canCreate = false
+ 
     init(
-        trackerCategory: CategoryViewModel? = nil,
-        delegate: CreateNewCategoryViewModelDelegate? = nil,
-        categoryStore: TrackerCategoryStore
+        categoryRepository: CategoryRepository,
+        mode: Mode,
+        onCreateCategory: @escaping () -> Void,
+        onDeinit: @escaping () -> Void
     ) {
-        self.delegate = delegate
-        self.trackerCategory = trackerCategory
-        self.categoryStore = categoryStore
+        self.categoryRepository = categoryRepository
+        self.mode = mode
+        self.onCreateCategory = onCreateCategory
+        self.onDeinit = onDeinit
+    }
+    
+    deinit {
+        onDeinit()
     }
 }
 
 extension CreateNewCategoryViewModel {
     func createButtonTapped() {
-        guard let name = name else { return }
-        guard let trackerCategory = trackerCategory else {
-            categoryStore?.addCategory(name: name)
-            delegate?.categoryUpdatedOrCreated()
-            return
+        if case .available(let name) = categoryNameStatus {
+            switch mode {
+            case .create:
+                categoryRepository.createCategory(.init(header: name, trackers: []))
+                
+            case .update(let id):
+                do {
+                    try categoryRepository.updateCategory(.init(id: id, header: name, trackers: []))
+                }
+                catch {
+                    preconditionFailure()
+                }
+            }
+            
+            onCreateCategory()
         }
-        
-        categoryStore?.update(category: trackerCategory.trackerCategory, withNewName: name)
-        delegate?.categoryUpdatedOrCreated()
+        else {
+            canCreate = false
+        }
     }
     
-    func categoryNameDidEnted(name: String) {
-        guard !name.isEmpty else {
-            self.name = nil
+    func categoryNameDidEntered(name: String) {
+        if name.isEmpty {
             categoryNameStatus = .empty
-            return
         }
-        if name != Strings.Localizable.Main.pinned && isNameAvailable(name: name) ?? false {
-            self.name = name
-            categoryNameStatus = .available
-        } else {
-            self.name = name
+        else if name.count > 4 {
+            categoryNameStatus = .available(name)
+        }
+        else {
             categoryNameStatus = .unavailable
         }
     }
+}
+
+extension CreateNewCategoryViewModel {
+    enum Mode {
+        case create
+        case update(UUID)
+    }
     
-    // Private
-    private func isNameAvailable(name: String) -> Bool? {
-        return try? categoryStore?.isNameAvailable(name: name)
+    enum CategoryNameStatus {
+        case empty
+        case available(String)
+        case preInstalled(String)
+        case unavailable
+                
+        var preinstalled: String? {
+            switch self {
+            case .empty, .unavailable, .available: nil
+            case .preInstalled(let name): name
+            }
+        }
     }
 }

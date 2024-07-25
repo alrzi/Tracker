@@ -11,7 +11,7 @@ import CoreData
 public class RecordObject: NSManagedObject, Entity {
     static public let entityName = String(describing: RecordObject.self)
     
-    @NSManaged public var date: Date
     @NSManaged public var id: UUID
+    @NSManaged public var date: Date
     @NSManaged public var tracker: TrackerObject?
 }

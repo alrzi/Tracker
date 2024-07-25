@@ -38,8 +38,7 @@ final class TrackersViewRouter {
     }
     
     func showTrackerCreationFlow() -> AnyPublisher<(), Never> {
-        trackerCreationFlowCoordinatorAssembly
-            .assemble(presentationContext: presentationContext)
+        trackerCreationFlowCoordinatorAssembly.assemble(presentationContext: presentationContext)
     }
     
     func showFiltersAssembly(filter: TrackerFilters) -> AnyPublisher<TrackerFilters, Never> {

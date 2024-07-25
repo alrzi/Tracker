@@ -100,7 +100,8 @@ extension PredicateBuilder: TrackerCategoryPredicateBuilderProtocol {
         NSPredicate(
             format: "%K == %@",
             #keyPath(CategoryObject.title),
-            name)
+            name
+        )
     }
 }
 

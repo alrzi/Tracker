@@ -13,7 +13,10 @@ final class FiltersAssembly: ViewControllerAssembly {
     func assemble(_ context: Context) -> UIViewController {
         FiltersViewController(
             filter: context.configuration,
-            onFilterSelected: { context.resultObserver.send($0) }
+            onFilterSelected: {
+                context.resultObserver.send($0)
+                context.closingContext.close()
+            }
         )
     }
 }

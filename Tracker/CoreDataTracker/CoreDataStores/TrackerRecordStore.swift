@@ -2,7 +2,7 @@ import CoreData
 
 protocol TrackerRecordStoreProtocol {
     func getTrackedDaysNumberFor(trackerWithId id: UUID?) throws -> Int
-    func isCompletedFor(_ selectedDay: String, trackerWithId id: UUID?) throws -> Bool
+    func isCompletedFor(_ selectedDay: String, trackerWithId id: UUID?) -> Bool
     func removeOrAddRecordOf(tracker: TrackerObject, forParticularDay day: String) throws
     func getNumberOfCompletedTrackers() -> Int
     func getAllRecords() -> [RecordObject]?
@@ -41,13 +41,19 @@ extension TrackerRecordStore: TrackerRecordStoreProtocol {
         return trackerRecordsCoreData?.count ?? .zero
     }
     
-    func isCompletedFor(_ selectedDay: String, trackerWithId id: UUID?) throws -> Bool {
+    func isCompletedFor(_ selectedDay: String, trackerWithId id: UUID?) -> Bool {
         guard let id = id else { return false }
         let fetchRequest = RecordObject.fetchRequest()
         let predicate = predicateBuilder.buildPredicateIsCompletedFor(selectedDate: selectedDay, trackerWithId: id)
         fetchRequest.predicate = predicate
-        let trackerRecordsCoreData = try context.fetch(fetchRequest)
-        return trackerRecordsCoreData.first != nil ? true : false
+        
+        do {
+            let trackerRecordsCoreData = try context.fetch(fetchRequest)
+            return trackerRecordsCoreData.first != nil ? true : false
+        }
+        catch {
+            return false
+        }
     }
     
     func removeOrAddRecordOf(tracker: TrackerObject, forParticularDay day: String) throws {
@@ -65,6 +71,7 @@ extension TrackerRecordStore: TrackerRecordStoreProtocol {
             trackerRecord.date = .now
             trackerRecord.tracker = tracker
         }
+        
         save()
     }
 

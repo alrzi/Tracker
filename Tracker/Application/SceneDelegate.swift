@@ -10,7 +10,11 @@ import UIKit
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     var window: UIWindow?
 
-    func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
+    func scene(
+        _ scene: UIScene,
+        willConnectTo session: UISceneSession,
+        options connectionOptions: UIScene.ConnectionOptions
+    ) {
         guard let windowScene = (scene as? UIWindowScene) else {
             return
         }
@@ -19,29 +23,47 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         
         // MARK: - Servises
         
-        let context = ManagedObjectContext.shared.context
+        let persistencyService = PersistencyService()
+                
+        let trackerStore = TrackerStore(context: persistencyService.managedObjectContext)
+        let trackerRecordStore = TrackerRecordStore(context: persistencyService.managedObjectContext)
         
-        let categoryStore = TrackerCategoryStore(context: context)
-        let trackerStore = TrackerStore(context: context)
-        let trackerRecordStore = TrackerRecordStore(context: context)
+        let trackerRepository = TrackerRepository(
+            persistencyService: persistencyService,
+            predicateBuilder: .init()
+        )
         
-        let trackerManager = TrackerManagerImpl(
-            trackerCategoryStore: categoryStore,
+        let trackerManager = TrackerManager(trackerRepository: trackerRepository)
+        
+        let dataProvider = DataProvider(
+            context: persistencyService.managedObjectContext,
             trackerStore: trackerStore,
             trackerRecordStore: trackerRecordStore
         )
         
-        let dataProvider = DataProvider(context: context)
-        
         let authService = AuthService()
         let analyticsService = AnalyticsService()
         
+        let categoryRepository = CategoryRepository(
+            persistencyService: persistencyService,
+            predicateBuilder: .init()
+        )
+        
+        let userInputCollector: UserInputCollector = .init()
+        
         // MARK: - Assembly
+        
+        let statistic = StatisticViewController(
+            viewModel: .init(
+                trackerRecordStore: <#T##any TrackerRecordStoreProtocol#>,
+                trackerStore: <#T##any TrackerStoreDataProviderProtocol#>
+            )
+        )
         
         let filtersAssembly = FiltersAssembly()
         let chooseScheduleAssembly = ChooseScheduleAssembly()
-        let createNewCategoryAssembly = CreateNewCategoryAssembly(categoryStore: categoryStore)
-        let categoryListAssembly = CategoryListAssembly(categoryStore: categoryStore)
+        let createNewCategoryAssembly = CreateNewCategoryAssembly(categoryRepository: categoryRepository)
+        let categoryListAssembly = CategoryListAssembly(categoryRepository: categoryRepository)
         
         let categoryFlowCoordinatorAssembly = CategoryFlowCoordinatorAssembly(
             categoryListAssembly: categoryListAssembly,
@@ -49,7 +71,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         )
         
         let createTrackerAssembly = CreateTrackerAssembly(
-            trackerManager: trackerManager,
+            trackerManager: trackerManager, 
+            userInputCollector: userInputCollector,
             categoryFlowCoordinatorAssembly: categoryFlowCoordinatorAssembly,
             chooseScheduleAssembly: chooseScheduleAssembly
         )
@@ -59,6 +82,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         )
                       
         let trackerCreationFlowCoordinatorAssembly = TrackerCreationFlowCoordinatorAssembly(
+            userInputCollector: userInputCollector, 
             chooseTrackerAssembly: chooseTrackerAssembly,
             createTrackerAssembly: createTrackerAssembly,
             chooseScheduleAssembly: chooseScheduleAssembly,
@@ -67,7 +91,9 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         
         let trackersAssembly = TrackersAssembly(
             analyticsService: analyticsService,
-            dataProvider: dataProvider,
+            dataProvider: dataProvider, 
+            trackerRepository: trackerRepository, 
+            categoryRepository: categoryRepository,
             trackerCreationFlowCoordinatorAssembly: trackerCreationFlowCoordinatorAssembly,
             createTrackerAssembly: createTrackerAssembly,
             filtersAssembly: filtersAssembly

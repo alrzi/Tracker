@@ -8,21 +8,20 @@
 import UIKit
 
 final class CreateNewCategoryAssembly: ViewControllerAssembly {
-    typealias Context =  LifecycleManagingContext<(), Never, ()>
+    typealias Context =  LifecycleManagingContext<(), Never, CreateNewCategoryViewModel.Mode>
     
-    private let categoryStore: TrackerCategoryStore
+    private let categoryRepository: CategoryRepository
     
-    init(categoryStore: TrackerCategoryStore) {
-        self.categoryStore = categoryStore
+    init(categoryRepository: CategoryRepository) {
+        self.categoryRepository = categoryRepository
     }
     
     func assemble(_ context: Context) -> UIViewController {
-        let presentationContext = NavigationPresentationContext()
-               
         let viewModel = CreateNewCategoryViewModel(
-            trackerCategory: nil,
-            delegate: nil,
-            categoryStore: categoryStore
+            categoryRepository: categoryRepository,
+            mode: context.configuration,
+            onCreateCategory: { context.closingContext.close() },
+            onDeinit: { context.resultObserver.send(completion: .finished) }
         )
         
         let viewController = CreateNewCategoryViewController(viewModel: viewModel)

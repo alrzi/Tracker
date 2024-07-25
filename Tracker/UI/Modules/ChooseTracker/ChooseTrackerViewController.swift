@@ -1,8 +1,7 @@
 import UIKit
 
 final class ChooseTrackerViewController: UIViewController {
-    // MARK: Private properties
-    private let nameOfScreenLabel: UILabel = {
+    private lazy var nameOfScreenLabel: UILabel = {
         let label = UILabel()
         label.text = Strings.Localizable.Choosing.tracker
         label.font = .medium16
@@ -10,20 +9,30 @@ final class ChooseTrackerViewController: UIViewController {
         return label
     }()
     
-    private let stackView: UIStackView = {
+    private lazy var stackView: UIStackView = {
         let view = UIStackView()
         view.axis = .vertical
         view.spacing = UIConstants.stackViewSpacing
         return view
     }()
     
-    let habitButton = ActionButton(
-        colorType: .black,
-        title: Strings.Localizable.Choosing.trackerType1)
+    private lazy var habitButton: ActionButton = {
+        let habitButton = ActionButton(
+            colorType: .black,
+            title: Strings.Localizable.Choosing.trackerType1
+        )
+        habitButton.addTarget(self, action: #selector(habitButtonTaped), for: .touchUpInside)
+        return habitButton
+    }()
     
-    let irregularEventButton = ActionButton(
-        colorType: .black,
-        title: Strings.Localizable.Choosing.trackerType2)
+    private lazy var irregularEventButton: ActionButton = {
+        let irregularEventButton = ActionButton(
+            colorType: .black,
+            title: Strings.Localizable.Choosing.trackerType2
+        )
+        irregularEventButton.addTarget(self, action: #selector(irregularEventButtonTapped), for: .touchUpInside)
+        return irregularEventButton
+    }()
     
     // MARK: UIConstants
     private enum UIConstants {
@@ -35,14 +44,13 @@ final class ChooseTrackerViewController: UIViewController {
         static let buttonsHeight: CGFloat = 60
     }
     
-    var initialInteractivePopGestureRecognizerDelegate: UIGestureRecognizerDelegate?
+    private var initialInteractivePopGestureRecognizerDelegate: UIGestureRecognizerDelegate?
     
     private let viewModel: ChooseTrackerViewModel
     
-    init(
-        viewModel: ChooseTrackerViewModel
-    ) {
+    init(viewModel: ChooseTrackerViewModel) {
         self.viewModel = viewModel
+        
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -53,34 +61,24 @@ final class ChooseTrackerViewController: UIViewController {
     // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
+        
         setupUI()
         setupLayout()
     }
-    
-    // MARK: - Private @objc target action methods
+        
     @objc private func habitButtonTaped() {
-        pushCreateTrackerViewController(kind: .habit)
+        viewModel.onCreateTracker(of: .habit)
     }
     
     @objc private func irregularEventButtonTapped() {
-        pushCreateTrackerViewController(kind: .occasional)
-    }
-    
-    private func pushCreateTrackerViewController(kind: TrackerKind) {
-        viewModel.onCreateTracker()
+        viewModel.onCreateTracker(of: .occasional)
     }
 }
 
 // MARK: - Private methods
+
 private extension ChooseTrackerViewController {
     func setupUI() {
-        // Add targets
-        habitButton.addTarget(
-            self, action: #selector(habitButtonTaped), for: .touchUpInside)
-        irregularEventButton.addTarget(
-            self, action: #selector(irregularEventButtonTapped), for: .touchUpInside)
-        
-        // Add subviews
         stackView.addSubviews(habitButton, irregularEventButton)
         view.addSubviews(nameOfScreenLabel, stackView)
         view.backgroundColor = Asset.Colors.myWhite.color

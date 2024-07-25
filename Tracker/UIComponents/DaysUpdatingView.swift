@@ -7,14 +7,9 @@
 
 import UIKit
 
-protocol DaysUpdatingViewProtocol {
-    var incrementClosure: (() -> Void)? { get }
-    var decrementClosure: (() -> Void)? { get }
-}
-
-final class DaysUpdaitingView: UIView, DaysUpdatingViewProtocol {
-    var incrementClosure: (() -> Void)?
-    var decrementClosure: (() -> Void)?
+final class DaysUpdaitingView: UIView {
+    private let incrementClosure: () -> Void
+    private let decrementClosure: () -> Void
     
     func configure(with viewModel: UpdateTrackedDaysViewModel) {
         daysCountLabel.text = viewModel.trackedDays
@@ -48,8 +43,15 @@ final class DaysUpdaitingView: UIView, DaysUpdatingViewProtocol {
         return view
     }()
     
-    init() {
+    init(
+        incrementClosure: @escaping () -> Void,
+        decrementClosure: @escaping () -> Void
+    ) {
+        self.incrementClosure = incrementClosure
+        self.decrementClosure = decrementClosure
+        
         super.init(frame: .zero)
+        
         setupUI()
         setTargets()
     }
@@ -59,11 +61,11 @@ final class DaysUpdaitingView: UIView, DaysUpdatingViewProtocol {
     }
     
     @objc private func decrementButtonTapped() {
-        decrementClosure?()
+        decrementClosure()
     }
     
     @objc private func incrementButtonTapped() {
-        incrementClosure?()
+        incrementClosure()
     }
 }
 

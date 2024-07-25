@@ -26,14 +26,16 @@ final class CreateTrackerViewRouter {
     func showCategoryFlow() -> AnyPublisher<(), Never> {
         categoryFlowCoordinatorAssembly
             .assemble(presentationContext: presentationContext)
+            .replaceError(with: ())
+            .eraseToAnyPublisher()
     }
     
-    func showChooseSchedule() -> AnyPublisher<(), Never> {
+    func showChooseSchedule() -> AnyPublisher<Set<Int>, Never> {
         let router = NavigationModuleRouter(
             assembly: chooseScheduleAssembly,
             presentationContext: presentationContext
         )
         
-        return router.route()
+        return router.route(configuration: .init())
     }
 }

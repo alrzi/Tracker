@@ -11,27 +11,22 @@ final class ChooseTrackerViewModel {
     private let router: ChooseTrackerRouter
     
     private var cancellable: Set<AnyCancellable> = []
-    private let resultObserver: PassthroughSubject<Destination, Never>
-    
-    private var destination: Destination =  .createTracker
-    
-    enum Destination {
-        case createTracker
-    }
+    private let resultObserver: PassthroughSubject<TrackerKind, Never>
     
     init(
         router: ChooseTrackerRouter,
-        resultObserver: PassthroughSubject<Destination, Never>
+        resultObserver: PassthroughSubject<TrackerKind, Never>
     ) {
         self.router = router        
         self.resultObserver = resultObserver
     }
     
-    func onCreateTracker() {
-        resultObserver.send(destination)
+    func onCreateTracker(of kind: TrackerKind) {
+        resultObserver.send(kind)
     }
     
     deinit {
         print(String(describing: self))
+        resultObserver.send(completion: .finished)
     }
 }

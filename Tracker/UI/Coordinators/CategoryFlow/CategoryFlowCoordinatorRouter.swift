@@ -23,7 +23,7 @@ final class CategoryFlowCoordinatorRouter {
         self.presentationContext = presentationContext
     }
     
-    func showCategoryList() -> AnyPublisher<(), Never> {
+    func showCategoryList() -> AnyPublisher<CategoryListAssembly.Output, CategoriesListViewModelError> {
         let router = NavigationModuleRouter(
             assembly: categoryListAssembly,
             presentationContext: presentationContext
@@ -32,12 +32,23 @@ final class CategoryFlowCoordinatorRouter {
         return router.route()
     }
     
-    func showCreateCategory() -> AnyPublisher<(), Never> {
+    func showCreateCategory(mode: CreateNewCategoryViewModel.Mode) -> AnyPublisher<(), Never> {
         let router = NavigationModuleRouter(
             assembly: createCategory,
             presentationContext: presentationContext
         )
         
-        return router.route()
+        return router.route(configuration: mode)
+    }
+    
+    func goBackTwoScreen() {
+        guard let viewControllers = presentationContext.navigationController?.viewControllers else {
+            return
+        }
+        
+        if viewControllers.count >= 2 {
+            let viewControllersToKeep = Array(viewControllers.prefix(viewControllers.count - 2))
+            presentationContext.navigationController?.setViewControllers(viewControllersToKeep, animated: true)
+        }
     }
 }

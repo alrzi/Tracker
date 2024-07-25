@@ -1,6 +1,6 @@
 import CoreData
 
-public class PersistencyService {
+public final class PersistencyService {
     private let modelName: String = "Tracker"
 
     public init() { }
@@ -26,7 +26,7 @@ public class PersistencyService {
         
         container.persistentStoreDescriptions = [persistentStore]
         
-        container.loadPersistentStores { description, error in
+        container.loadPersistentStores { _, error in
             if let error {
                 fatalError("[Error]: \(error.localizedDescription)")
             }
@@ -35,7 +35,7 @@ public class PersistencyService {
         return container
     }()
 
-    private lazy var managedObjectContext: NSManagedObjectContext = {
+    private(set) lazy var managedObjectContext: NSManagedObjectContext = {
         return persistentContainer.viewContext
     }()
 
@@ -57,7 +57,7 @@ public class PersistencyService {
                 in: .userDomainMask,
                 appropriateFor: nil,
                 create: true
-            ).appendingPathComponent("Hoop.sqlite")
+            ).appendingPathComponent("Tracker.sqlite")
             return fileURL
         } catch {
             fatalError("[Error]: \(error.localizedDescription)")
@@ -65,10 +65,13 @@ public class PersistencyService {
     }()
 }
 
-// MARK: - Methods
+public enum PersistencyServiceError: Error {
+    case notSaved
+}
+
 public extension PersistencyService {
-    func fetchObjects<T: NSManagedObject>(with type: T.Type) -> [T] where T: Entity {
-        let fetchRequest = NSFetchRequest<T>(entityName: T.entityName)
+    func fetchObjects<T: NSManagedObject>(_ type: T.Type) -> [T] where T: Entity {
+        let fetchRequest = NSFetchRequest<T>(entityName: type.entityName)
         
         do {
             let result = try managedObjectContext.fetch(fetchRequest)
@@ -93,7 +96,7 @@ public extension PersistencyService {
     
     
     func fetchObject<T: NSManagedObject>(with fetchRequest: NSFetchRequest<T>) async throws -> [T] {
-        try await managedObjectContext.perform { () -> [T] in
+        try await managedObjectContext.perform {
             return try self.managedObjectContext.fetch(fetchRequest)
         }
     }
@@ -104,12 +107,11 @@ public extension PersistencyService {
             return count
         } catch {
             debugPrint(error.localizedDescription)
+            return 0
         }
-        
-        return 0
     }
 
-    func createObject<T: NSManagedObject>(for type: T.Type) -> T {
+    func createObject<T: NSManagedObject>(_ type: T.Type) -> T {
         return T(context: managedObjectContext)
     }
 
@@ -127,6 +129,49 @@ public extension PersistencyService {
     }
 
     func removeObject(_ object: NSManagedObject) {
-        managedObjectContext.delete(object)
+        managedObjectContext.delete(object)        
+    }
+    
+    func deleteAllObjects<T: NSManagedObject>(_ type: T.Type) where T: Entity {
+        let fetchRequest = NSFetchRequest<T>(entityName: type.entityName)
+        let deleteRequest = NSBatchDeleteRequest(
+            fetchRequest: fetchRequest as? NSFetchRequest<NSFetchRequestResult> ?? .init(entityName: type.entityName)
+        )
+
+        do {
+            try managedObjectContext.execute(deleteRequest)
+        } catch {
+            debugPrint(error.localizedDescription)
+        }
+    }
+    
+    func fetchObject<T, V>(
+        _ type: T.Type,
+        by keyPath: KeyPath<T, V>,
+        value: V
+    ) -> [T]? where T: NSManagedObject & Entity {
+        let fetchRequest = NSFetchRequest<T>(entityName: type.entityName)
+        
+        let key = NSExpression(forKeyPath: keyPath).keyPath
+        
+        fetchRequest.predicate = NSPredicate(format: "%K == %@", argumentArray: [key, value])
+
+        do {
+            let result = try managedObjectContext.fetch(fetchRequest)
+            return result
+        } catch {
+            debugPrint(error.localizedDescription)
+        }
+
+        return nil
+    }
+    
+    func object<T: NSManagedObject>(_ type: T.Type, with moID: NSManagedObjectID) -> T? {
+        do {
+            let object = try managedObjectContext.existingObject(with: moID)
+            return object as? T
+        } catch let err {
+            return nil
+        }
     }
 }

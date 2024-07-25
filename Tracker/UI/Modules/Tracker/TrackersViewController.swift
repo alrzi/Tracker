@@ -1,7 +1,11 @@
 import UIKit
+import CoreData
 import Combine
 
 final class TrackersViewController: UIViewController {
+    typealias DataSource = UICollectionViewDiffableDataSource<TrackersDataSource.Section, TrackersDataSource.SectionItem>
+    typealias CellRegistration =  UICollectionView.CellRegistration<TrackerCollectionViewCell, TrackersDataSource.SectionItem>
+    typealias SupplementaryRegistration = UICollectionView.SupplementaryRegistration<TrackerCollectionHeader>
     // MARK: - Private properties
     
     private lazy var alertPresenter = AlertPresenter(presentingViewController: self)
@@ -33,13 +37,44 @@ final class TrackersViewController: UIViewController {
         let view = UICollectionView(frame: .zero, collectionViewLayout: createLayout())
         view.backgroundColor = Asset.Colors.myWhite.color
         view.allowsSelection = true
-        view.registerHeader(TrackerCollectionHeader.self)
-        view.register(cellClass: TrackerCollectionViewCell.self)
         return view
     }()
     
-    private lazy var dataSource: TrackersDataSource = {
-        TrackersDataSource(collectionView: collectionView)
+    private lazy var dataSource: DataSource = {
+        let cellRegistration = CellRegistration { [viewModel] cell, _, articleObjectID in
+            switch articleObjectID {
+            case .tracker(let id):
+                guard let tracker = viewModel.getTracker(for: id) else {
+                    return
+                }
+                
+                cell.delegate = self
+                cell.configure(with: tracker)
+            }
+        }
+        
+        let dataSource = DataSource(collectionView: collectionView) { collectionView, indexPath, itemIdentifier in
+            
+            collectionView.dequeueConfiguredReusableCell(using: cellRegistration, for: indexPath, item: itemIdentifier)
+        }
+        
+        let headerRegistration = SupplementaryRegistration(elementKind: UICollectionView.elementKindSectionHeader) {
+            supplementaryView, string, indexPath in
+            let item = dataSource.snapshot().sectionIdentifiers[indexPath.section]
+            
+            switch item {
+            case .search:
+                break
+            case .section(let title):
+                supplementaryView.configure(with: title)
+            }
+        }
+        
+        dataSource.supplementaryViewProvider = { collectionView, kind, indexPath in
+            collectionView.dequeueConfiguredReusableSupplementary(using: headerRegistration, for: indexPath)
+        }
+        
+        return dataSource
     }()
     
     // MARK: - UIConstants
@@ -78,13 +113,11 @@ final class TrackersViewController: UIViewController {
         setupUI()
         setupLayout()
         
-        viewModel.$pinnedTrackers
-            .compactMap { $0 }
-            .sink { [weak self] in self?.updateSnapshot(with: $0) }
-            .store(in: &cancellables)
-        
-        viewModel.$trackerCategories
-            .sink { [weak self] in self?.updateSnapshot(with: $0) }
+        viewModel.$trackerCategoriesSnapshot
+            .sink { [dataSource] in 
+                dataSource.apply($0)
+                dataSource.snapshot().reloadedItemIdentifiers
+            }
             .store(in: &cancellables)
     }
     
@@ -106,14 +139,6 @@ final class TrackersViewController: UIViewController {
     
     @objc private func filterTrackers() {
         viewModel.onFilterButton()
-    }
-    
-    private func updateSnapshot(with sections: [TrackerCategory]) {
-        dataSource.reload(sections)
-    }
-    
-    private func updateSnapshot(with sections: TrackerCategory) {
-        dataSource.reload(sections)
     }
 }
 

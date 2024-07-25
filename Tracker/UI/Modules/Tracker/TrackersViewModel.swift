@@ -7,10 +7,14 @@
 
 import Combine
 import Foundation
+import CoreData.NSManagedObjectID
+import UIKit
 
 final class TrackersViewModel {
     private let analyticsService: AnalyticsService
     private var dataProvider: DataProviderProtocol
+    private let trackerRepository: TrackerRepository
+    private let categoryRepository: CategoryRepository
     private let router: TrackersViewRouter
     
     private var cancellable: Set<AnyCancellable> = []
@@ -19,20 +23,39 @@ final class TrackersViewModel {
     private var currentDay: Date = .now
     private var currentWeekdayString: String { currentDay.weekDayString }
     private var currentDateString: String { currentDay.dateString }
-    
-    @Published private(set) var pinnedTrackers: TrackerCategory?
+       
     @Published private(set) var trackerCategories: [TrackerCategory] = []
+    
+    @Published private(set) var trackerCategoriesSnapshot: NSDiffableDataSourceSnapshot<TrackersDataSource.Section, TrackersDataSource.SectionItem> = .init()
     
     init(
         analyticsService: AnalyticsService,
         dataProvider: DataProviderProtocol,
+        trackerRepository: TrackerRepository,
+        categoryRepository: CategoryRepository,
         router: TrackersViewRouter
     ) {
         self.analyticsService = analyticsService
         self.dataProvider = dataProvider
+        self.trackerRepository = trackerRepository
+        self.categoryRepository = categoryRepository
         self.router = router
         
-        self.dataProvider.delegate = self
+        dataProvider.snapshotPublisher
+            .sink { [weak self] in self?.trackerCategoriesSnapshot = $0  }
+            .store(in: &cancellable)
+        
+        try? dataProvider.fetch()
+        
+//        mockCategories.forEach { category in
+//            category.trackers.forEach { tracker in
+//               try? trackerRepository.addCategory(withId: category.id, toTracker: tracker)
+//            }
+//        }
+    }
+    
+    func getTracker(for id: NSManagedObjectID) -> Tracker? {
+        dataProvider.getTracker(at: id)
     }
     
     func onDateChanged(date: Date) {
@@ -69,8 +92,8 @@ final class TrackersViewModel {
     func onFilterButton() {
         analyticsService.handleAnalitics(event: .filterItemClick(.main, .filter))
         
-        router.showFiltersAssembly(filter: .all)
-            .sink { _ in }
+        router.showFiltersAssembly(filter: currentFilter)
+            .sink { [weak self] in self?.currentFilter = $0 }
             .store(in: &cancellable)
     }
     
@@ -149,29 +172,5 @@ final class TrackersViewModel {
         } catch {
             print(error)
         }
-    }
-}
-
-// MARK: - DataProviderDelegate
-
-extension TrackersViewModel: DataProviderDelegate {
-    func didUpdate(_ update: DataProviderUpdate) {
-                        
-    }
-    
-    func noResultFound() {
-            
-    }
-    
-    func resultFound() {
-            
-    }
-    
-    func place() {
-            
-    }
-    
-    func onChange(of data: [TrackerCategory]) {
-        trackerCategories = data
     }
 }

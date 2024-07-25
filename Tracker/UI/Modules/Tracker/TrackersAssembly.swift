@@ -12,6 +12,8 @@ final class TrackersAssembly: ViewControllerAssembly {
     
     private let analyticsService: AnalyticsService
     private let dataProvider: DataProviderProtocol
+    private let trackerRepository: TrackerRepository
+    private let categoryRepository: CategoryRepository
     
     private let trackerCreationFlowCoordinatorAssembly: TrackerCreationFlowCoordinatorAssembly
     private let createTrackerAssembly: CreateTrackerAssembly
@@ -20,12 +22,16 @@ final class TrackersAssembly: ViewControllerAssembly {
     init(
         analyticsService: AnalyticsService,
         dataProvider: DataProviderProtocol,
+        trackerRepository: TrackerRepository,
+        categoryRepository: CategoryRepository,
         trackerCreationFlowCoordinatorAssembly: TrackerCreationFlowCoordinatorAssembly,
         createTrackerAssembly: CreateTrackerAssembly,
         filtersAssembly: FiltersAssembly
     ) {
         self.analyticsService = analyticsService
         self.dataProvider = dataProvider
+        self.trackerRepository = trackerRepository
+        self.categoryRepository = categoryRepository
         self.trackerCreationFlowCoordinatorAssembly = trackerCreationFlowCoordinatorAssembly
         self.createTrackerAssembly = createTrackerAssembly
         self.filtersAssembly = filtersAssembly
@@ -36,7 +42,7 @@ final class TrackersAssembly: ViewControllerAssembly {
         
         let router = TrackersViewRouter(
             trackerCreationFlowCoordinatorAssembly: trackerCreationFlowCoordinatorAssembly,
-            createTrackerAssembly: createTrackerAssembly, 
+            createTrackerAssembly: createTrackerAssembly,
             filtersAssembly: filtersAssembly,
             presentationContext: presentationContext
         )
@@ -44,14 +50,14 @@ final class TrackersAssembly: ViewControllerAssembly {
         let viewModel = TrackersViewModel(
             analyticsService: analyticsService,
             dataProvider: dataProvider,
+            trackerRepository: trackerRepository,
+            categoryRepository: categoryRepository,
             router: router
         )
         
         let viewController = TrackersViewController(viewModel: viewModel)
         
         let navigationController = UINavigationController(rootViewController: viewController)
-        
-        navigationController.setNavigationBarHidden(true, animated: false)
         
         presentationContext.navigationController = navigationController
         

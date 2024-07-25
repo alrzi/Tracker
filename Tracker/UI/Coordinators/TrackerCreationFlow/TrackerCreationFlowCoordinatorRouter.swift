@@ -6,6 +6,7 @@
 //
 
 import Combine
+import Foundation
 
 final class TrackerCreationFlowCoordinatorRouter {
     private let chooseTrackerAssembly: ChooseTrackerAssembly
@@ -29,7 +30,7 @@ final class TrackerCreationFlowCoordinatorRouter {
         self.presentationContext = presentationContext
     }
     
-    func showChooseTracker() -> AnyPublisher<ChooseTrackerViewModel.Destination, Never> {
+    func showChooseTracker() -> AnyPublisher<TrackerKind, Never> {
         NavigationModuleRouter(
             assembly: chooseTrackerAssembly,
             presentationContext: presentationContext
@@ -37,7 +38,7 @@ final class TrackerCreationFlowCoordinatorRouter {
         .route()
     }
     
-    func showCreateTracker() -> AnyPublisher<CreateTrackerViewModelImpl.Destination, Never> {
+    func showCreateTracker() -> AnyPublisher<CreateTrackerViewModelImpl.Action, Never> {
         NavigationModuleRouter(
             assembly: createTrackerAssembly,
             presentationContext: presentationContext
@@ -45,16 +46,29 @@ final class TrackerCreationFlowCoordinatorRouter {
         .route()
     }
     
-    func showChooseSchedule() -> AnyPublisher<(), Never> {
+    func showChooseSchedule(weekDays: ChooseScheduleAssembly.WeekDays) -> AnyPublisher<Set<Int>, Never> {
         NavigationModuleRouter(
             assembly: chooseScheduleAssembly,
             presentationContext: presentationContext
         )
-        .route()
+        .route(configuration: weekDays)
     }
     
-    func showCategoryFlow() -> AnyPublisher<(), Never> {
+    func showCategoryFlow() -> AnyPublisher<(), CategoriesListViewModelError> {
         categoryFlowCoordinatorAssembly
             .assemble(presentationContext: presentationContext)
+    }
+    
+    func popToRoot() -> AnyPublisher<(), Never> {
+        Future<(), Never> { [weak self] promise in
+            guard let navigationController = self?.presentationContext.navigationController else {
+                return
+            }
+            
+            navigationController.popToRootViewController(animated: true)
+            promise(.success(()))
+        }
+        .receive(on: DispatchQueue.main)
+        .eraseToAnyPublisher()
     }
 }

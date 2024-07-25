@@ -2,36 +2,28 @@ import UIKit
 import Combine
 
 final class CreateNewCategoryViewController: FrameViewController {
-    // MARK: - Private properties
-    private let textField = TrackerUITextField(
-        text: Strings.Localizable.NewCategory.enterName)
+    private lazy var textField: TrackerUITextField = {
+        let view = TrackerUITextField(text: Strings.Localizable.NewCategory.enterName)
+        view.delegate = self
+        return view
+    }()
     
-    private var mainStackView: UIStackView = {
+    private lazy var mainStackView: UIStackView = {
         let view = UIStackView()
         view.alignment = .fill
         view.axis = .vertical
         return view
     }()
     
-    private var warningCharactersLabel: UILabel = {
+    private lazy var warningCharactersLabel: UILabel = {
         let view = UILabel()
-        view.text = Strings.Localizable.NewCategory.alreadyExist
         view.numberOfLines = .zero
         view.font = .regular17
         view.textColor = Asset.Colors.myRed.color
-        view.alpha = .zero
         view.textAlignment = .center
         return view
     }()
     
-    // MARK: Lifecicle
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        setupUI()
-        setupLayout()
-    }
-
-    // FeedbackGenerator
     private let feedbackGenerator = UIImpactFeedbackGenerator(style: .heavy)
     private let viewModel: CreateNewCategoryViewModel
     private var cancellables = Set<AnyCancellable>()
@@ -39,25 +31,40 @@ final class CreateNewCategoryViewController: FrameViewController {
     // MARK: - Init
     init(viewModel: CreateNewCategoryViewModel) {
         self.viewModel = viewModel
+        
         super.init(
             title: Strings.Localizable.NewCategory.new,
             buttonCenter: ActionButton(
                 colorType: .grey,
                 title: Strings.Localizable.NewCategory.ready)
         )
-        bind()
     }
     
-    func bind() {
-        viewModel.$trackerCategory.sink { [weak self] category in
-//            self?.textField.set(text: category?.title)
-        }
-        .store(in: &cancellables)
+    // MARK: Lifecicle
+    override func viewDidLoad() {
+        super.viewDidLoad()
         
-        viewModel.$categoryNameStatus.sink { [weak self] status in
-            self?.handleAnimationFor(status: status)
-        }
-        .store(in: &cancellables)
+        setupUI()
+        setupLayout()
+        bind(viewModel: viewModel)
+    }
+    
+    func bind(viewModel: CreateNewCategoryViewModel) {
+        viewModel.$categoryNameStatus            
+            .map(\.preinstalled)
+            .compactMap { $0 }
+            .prefix(1)
+            .sink { [weak self] name in self?.textField.set(text: name) }
+            .store(in: &cancellables)
+        
+        viewModel.$categoryNameStatus
+            .sink { [weak self] status in self?.handleAnimationFor(status: status) }
+            .store(in: &cancellables)
+        
+        viewModel.$canCreate
+            .filter { !$0 }
+            .sink { [weak self] status in self?.shakeButton() }
+            .store(in: &cancellables)
     }
     
     required init?(coder: NSCoder) {
@@ -66,13 +73,7 @@ final class CreateNewCategoryViewController: FrameViewController {
     
     // @objc
     override func handleButtonCenterTap() {
-        if !viewModel.canCreateCategory {
-            feedbackGenerator.impactOccurred()
-            buttonCenter?.shakeSelf()
-        } else {
-            viewModel.createButtonTapped()
-            dismiss(animated: true)
-        }
+        viewModel.createButtonTapped()
     }
 }
 
@@ -80,9 +81,8 @@ final class CreateNewCategoryViewController: FrameViewController {
 private extension CreateNewCategoryViewController {
     func setupUI() {
         container.addSubviews(mainStackView)
-        mainStackView.addSubviews(textField)
-        mainStackView.setCustomSpacing(8, after: textField)
-        textField.delegate = self
+        mainStackView.addSubviews(textField, warningCharactersLabel)
+        mainStackView.setCustomSpacing(16, after: textField)
     }
     
     func setupLayout() {
@@ -98,41 +98,40 @@ private extension CreateNewCategoryViewController {
         ])
     }
     
-    func addWarningLabel() {
-        mainStackView.addArrangedSubview(warningCharactersLabel)
-        UIView.animate(withDuration: 0.3) {
-            self.warningCharactersLabel.alpha = 1
-        }
-    }
-    
-    func removeWarningLabel() {
-        mainStackView.removeArrangedSubview(warningCharactersLabel)
-        warningCharactersLabel.removeFromSuperview()
-        UIView.animate(withDuration: 0.3) {
-            self.warningCharactersLabel.alpha = 0
-            self.view.layoutIfNeeded()
-        }
-    }
-    
     func handleAnimationFor(status: CreateNewCategoryViewModel.CategoryNameStatus) {
         switch status {
         case .empty:
+            warningCharactersLabel.text = "Введите имя для категории"
+            warningCharactersLabel.textColor = .systemYellow
             buttonCenter?.colorType = .grey
-            removeWarningLabel()
+       
         case .available:
+            warningCharactersLabel.text = "Подходящее имя"
+            warningCharactersLabel.textColor = .systemGreen
             buttonCenter?.colorType = .black
-            removeWarningLabel()
+        
         case .unavailable:
+            warningCharactersLabel.text = Strings.Localizable.NewCategory.alreadyExist
+            warningCharactersLabel.textColor = .systemRed
             buttonCenter?.colorType = .grey
-            addWarningLabel()
+        
+        case .preInstalled:
+            warningCharactersLabel.text = "Поменяйте иня"
+            warningCharactersLabel.textColor = .systemBlue
+            buttonCenter?.colorType = .black
         }
+    }
+    
+    func shakeButton() {
+        feedbackGenerator.impactOccurred()
+        buttonCenter?.shakeSelf()
     }
 }
 
 // MARK: - TrackerUITextFieldDelegate
 extension CreateNewCategoryViewController: TrackerUITextFieldDelegate {
     func isChangeText(text: String, newLength: Int) -> Bool? {
-        viewModel.categoryNameDidEnted(name: text)
+        viewModel.categoryNameDidEntered(name: text)
         return true
     }
 }

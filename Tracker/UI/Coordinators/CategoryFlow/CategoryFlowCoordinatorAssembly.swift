@@ -21,7 +21,7 @@ final class CategoryFlowCoordinatorAssembly {
     
     func assemble(
         presentationContext: PresentationContextProtocol
-    ) -> AnyPublisher<(), Never> {
+    ) -> AnyPublisher<(), CategoriesListViewModelError> {
         let router = CategoryFlowCoordinatorRouter(
             categoryListAssembly: categoryListAssembly,
             createCategory: createCategory,

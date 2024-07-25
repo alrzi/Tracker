@@ -8,7 +8,7 @@
 import UIKit
 
 final class ChooseTrackerAssembly: ViewControllerAssembly {
-    typealias Context = LifecycleManagingContext<ChooseTrackerViewModel.Destination, Never, ()>
+    typealias Context = LifecycleManagingContext<TrackerKind, Never, ()>
     
     private let createTrackerAssembly: CreateTrackerAssembly
     
@@ -29,7 +29,7 @@ final class ChooseTrackerAssembly: ViewControllerAssembly {
             resultObserver: context.resultObserver
         )
         
-        let viewController = ChooseTrackerViewController(viewModel: viewModel)            
+        let viewController = ChooseTrackerViewController(viewModel: viewModel)
         
         return viewController
     }

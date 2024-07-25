@@ -8,17 +8,21 @@
 import Combine
 
 final class TrackerCreationFlowCoordinatorAssembly {
+    private let userInputCollector: UserInputCollector
+    
     private let chooseTrackerAssembly: ChooseTrackerAssembly
     private let createTrackerAssembly: CreateTrackerAssembly
     private let chooseScheduleAssembly: ChooseScheduleAssembly
     private let categoryFlowCoordinatorAssembly: CategoryFlowCoordinatorAssembly
  
     init(
+        userInputCollector: UserInputCollector,
         chooseTrackerAssembly: ChooseTrackerAssembly,
         createTrackerAssembly: CreateTrackerAssembly,
         chooseScheduleAssembly: ChooseScheduleAssembly,
         categoryFlowCoordinatorAssembly: CategoryFlowCoordinatorAssembly
     ) {
+        self.userInputCollector = userInputCollector
         self.chooseTrackerAssembly = chooseTrackerAssembly
         self.createTrackerAssembly = createTrackerAssembly
         self.chooseScheduleAssembly = chooseScheduleAssembly
@@ -36,7 +40,10 @@ final class TrackerCreationFlowCoordinatorAssembly {
             presentationContext: presentationContext
         )
         
-        return TrackerCreationFlowCoordinator(router: router)
-            .makeFlow()
+        return TrackerCreationFlowCoordinator(
+            userInputCollector: userInputCollector,
+            router: router
+        )
+        .makeFlow()
     }
 }

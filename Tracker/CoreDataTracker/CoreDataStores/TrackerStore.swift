@@ -7,6 +7,7 @@ protocol TrackerStoreManagerProtocol {
     func getTrackedDaysNumberFor(id: UUID) -> Int?
     func getObjectBy(id: UUID) -> [TrackerObject]?
     func delete(_ entity: TrackerObject) throws
+    func object<T: NSManagedObject>(_ type: T.Type, with moID: NSManagedObjectID) -> T?
 }
 
 protocol TrackerStoreDataProviderProtocol {
@@ -46,6 +47,15 @@ extension TrackerStore: TrackerStoreManagerProtocol {
         if let trackerCoreData = getObjectBy(id: tracker.id)?.first {
             trackerCoreData.update(with: tracker)
             save()
+        }
+    }
+    
+    func object<T: NSManagedObject>(_ type: T.Type, with moID: NSManagedObjectID) -> T? {
+        do {
+            let object = try context.existingObject(with: moID)
+            return object as? T
+        } catch let err {
+            return nil
         }
     }
 }

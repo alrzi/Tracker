@@ -8,10 +8,17 @@
 import UIKit
 
 final class ChooseScheduleAssembly: ViewControllerAssembly {
-    typealias Context =  LifecycleManagingContext<(), Never, ()>
+    typealias WeekDays = Set<Int>
+    typealias Context =  LifecycleManagingContext<WeekDays, Never, WeekDays>
     
     func assemble(_ context: Context) -> UIViewController {
-        let viewController = ChooseScheduleViewController(weekDays: [1])
+        let viewController = ChooseScheduleViewController(
+            weekDays: context.configuration,
+            weekDaysToShow: {
+                context.resultObserver.send($0)
+                context.closingContext.close()
+            }
+        )
         
         return viewController
     }

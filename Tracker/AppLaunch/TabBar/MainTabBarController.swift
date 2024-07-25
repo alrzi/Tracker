@@ -24,11 +24,11 @@ final class TabBarViewController: UITabBarController {
         
         viewControllers = [
             trackersAssembly.assemble(),
-            trackersAssembly.assemble()
+            
         ]
         
         TabItem.allCases.enumerated().forEach { index, item in
-            viewControllers?[index].tabBarItem = .init(tabItem: item)
+            viewControllers?[safe: index]?.tabBarItem = .init(tabItem: item)
         }
         
         let standardAppearance = UITabBarAppearance()

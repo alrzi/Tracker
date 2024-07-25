@@ -12,17 +12,7 @@ struct TrackerCategory: Hashable {
     ) {
         self.id = id
         self.header = header
-        self.trackers = trackers        
-    }
-}
-
-extension TrackerCategory {
-    init(coreData: CategoryObject) {
-        self.id = coreData.id
-        self.header = coreData.title
-        
-        let trackerCoreDatas = coreData.trackers?.array as? [TrackerObject] ?? []
-        self.trackers = trackerCoreDatas.map { Tracker(coreData: $0) }
+        self.trackers = trackers
     }
 }
 

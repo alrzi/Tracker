@@ -1,23 +1,17 @@
 import Foundation
+import UIKit
 import CoreData
+import Combine
 
-protocol DataProviderDelegate: AnyObject {
-    func didUpdate(_ update: DataProviderUpdate)
-    func noResultFound()
-    func resultFound()
-    func place()
-}
 
 protocol DataProviderProtocol {
-    var delegate: DataProviderDelegate? { get set }
-    var isEmpty: Bool { get }
-
-    // DataSource
-    var numberOfSections: Int { get }
-    func numberOfRowsInSection(_ section: Int) -> Int
-    func getTracker(at indexPath: IndexPath) -> Tracker?
-    func header(for section: Int) -> String
-
+    typealias Snapshot = NSDiffableDataSourceSnapshot<TrackersDataSource.Section, TrackersDataSource.SectionItem>
+    
+    var snapshotPublisher: any Publisher<Snapshot, Never> { get }
+    
+    func fetch() throws
+    func getTracker(at id: NSManagedObjectID) -> Tracker?
+    
     // Editing, Modifying
     func daysTracked(for indexPath: IndexPath) -> Int
     func saveAsCompletedTracker(with indexPath: IndexPath, for day: String) throws
@@ -36,86 +30,64 @@ protocol DataProviderProtocol {
 }
 
 final class DataProvider: NSObject {
-    // Idexes for delegate
-    private var insertedSection: IndexSet?
-    private var deletedSection: IndexSet?
-    private var insertedIndexes: IndexPath?
-    private var deletedIndexes: IndexPath?
-    private var updatedIndexes: IndexPath?
-    private var movedIndexes: Set<DataProviderUpdate.Move>?
+    typealias Snapshot = NSDiffableDataSourceSnapshot<TrackersDataSource.Section, TrackersDataSource.SectionItem>
     
-    // Context -> one for 3 stores
-    private let context: NSManagedObjectContext
-    // Stores
     private let trackerStore: TrackerStoreManagerProtocol
-    private let trackerCategoryStore: TrackerCategoryStoreProtocol
     private let trackerRecordStore: TrackerRecordStoreProtocol
-    // PredicateBuilder
-    private var predicateBuilder: TrackerPredicateBuilderProtocol = PredicateBuilder()
-    // Delegate
-    weak var delegate: DataProviderDelegate?
     
-    // Fetch controller
-    private lazy var fetchedResultsController: NSFetchedResultsController<TrackerObject> = {
+    private let predicateBuilder: TrackerPredicateBuilderProtocol = PredicateBuilder()
+    
+    private let fetchedResultsController: NSFetchedResultsController<TrackerObject>
+    
+    private var snapshotSubject = PassthroughSubject<Snapshot, Never>()
+    var snapshotPublisher: any Publisher<Snapshot, Never> { snapshotSubject }
+        
+    init(
+        context: NSManagedObjectContext,
+        trackerStore: TrackerStore,
+        trackerRecordStore: TrackerRecordStore
+    ) {
+        self.trackerStore = trackerStore
+        self.trackerRecordStore = trackerRecordStore        
+        
         let fetchRequest = NSFetchRequest<TrackerObject>(entityName: TrackerObject.entityName)
         fetchRequest.fetchBatchSize = 20
         fetchRequest.fetchLimit = 50
+        
         let weekDay = Date().weekDayString
         fetchRequest.predicate = predicateBuilder.buildPredicateTrackersFor(weekDay: weekDay)
+        
         fetchRequest.sortDescriptors = [
             NSSortDescriptor(key: #keyPath(TrackerObject.isPinned), ascending: false),
             NSSortDescriptor(key: #keyPath(TrackerObject.category.title), ascending: true),
             NSSortDescriptor(key: #keyPath(TrackerObject.name), ascending: true)
         ]
 
-        let fetchedResultsController = NSFetchedResultsController(
+        fetchedResultsController = NSFetchedResultsController(
             fetchRequest: fetchRequest,
             managedObjectContext: context,
             sectionNameKeyPath: #keyPath(TrackerObject.category.title),
             cacheName: nil
         )
         
-        do {
-            try fetchedResultsController.performFetch()
-        } catch {
-            print("Failed to fetch trackers: \(error)")
-        }
+        super.init()
         
         fetchedResultsController.delegate = self
-        return fetchedResultsController
-    }()
-    
-    // MARK: - Init
-    init(context: NSManagedObjectContext) {
-        self.context = context
-        self.trackerStore = TrackerStore(context: context)
-        self.trackerRecordStore = TrackerRecordStore(context: context)
-        self.trackerCategoryStore = TrackerCategoryStore(context: context)
     }
 }
 
 // MARK: - DataProviderProtocol
 extension DataProvider: DataProviderProtocol {
-    var isEmpty: Bool {
-        guard let objects = fetchedResultsController.fetchedObjects else { return false }
-        return objects.isEmpty ? true : false
+    func fetch() throws {
+        try fetchedResultsController.performFetch()
     }
     
-    var numberOfSections: Int {
-        fetchedResultsController.sections?.count ?? .zero
-    }
-    
-    func numberOfRowsInSection(_ section: Int) -> Int {
-        fetchedResultsController.sections?[section].numberOfObjects ?? .zero
-    }
-
-    func getTracker(at indexPath: IndexPath) -> Tracker? {
-        let trackerCoreData = fetchedResultsController.object(at: indexPath)
-        return Tracker(coreData: trackerCoreData)
-    }
-    
-    func header(for section: Int) -> String {
-        fetchedResultsController.sections?[section].name ?? ""
+    func getTracker(at id: NSManagedObjectID) -> Tracker? {
+        guard let object = trackerStore.object(TrackerObject.self, with: id) else {
+            return nil
+        }
+        
+        return .init(object: object)
     }
     
     func daysTracked(for indexPath: IndexPath) -> Int {
@@ -129,9 +101,11 @@ extension DataProvider: DataProviderProtocol {
     
     func isTrackerAt(indexPath: IndexPath, completedForDate date: String) -> Bool {
         let tracker = fetchedResultsController.object(at: indexPath)
+        
         do {
             return try trackerRecordStore.isCompletedFor(date, trackerWithId: tracker.id)
-        } catch {
+        } 
+        catch {
             return false
         }
     }
@@ -148,6 +122,7 @@ extension DataProvider: DataProviderProtocol {
 
     func pinTrackerAt(indexPath: IndexPath) {
         let trackerCoreData = fetchedResultsController.object(at: indexPath)
+        
     }
     
     func unPinTrackerAt(indexPath: IndexPath) {
@@ -159,21 +134,19 @@ extension DataProvider: DataProviderProtocol {
         let predicate = predicateBuilder.buildPredicateTrackersFor(weekDay: weekDay)
         fetchedResultsController.fetchRequest.predicate = predicate
         try fetchedResultsController.performFetch()
-        isEmpty ? delegate?.place() : delegate?.resultFound()
     }
 
     func fetchCompletedTrackersFor(date: String) throws {
         let predicate = predicateBuilder.buildPredicateCompletedTrackersFor(date: date)
         fetchedResultsController.fetchRequest.predicate = predicate
         try fetchedResultsController.performFetch()
-        isEmpty ? delegate?.place() : delegate?.resultFound()
+        
     }
 
     func fetchUncompletedTrackersFor(weekDay: String, andForDate date: String) throws {
         let predicate = predicateBuilder.buildPredicateUncompletedTrackers(forWeekDay: weekDay, andForDate: date)
         fetchedResultsController.fetchRequest.predicate = predicate
-        try fetchedResultsController.performFetch()
-        isEmpty ? delegate?.place() : delegate?.resultFound()
+        try fetchedResultsController.performFetch()        
     }
 
     func fetchTrackersWith(name: String, forWeekDay weekDay: String) throws {
@@ -184,8 +157,8 @@ extension DataProvider: DataProviderProtocol {
             let predicate = predicateBuilder.buildPredicateTrackersFor(weekDay: weekDay)
             fetchedResultsController.fetchRequest.predicate = predicate
         }
+        
         try fetchedResultsController.performFetch()
-        isEmpty ? delegate?.noResultFound() : delegate?.resultFound()
     }
 
     func fetchCompletedTrackersWith(name: String, forDate date: String) throws {
@@ -197,7 +170,7 @@ extension DataProvider: DataProviderProtocol {
             fetchedResultsController.fetchRequest.predicate = predicate
         }
         try fetchedResultsController.performFetch()
-        isEmpty ? delegate?.noResultFound() : delegate?.resultFound()
+        
     }
 
     func fetchUncompletedTrackersWith(name: String, forWeekDay weekDay: String, andForDate date: String) throws {
@@ -208,90 +181,25 @@ extension DataProvider: DataProviderProtocol {
             let predicate = predicateBuilder.buildPredicateUncompletedTrackers(forWeekDay: weekDay, andForDate: date)
             fetchedResultsController.fetchRequest.predicate = predicate
         }
+        
         try fetchedResultsController.performFetch()
-        isEmpty ? delegate?.noResultFound() : delegate?.resultFound()
     }
 }
 
-// MARK: - NSFetchedResultsControllerDelegate
 extension DataProvider: NSFetchedResultsControllerDelegate {
-    func controllerWillChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
-        insertedSection = IndexSet()
-        deletedSection = IndexSet()
-        insertedIndexes = IndexPath()
-        deletedIndexes = IndexPath()
-        updatedIndexes = IndexPath()
-        movedIndexes = Set<DataProviderUpdate.Move>()
-    }
-    
-    func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
-        guard let insertedSectionIndexSet = insertedSection,
-            let deletedSectionIndexSet = deletedSection,
-            let insertedItem = insertedIndexes,
-            let deletedItem = deletedIndexes,
-            let updatedItem = updatedIndexes,
-            let movedItem = movedIndexes else {
-            return
-        }
-        
-        let update = DataProviderUpdate(
-            insertedSection: insertedSectionIndexSet,
-            deletedSection: deletedSectionIndexSet,
-            insertedIndexes: insertedItem,
-            deletedIndexes: deletedItem,
-            updatedIndexes: updatedItem,
-            movedIndexes: movedItem
-        )       
-        // Update delegate with indexes
-        delegate?.didUpdate(update)
-        isEmpty ? delegate?.place() : delegate?.resultFound()
-        
-        insertedSection = nil
-        deletedSection = nil
-        insertedIndexes = nil
-        deletedIndexes = nil
-        updatedIndexes = nil
-        movedIndexes = nil
-    }
-    
     func controller(
-        _ controller: NSFetchedResultsController<NSFetchRequestResult>,
-        didChange sectionInfo: NSFetchedResultsSectionInfo,
-        atSectionIndex sectionIndex: Int,
-        for type: NSFetchedResultsChangeType
+        _ controller: NSFetchedResultsController<any NSFetchRequestResult>,
+        didChangeContentWith snapshot: NSDiffableDataSourceSnapshotReference
     ) {
-        switch type {
-        case .insert:
-            insertedSection = IndexSet(integer: sectionIndex)
-        case .delete:
-            deletedSection = IndexSet(integer: sectionIndex)
-        default:
-            break
+        let coreDataSnapshot = snapshot as NSDiffableDataSourceSnapshot<String, NSManagedObjectID>
+        var newEmptySnapshot = Snapshot()
+        
+        for sectionIdentifier in coreDataSnapshot.sectionIdentifiers {
+            newEmptySnapshot.appendSections([.section(sectionIdentifier)])
+            let itemIdentifiers = coreDataSnapshot.itemIdentifiers(inSection: sectionIdentifier)
+            newEmptySnapshot.appendItems(itemIdentifiers.map { .tracker($0) }, toSection: .section(sectionIdentifier))
         }
-    }
-    
-    func controller(
-        _ controller: NSFetchedResultsController<NSFetchRequestResult>,
-        didChange anObject: Any,
-        at indexPath: IndexPath?,
-        for type: NSFetchedResultsChangeType,
-        newIndexPath: IndexPath?
-    ) {
-        switch type {
-        case .insert:
-            guard let newIndexPath = newIndexPath else { return }
-            insertedIndexes = newIndexPath
-        case .delete:
-            guard let indexPath = indexPath else { return }
-            deletedIndexes = indexPath
-        case .update:
-            guard let indexPath = indexPath else { return }
-            updatedIndexes = indexPath
-        case .move:
-            guard let indexPath = indexPath, let newIndexPath = newIndexPath else { return }
-            movedIndexes?.insert(.init(oldIndexPath: indexPath, newIndexPath: newIndexPath))
-        @unknown default:
-            break
-        }
+
+        snapshotSubject.send(newEmptySnapshot)
     }
 }

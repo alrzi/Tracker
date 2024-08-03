@@ -9,11 +9,11 @@ import Combine
 
 final class CategoryFlowCoordinatorAssembly {
     private let categoryListAssembly: CategoryListAssembly
-    private let createCategory: CreateNewCategoryAssembly
+    private let createCategory: CategoryCreationAssembly
     
     init(
         categoryListAssembly: CategoryListAssembly,
-        createCategory: CreateNewCategoryAssembly
+        createCategory: CategoryCreationAssembly
     ) {
         self.categoryListAssembly = categoryListAssembly
         self.createCategory = createCategory

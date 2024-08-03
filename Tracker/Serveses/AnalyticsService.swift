@@ -20,16 +20,22 @@ struct AnalyticsService {
         switch event {
         case .screenOpen(let screen):
             setParamsAndReport(event: event.stringValue, screen: screen.rawValue)
+        
         case .screenClose(let screen):
             setParamsAndReport(event: event.stringValue, screen: screen.rawValue)
+        
         case let .trackItemClick(screen, item):
             setParamsAndReport(event: event.stringValue, screen: screen.rawValue, item: item.stringValue)
+        
         case let .filterItemClick(screen, item):
             setParamsAndReport(event: event.stringValue, screen: screen.rawValue, item: item.stringValue)
+        
         case let .editItemClick(screen, item):
             setParamsAndReport(event: event.stringValue, screen: screen.rawValue, item: item.stringValue)
+        
         case let .deleteItemClick(screen, item):
             setParamsAndReport(event: event.stringValue, screen: screen.rawValue, item: item.stringValue)
+        
         case let .addTracker(screen, item):
             setParamsAndReport(event: event.stringValue, screen: screen.rawValue, item: item.stringValue)
         }

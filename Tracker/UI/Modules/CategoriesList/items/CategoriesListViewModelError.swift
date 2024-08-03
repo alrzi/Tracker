@@ -8,5 +8,5 @@
 import Foundation
 
 enum CategoriesListViewModelError: Error {
-    case onCategorySelected(TrackerCategory)
+    case onCategorySelected(TrackerSection)
 }

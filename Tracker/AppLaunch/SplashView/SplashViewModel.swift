@@ -11,7 +11,7 @@ final class SplashViewModel {
     }
 
     func isUserLoggedIn() -> Bool {
-        return authService.isLoggedIn
+        authService.isLoggedIn
     }
 
     func loginUser() {

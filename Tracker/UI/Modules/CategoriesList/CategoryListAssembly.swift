@@ -9,7 +9,7 @@ import UIKit
 
 final class CategoryListAssembly: ViewControllerAssembly {
     typealias Output = CategoriesListViewModel.Output
-    typealias Context =  LifecycleManagingContext<Output, CategoriesListViewModelError, ()>
+    typealias Context = LifecycleManagingContext<Output, CategoriesListViewModelError, ()>
     
     private let categoryRepository: CategoryRepository
     
@@ -17,9 +17,7 @@ final class CategoryListAssembly: ViewControllerAssembly {
         self.categoryRepository = categoryRepository
     }
     
-    func assemble(_ context: Context) -> UIViewController {
-        let presentationContext = NavigationPresentationContext()
-        
+    func assemble(_ context: Context) -> UIViewController {        
         let viewModel = CategoriesListViewModel(
             categoryRepository: categoryRepository,
             onAction: {

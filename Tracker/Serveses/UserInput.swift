@@ -12,7 +12,7 @@ enum UserInputValue: Hashable {
     case color(String?)
     case emoji(String?)
     case weekDays(Set<Int>)
-    case category(TrackerCategory?)
+    case category(TrackerSection?)
     case kind(TrackerKind)
 }
 
@@ -20,7 +20,7 @@ final class UserInputCollector {
     private let name: CurrentValueSubject<String?, Never> = .init(nil)
     private let color: CurrentValueSubject<String?, Never> = .init(nil)
     private let emoji: CurrentValueSubject<String?, Never> = .init(nil)
-    private let trackerCategory: CurrentValueSubject<TrackerCategory?, Never> = .init(nil)
+    private let trackerCategory: CurrentValueSubject<TrackerSection?, Never> = .init(nil)
     private let weekDays: CurrentValueSubject<Set<Int>, Never> = .init([])
     private let kind: CurrentValueSubject<TrackerKind, Never> = .init(.habit)
     
@@ -30,8 +30,8 @@ final class UserInputCollector {
     private let weekDaysSubject = PassthroughSubject<Set<Int>, Never>()
     var weekDaysPublisher: some Publisher<Set<Int>, Never> { weekDaysSubject }
     
-    private let categorySubject = PassthroughSubject<TrackerCategory, Never>()
-    var categoryPublisher: some Publisher<TrackerCategory, Never> { categorySubject }
+    private let categorySubject = PassthroughSubject<TrackerSection, Never>()
+    var categoryPublisher: some Publisher<TrackerSection, Never> { categorySubject }
     
     var schedule: Set<Int> { weekDays.value }
     
@@ -52,7 +52,7 @@ final class UserInputCollector {
                     let color = color,
                     !color.isEmpty,
                     let category = category,
-                    !category.header.isEmpty,
+                    !category.title.isEmpty,
                     !weekDays.isEmpty
                 else {
                     return nil
@@ -63,7 +63,8 @@ final class UserInputCollector {
                     emoji: emoji,
                     color: color,
                     schedule: weekDays,
-                    kind: kind
+                    kind: kind,
+                    trackedDays: .zero
                 )
             }            
             .sink { [weak self] in self?.trackerSubject.send($0) }
@@ -72,7 +73,6 @@ final class UserInputCollector {
         weekDays            
             .sink { [weak self] in self?.weekDaysSubject.send($0) }
             .store(in: &cancellable)
-        
         
         trackerCategory
             .compactMap({ $0 })
@@ -95,7 +95,7 @@ final class UserInputCollector {
         name.send(tracker.name)
         color.send(tracker.color)
         emoji.send(tracker.emoji)
-        weekDays.send(tracker.schedule)
+        weekDays.send(tracker.weekDays)
         kind.send(tracker.kind)
     }
 }

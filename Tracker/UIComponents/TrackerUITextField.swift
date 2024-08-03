@@ -36,12 +36,12 @@ final class TrackerUITextField: UIView {
         setupLayout()
     }
     
-    func set(text: String?) {
-        textField.text = text
-    }
-    
     required init?(coder: NSCoder) {
         fatalError("Unsupported")
+    }
+    
+    func set(text: String?) {
+        textField.text = text
     }
     
     func hideKeyBoard() {

@@ -8,7 +8,6 @@
 import Foundation
 
 final class TabBarViewModel {
-    
     private let router: TabBarViewRouter
     
     init(router: TabBarViewRouter) {

@@ -8,10 +8,8 @@ final class StatisticTableViewCell: UITableViewCell {
     }
 
     func bind(to viewModel: StatisticCellViewModel) {
-        viewModel.$value
-            .sink { [weak self] value in
-                self?.daysLabel.text = value
-            }
+        viewModel.$completedTrackersCount
+            .sink { [weak self] in self?.daysLabel.text = $0 }
             .store(in: &cancellables)
     }
 
@@ -51,7 +49,9 @@ final class StatisticTableViewCell: UITableViewCell {
 
     override func prepareForReuse() {
         super.prepareForReuse()
+        
         gradient.removeFromSuperlayer()
+        cancellables.removeAll()
     }
 
     required init?(coder: NSCoder) {
@@ -96,7 +96,9 @@ final class StatisticTableViewCell: UITableViewCell {
         shape.lineWidth = 2
         shape.path = UIBezierPath(
             roundedRect: container.bounds,
-            cornerRadius: container.layer.cornerRadius).cgPath
+            cornerRadius: container.layer.cornerRadius
+        ).cgPath
+        
         shape.strokeColor = UIColor.black.cgColor
         shape.fillColor = UIColor.clear.cgColor
         gradient.mask = shape

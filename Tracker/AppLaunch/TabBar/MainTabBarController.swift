@@ -2,15 +2,18 @@ import UIKit
 
 final class TabBarViewController: UITabBarController {
     private let trackersAssembly: TrackersAssembly
+    private let statisticAssembly: StatisticAssembly
     
     private let viewModel: TabBarViewModel
     
     init(
         trackersAssembly: TrackersAssembly,
+        statisticAssembly: StatisticAssembly,
         viewModel: TabBarViewModel
     ) {
         self.viewModel = viewModel
         self.trackersAssembly = trackersAssembly
+        self.statisticAssembly = statisticAssembly
         
         super.init(nibName: nil, bundle: nil)
     }
@@ -24,7 +27,7 @@ final class TabBarViewController: UITabBarController {
         
         viewControllers = [
             trackersAssembly.assemble(),
-            
+            statisticAssembly.assemble()
         ]
         
         TabItem.allCases.enumerated().forEach { index, item in
@@ -32,6 +35,7 @@ final class TabBarViewController: UITabBarController {
         }
         
         let standardAppearance = UITabBarAppearance()
+        
         UITabBar.appearance().standardAppearance = standardAppearance
         UITabBar.appearance().scrollEdgeAppearance = standardAppearance
     }

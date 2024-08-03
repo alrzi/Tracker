@@ -39,7 +39,6 @@ final class CategoriesListViewController: FrameViewController {
     private let viewModel: CategoriesListViewModel
     private var cancellables = Set<AnyCancellable>()
     
-       
     // MARK: - Init
     
     init(viewModel: CategoriesListViewModel) {
@@ -49,7 +48,8 @@ final class CategoriesListViewController: FrameViewController {
             title: Strings.Localizable.Category.category,
             buttonCenter: ActionButton(
                 colorType: .black,
-                title: Strings.Localizable.Category.addNew)
+                title: Strings.Localizable.Category.addNew
+            )
         )
     }
     
@@ -70,9 +70,8 @@ final class CategoriesListViewController: FrameViewController {
         viewModel.$categoryViewModels
             .dropFirst()
             .sink { [weak self] categories in
-                guard let self = self else { return }
-                self.handleCategories(categories)
-                self.setPlaceholder(for: categories)
+                self?.handleCategories(categories)
+                self?.setPlaceholder(for: categories)
             }
             .store(in: &cancellables)
     }
@@ -102,11 +101,7 @@ private extension CategoriesListViewController {
     }
     
     func setPlaceholder(for categories: [CategoryViewModel]) {
-        if !categories.isEmpty {
-            self.placeholder.state = .invisible(animate: false)
-        } else {
-            self.placeholder.state = .recomendation
-        }
+        placeholder.state = !categories.isEmpty ? .invisible(animate: false) : .recomendation
     }
     
     func handleCategories(_ categories: [CategoryViewModel]) {
@@ -178,7 +173,7 @@ extension CategoriesListViewController: UIContextMenuInteractionDelegate {
             identifier: nil,
             previewProvider: nil
         ) { _ in
-                return menu
+            return menu
         }
     }
 

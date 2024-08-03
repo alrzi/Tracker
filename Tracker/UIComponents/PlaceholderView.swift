@@ -22,8 +22,10 @@ final class PlaceholderView: UIView {
             switch self {
             case .star:
                 return Asset.Assets._05placeholderTracker.image
+            
             case .noResult:
                 return Asset.Assets._13placeholderNoResult.image
+            
             case .noStatistic:
                 return Asset.Assets._12placeholderNoStatistic.image
             }
@@ -79,26 +81,33 @@ private extension PlaceholderView {
             placeholderImageView.widthAnchor.constraint(equalToConstant: UIConstants.imageSize)
         ])
         
-        NSLayoutConstraint.activate([
-            placeholderText.centerXAnchor.constraint(equalTo: centerXAnchor),
-            placeholderText.leadingAnchor.constraint(equalTo: leadingAnchor, constant: .leadingInset),
-            placeholderText.trailingAnchor.constraint(equalTo: trailingAnchor, constant: .trailingInset),
-            placeholderText.topAnchor.constraint(
-                equalTo: placeholderImageView.bottomAnchor,
-                constant: UIConstants.textToImageOffset)
-        ])
+        NSLayoutConstraint.activate(
+            [
+                placeholderText.centerXAnchor.constraint(equalTo: centerXAnchor),
+                placeholderText.leadingAnchor.constraint(equalTo: leadingAnchor, constant: .leadingInset),
+                placeholderText.trailingAnchor.constraint(equalTo: trailingAnchor, constant: .trailingInset),
+                placeholderText.topAnchor.constraint(
+                    equalTo: placeholderImageView.bottomAnchor,
+                    constant: UIConstants.textToImageOffset
+                )
+            ]
+        )
     }
     
     func updateAppearance() {
         switch state {
         case .invisible(let isAnimate):
             isAnimate ? setAlphaToZero() : setAlphaToZero(time: .zero)
+        
         case .question:
             setState(image: .star, text: Strings.Localizable.Placeholder.question)
+        
         case .noResult:
             setState(image: .noResult, text: Strings.Localizable.Placeholder.noResults)
+        
         case .noStatistic:
             setState(image: .noStatistic, text: Strings.Localizable.Placeholder.noStatistic)
+        
         case .recomendation:
             setState(image: .star, text: Strings.Localizable.Placeholder.recomendation)
         }

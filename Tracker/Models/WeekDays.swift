@@ -1,8 +1,11 @@
-@objc public enum WeekDay: Int64, CaseIterable {
+import Foundation
+
+@objc
+public enum WeekDay: Int64, CaseIterable {
     case monday, tuesday, wednesday, thursday, friday, saturday, sunday
     
     // create set of ints 0..<7
-    static let allDaysOfWeek = Set(WeekDay.allCases.map { Int($0.rawValue) })
+    static let allDaysOfWeek = Set(Self.allCases.map { Int($0.rawValue) })
     
     static var count: Int {
         allDaysOfWeek.count
@@ -43,7 +46,8 @@ extension Set<Int> {
     func weekdayStringShort() -> String {
         if self == WeekDay.allDaysOfWeek {
             return Strings.Localizable.Schedule.everyday
-        } else {
+        } 
+        else {
             let weekDay = WeekDay
                 .allCases // take all cases  from Mon to Sun
                 .filter { self.contains(Int($0.rawValue)) } // check if set has any of weekDays

@@ -8,7 +8,7 @@
 import UIKit
 
 final class FiltersAssembly: ViewControllerAssembly {
-    typealias Context =  LifecycleManagingContext<TrackerFilters, Never, TrackerFilters>
+    typealias Context = LifecycleManagingContext<TrackerFilters, Never, TrackerFilters>
     
     func assemble(_ context: Context) -> UIViewController {
         FiltersViewController(

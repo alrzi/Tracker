@@ -6,9 +6,9 @@ struct CategoryViewModel: Hashable {
     }
     
     // MARK: - Model
-    let trackerCategory: TrackerCategory
+    let trackerCategory: TrackerSection
     
-    init(trackerCategory: TrackerCategory) {
+    init(trackerCategory: TrackerSection) {
         self.trackerCategory = trackerCategory
     }
     
@@ -17,6 +17,6 @@ struct CategoryViewModel: Hashable {
     }
     
     var header: String {
-        trackerCategory.header.capitalized
+        trackerCategory.title.capitalized
     }
 }

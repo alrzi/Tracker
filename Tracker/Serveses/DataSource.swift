@@ -15,10 +15,12 @@ protocol DataSourceProtocol {
 struct DataSourceImpl {
     private var category = TableData(
         title: Strings.Localizable.Create.category,
-        subtitle: "")
+        subtitle: ""
+    )
     private var schedule = TableData(
         title: Strings.Localizable.Create.schedule,
-        subtitle: "")
+        subtitle: ""
+    )
     
     // Public data
     private let collectionViewData: [CollectionViewData] = [
@@ -49,6 +51,7 @@ extension DataSourceImpl: DataSourceProtocol {
         switch collectionViewData[section] {
         case .emojiSection(let items):
             return items.count
+        
         case .colorSection(let items):
             return items.count
         }
@@ -62,6 +65,7 @@ extension DataSourceImpl: DataSourceProtocol {
         switch kind {
         case .occasional:
             return firstRowData
+        
         case .habit:
             return secondRowData
         }
@@ -71,6 +75,7 @@ extension DataSourceImpl: DataSourceProtocol {
         switch kind {
         case .occasional:
             return firstRowData.count
+        
         case .habit:
             return secondRowData.count
         }
@@ -118,6 +123,7 @@ enum CollectionViewData {
         switch self {
         case .emojiSection:
             return Strings.Localizable.Create.emoji
+        
         case .colorSection:
             return Strings.Localizable.Create.color
         }
@@ -126,7 +132,7 @@ enum CollectionViewData {
 
 enum CollectionViewColors: String, CaseIterable {
     static var array: [CollectionViewColors] {
-        return CollectionViewColors.allCases
+        CollectionViewColors.allCases
     }
     
     case color0 = "#FD4C49"

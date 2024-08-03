@@ -4,17 +4,18 @@ import UIKit
 final class FiltersViewController: FrameViewController {
     typealias Snapshot = NSDiffableDataSourceSnapshot<Int, TrackerFilters>
     
-    private lazy var dataSource = UITableViewDiffableDataSource<Int, TrackerFilters>(
-        tableView: tableView) { [weak self] collectionView, indexPath, filter in
+    private lazy var dataSource = UITableViewDiffableDataSource<Int, TrackerFilters>(tableView: tableView) { [weak self] collectionView, indexPath, filter in
         let cell = collectionView.dequeueReusableCell(for: indexPath)
         cell.textLabel?.text = filter.description
         cell.backgroundColor = Asset.Colors.myBackground.color
         cell.selectionStyle = .none
         if TrackerFilters.allCases[indexPath.row] == self?.currentFilter {
             cell.accessoryType = .checkmark
-        } else if self?.currentFilter == nil && indexPath.row == 1 {
+        } 
+        else if self?.currentFilter == nil && indexPath.row == 1 {
             cell.accessoryType = .checkmark
-        } else {
+        } 
+        else {
             cell.accessoryView = .none
         }
         return cell

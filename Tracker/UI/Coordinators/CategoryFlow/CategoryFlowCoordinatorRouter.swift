@@ -9,13 +9,13 @@ import Combine
 
 final class CategoryFlowCoordinatorRouter {
     private let categoryListAssembly: CategoryListAssembly
-    private let createCategory: CreateNewCategoryAssembly
+    private let createCategory: CategoryCreationAssembly
                     
     private let presentationContext: PresentationContextProtocol
     
     init(
         categoryListAssembly: CategoryListAssembly,
-        createCategory: CreateNewCategoryAssembly,
+        createCategory: CategoryCreationAssembly,
         presentationContext: PresentationContextProtocol
     ) {
         self.categoryListAssembly = categoryListAssembly
@@ -24,31 +24,18 @@ final class CategoryFlowCoordinatorRouter {
     }
     
     func showCategoryList() -> AnyPublisher<CategoryListAssembly.Output, CategoriesListViewModelError> {
-        let router = NavigationModuleRouter(
+        NavigationModuleRouter(
             assembly: categoryListAssembly,
             presentationContext: presentationContext
         )
-        
-        return router.route()
+        .route()
     }
     
-    func showCreateCategory(mode: CreateNewCategoryViewModel.Mode) -> AnyPublisher<(), Never> {
-        let router = NavigationModuleRouter(
+    func showCreateCategory(mode: CategoryCreationViewModel.Mode) -> AnyPublisher<(), Never> {
+        NavigationModuleRouter(
             assembly: createCategory,
             presentationContext: presentationContext
         )
-        
-        return router.route(configuration: mode)
-    }
-    
-    func goBackTwoScreen() {
-        guard let viewControllers = presentationContext.navigationController?.viewControllers else {
-            return
-        }
-        
-        if viewControllers.count >= 2 {
-            let viewControllersToKeep = Array(viewControllers.prefix(viewControllers.count - 2))
-            presentationContext.navigationController?.setViewControllers(viewControllersToKeep, animated: true)
-        }
+        .route(configuration: mode)
     }
 }

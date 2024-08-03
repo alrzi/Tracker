@@ -5,6 +5,7 @@ protocol FrameViewControllerProtocol {
     var buttonLeft: ActionButton? { get }
     var buttonRight: ActionButton? { get }
     var buttonCenter: ActionButton? { get }
+    
     func handleButtonLeftTap()
     func handleButtonRightTap()
     func handleButtonCenterTap()
@@ -77,9 +78,14 @@ class FrameViewController: UIViewController, FrameViewControllerProtocol {
         setupLayout()
     }
         
-    @objc func handleButtonLeftTap() {}
-    @objc func handleButtonRightTap() {}
-    @objc func handleButtonCenterTap() {}
+    @objc 
+    func handleButtonLeftTap() {}
+    
+    @objc
+    func handleButtonRightTap() {}
+    
+    @objc
+    func handleButtonCenterTap() {}
 }
     
 private extension FrameViewController {
@@ -101,36 +107,50 @@ private extension FrameViewController {
     }
     
     func setupLayout() {
-        NSLayoutConstraint.activate([
-            screenTitle.topAnchor.constraint(
-                equalTo: view.safeAreaLayoutGuide.topAnchor, constant: UIConstants.nameLabelTopInset),
-            screenTitle.centerXAnchor.constraint(equalTo: view.centerXAnchor)
-        ])
+        NSLayoutConstraint.activate(
+            [
+                screenTitle.topAnchor.constraint(
+                    equalTo: view.safeAreaLayoutGuide.topAnchor,
+                    constant: UIConstants.nameLabelTopInset
+                ),
+                screenTitle.centerXAnchor.constraint(equalTo: view.centerXAnchor)
+            ]
+        )
         
-        NSLayoutConstraint.activate([
-            container.topAnchor.constraint(
-                equalTo: screenTitle.bottomAnchor,
-                constant: UIConstants.containerToTitleInset),
-            container.leadingAnchor.constraint(
-                equalTo: view.leadingAnchor,
-                constant: .leadingInset),
-            container.trailingAnchor.constraint(
-                equalTo: view.trailingAnchor,
-                constant: .trailingInset),
-            container.bottomAnchor.constraint(equalTo: screenButtons.topAnchor)
-        ])
+        NSLayoutConstraint.activate(
+            [
+                container.topAnchor.constraint(
+                    equalTo: screenTitle.bottomAnchor,
+                    constant: UIConstants.containerToTitleInset
+                ),
+                container.leadingAnchor.constraint(
+                    equalTo: view.leadingAnchor,
+                    constant: .leadingInset
+                ),
+                container.trailingAnchor.constraint(
+                    equalTo: view.trailingAnchor,
+                    constant: .trailingInset
+                ),
+                container.bottomAnchor.constraint(equalTo: screenButtons.topAnchor)
+            ]
+        )
         
-        NSLayoutConstraint.activate([
-            screenButtons.leadingAnchor.constraint(
-                equalTo: view.leadingAnchor,
-                constant: UIConstants.leading),
-            screenButtons.trailingAnchor.constraint(
-                equalTo: view.trailingAnchor,
-                constant: UIConstants.trailing),
-            screenButtons.bottomAnchor.constraint(
-                equalTo: view.safeAreaLayoutGuide.bottomAnchor,
-                constant: UIConstants.bottom),
-            screenButtons.heightAnchor.constraint(equalToConstant: .buttonsHeight)
-        ])
+        NSLayoutConstraint.activate(
+            [
+                screenButtons.leadingAnchor.constraint(
+                    equalTo: view.leadingAnchor,
+                    constant: UIConstants.leading
+                ),
+                screenButtons.trailingAnchor.constraint(
+                    equalTo: view.trailingAnchor,
+                    constant: UIConstants.trailing
+                ),
+                screenButtons.bottomAnchor.constraint(
+                    equalTo: view.safeAreaLayoutGuide.bottomAnchor,
+                    constant: UIConstants.bottom
+                ),
+                screenButtons.heightAnchor.constraint(equalToConstant: .buttonsHeight)
+            ]
+        )
     }
 }

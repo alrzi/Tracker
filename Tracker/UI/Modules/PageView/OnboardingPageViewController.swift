@@ -37,7 +37,6 @@ final class OnboardingPageViewController: UIPageViewController {
         fatalError("init(coder:) has not been implemented")
     }
     
-    
     override func viewDidLoad() {
         super.viewDidLoad()
         setupLayout()
@@ -50,7 +49,8 @@ final class OnboardingPageViewController: UIPageViewController {
         }
     }
     
-    @objc private func buttonTapped() {
+    @objc 
+    private func buttonTapped() {
         userSuccessfullyLoggedIn?()
     }
     

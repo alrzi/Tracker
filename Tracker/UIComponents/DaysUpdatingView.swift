@@ -91,7 +91,6 @@ private extension DaysUpdaitingView {
         ])
     }
     
-    
     func setTargets() {
         incrementButton.addTarget(self, action: #selector(incrementButtonTapped), for: .touchUpInside)
         decrementButton.addTarget(self, action: #selector(decrementButtonTapped), for: .touchUpInside)
@@ -104,7 +103,8 @@ private extension DaysUpdaitingView {
             
             incrementButton.alpha = 1
             incrementButton.isEnabled = true
-        } else {
+        } 
+        else {
             decrementButton.alpha = 1
             decrementButton.isEnabled = true
             

@@ -3,8 +3,8 @@ import Combine
 
 final class StatisticViewController: UIViewController {
     private let placeholder = PlaceholderView(state: .noStatistic)
-    // MARK: - Private properties
-    private let tableView: UITableView = {
+    
+    private lazy var tableView: UITableView = {
         let view = UITableView()
         view.contentInset.top = 77
         view.backgroundColor = .clear
@@ -12,53 +12,48 @@ final class StatisticViewController: UIViewController {
         view.separatorStyle = .none
         view.showsVerticalScrollIndicator = false
         view.register(cellClass: StatisticTableViewCell.self)
+        view.delegate = self
+        view.dataSource = self
         return view
     }()
+    
+    private let viewModel: StatisticViewModel
+    private var cancellables = Set<AnyCancellable>()
+    
+    init(viewModel: StatisticViewModel) {
+        self.viewModel = viewModel
+        
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("Unsupported")
+    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        
         setupUI()
-        setDelegates()
+        
+        bind(viewModel: viewModel)
     }
 
-    private let viewModel: StatisticViewModel
-    private var cancellables = Set<AnyCancellable>()
-
-    init(viewModel: StatisticViewModel) {
-        self.viewModel = viewModel
-        super.init(nibName: nil, bundle: nil)
-        bind()
-    }
-
-    func bind() {
+    private func bind(viewModel: StatisticViewModel) {
         viewModel.$isAnyTrackers
             .dropFirst()
             .sink { [weak self] isAny in
                 if isAny {
                     self?.placeholder.state = .invisible(animate: false)
                     self?.tableView.reloadData()
-                } else {
+                } 
+                else {
                     self?.placeholder.state = .noStatistic
                     self?.tableView.reloadData()
                 }
             }
             .store(in: &cancellables)
     }
-
-    required init?(coder: NSCoder) {
-        fatalError("Unsupported")
-    }
-
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        viewModel.viewWillAppear()
-    }
-
-    private func setDelegates() {
-        tableView.delegate = self
-        tableView.dataSource = self
-    }
-
+    
     private func setupUI() {
         title = Strings.Localizable.Statistic.title
         navigationController?.navigationBar.prefersLargeTitles = true
@@ -78,9 +73,10 @@ final class StatisticViewController: UIViewController {
 }
 
 // MARK: - UITableViewDataSource
+
 extension StatisticViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return viewModel.statisticData.count
+        viewModel.statisticData.count
     }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -92,8 +88,9 @@ extension StatisticViewController: UITableViewDataSource {
 }
 
 // MARK: - UITableViewDelegate
+
 extension StatisticViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return 102
+        102
     }
 }

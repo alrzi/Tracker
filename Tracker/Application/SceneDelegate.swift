@@ -24,21 +24,25 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // MARK: - Servises
         
         let persistencyService = PersistencyService()
-                
-        let trackerStore = TrackerStore(context: persistencyService.managedObjectContext)
-        let trackerRecordStore = TrackerRecordStore(context: persistencyService.managedObjectContext)
+        
+        let recordRepository = RecordRepository(
+            persistencyService: persistencyService,
+            predicateBuilder: .init()
+        )
         
         let trackerRepository = TrackerRepository(
             persistencyService: persistencyService,
             predicateBuilder: .init()
         )
         
-        let trackerManager = TrackerManager(trackerRepository: trackerRepository)
+        let trackerManager = TrackerManager(
+            trackerRepository: trackerRepository,
+            recordRepository: recordRepository
+        )
         
         let dataProvider = DataProvider(
-            context: persistencyService.managedObjectContext,
-            trackerStore: trackerStore,
-            trackerRecordStore: trackerRecordStore
+            context: persistencyService.managedObjectContext, 
+            trackerManager: trackerManager            
         )
         
         let authService = AuthService()
@@ -53,16 +57,14 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         
         // MARK: - Assembly
         
-        let statistic = StatisticViewController(
-            viewModel: .init(
-                trackerRecordStore: <#T##any TrackerRecordStoreProtocol#>,
-                trackerStore: <#T##any TrackerStoreDataProviderProtocol#>
-            )
+        let statisticAssembly = StatisticAssembly(
+            recordRepository: recordRepository,
+            trackerManager: trackerManager
         )
         
         let filtersAssembly = FiltersAssembly()
-        let chooseScheduleAssembly = ChooseScheduleAssembly()
-        let createNewCategoryAssembly = CreateNewCategoryAssembly(categoryRepository: categoryRepository)
+        let chooseScheduleAssembly = WeekDaysSelectionAssembly()
+        let createNewCategoryAssembly = CategoryCreationAssembly(categoryRepository: categoryRepository)
         let categoryListAssembly = CategoryListAssembly(categoryRepository: categoryRepository)
         
         let categoryFlowCoordinatorAssembly = CategoryFlowCoordinatorAssembly(
@@ -70,36 +72,43 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             createCategory: createNewCategoryAssembly
         )
         
-        let createTrackerAssembly = CreateTrackerAssembly(
+        let createTrackerAssembly = TrackerCreationAssembly(
             trackerManager: trackerManager, 
             userInputCollector: userInputCollector,
             categoryFlowCoordinatorAssembly: categoryFlowCoordinatorAssembly,
             chooseScheduleAssembly: chooseScheduleAssembly
         )
         
-        let chooseTrackerAssembly = ChooseTrackerAssembly(
+        let trackerTypeSelectionAssembly = TrackerTypeSelectionAssembly(
             createTrackerAssembly: createTrackerAssembly
         )
-                      
-        let trackerCreationFlowCoordinatorAssembly = TrackerCreationFlowCoordinatorAssembly(
-            userInputCollector: userInputCollector, 
-            chooseTrackerAssembly: chooseTrackerAssembly,
+        
+        let trackerUpdatingFlowCoordinatorAssembly = TrackerUpdatingFlowCoordinatorAssembly(
+            userInputCollector: userInputCollector,
             createTrackerAssembly: createTrackerAssembly,
             chooseScheduleAssembly: chooseScheduleAssembly,
             categoryFlowCoordinatorAssembly: categoryFlowCoordinatorAssembly
         )
         
+        let trackerCreationFlowCoordinatorAssembly = TrackerCreationFlowCoordinatorAssembly(
+            trackerTypeSelectionAssembly: trackerTypeSelectionAssembly,
+            trackerUpdatingFlowCoordinatorAssembly: trackerUpdatingFlowCoordinatorAssembly
+        )
+        
         let trackersAssembly = TrackersAssembly(
             analyticsService: analyticsService,
-            dataProvider: dataProvider, 
-            trackerRepository: trackerRepository, 
-            categoryRepository: categoryRepository,
+            dataProvider: dataProvider,
+            trackerManager: trackerManager, 
             trackerCreationFlowCoordinatorAssembly: trackerCreationFlowCoordinatorAssembly,
-            createTrackerAssembly: createTrackerAssembly,
+            trackerUpdatingFlowCoordinatorAssembly: trackerUpdatingFlowCoordinatorAssembly,
             filtersAssembly: filtersAssembly
         )
         
-        let tabBarAssembly = TabBarAssembly(trackersAssembly: trackersAssembly)
+        let tabBarAssembly = TabBarAssembly(
+            trackersAssembly: trackersAssembly,
+            statisticAssembly: statisticAssembly
+        )
+        
         let splash = SplashViewAssembly(tabBarAssembly: tabBarAssembly, authService: authService)
         
         let viewController = splash.assemble(windowFromScene)

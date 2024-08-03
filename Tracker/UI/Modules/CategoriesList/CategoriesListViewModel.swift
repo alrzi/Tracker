@@ -4,15 +4,15 @@ import Combine
 final class CategoriesListViewModel: ObservableObject {
     private let categoryRepository: CategoryRepository
     
-    let onAction: (Output) -> ()
-    let onCategorySelected: (TrackerCategory) -> ()
+    let onAction: (Output) -> Void
+    let onCategorySelected: (TrackerSection) -> Void
     
     @Published private(set) var categoryViewModels: [CategoryViewModel] = []
     
     init(
         categoryRepository: CategoryRepository,
-        onAction: @escaping (Output) -> (),
-        onCategorySelected: @escaping (TrackerCategory) -> ()
+        onAction: @escaping (Output) -> Void,
+        onCategorySelected: @escaping (TrackerSection) -> Void
     ) {
         self.categoryRepository = categoryRepository
         self.onAction = onAction

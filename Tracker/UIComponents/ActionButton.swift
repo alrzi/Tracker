@@ -10,6 +10,7 @@ enum State {
         case .selected:
             self = .unselected
             return true
+        
         case .unselected:
             self = .selected
             return false
@@ -73,16 +74,19 @@ final class ActionButton: UIButton {
             backgroundColor = Asset.Colors.myBlack.color
             setTitleColor(Asset.Colors.myWhite.color, for: .normal)
             setTitle(title, for: .normal)
+        
         case .red:
             backgroundColor = Asset.Colors.myWhite.color
             layer.borderWidth = 1
             layer.borderColor = Asset.Colors.myRed.color.cgColor
             setTitleColor(Asset.Colors.myRed.color, for: .normal)
             setTitle(title, for: .normal)
+        
         case .grey:
             backgroundColor = Asset.Colors.myGray.color
             setTitleColor(.white, for: .normal)
             setTitle(title, for: .normal)
+        
         case .trueBlack:
             backgroundColor = .black
             setTitleColor(.white, for: .normal)
@@ -96,6 +100,7 @@ final class ActionButton: UIButton {
             UIView.animate(withDuration: 0.3, delay: 0) {
                 self.colorType = .black
             }
+            
         case .disabled:
             UIView.animate(withDuration: 0.3, delay: 0) {
                 self.colorType = .grey

@@ -19,6 +19,7 @@ protocol TrackerRepositoryProtocol {
     func getTracker(by id: UUID) throws -> Tracker
     func updateTracker(_ tracker: Tracker) throws
     func deleteTracker(with id: UUID) throws
+    func addPrepared(sections: [TrackerSection])
 }
 
 final class TrackerRepository {
@@ -53,6 +54,22 @@ extension TrackerRepository: TrackerRepositoryProtocol {
         let trackerObject = persistencyService.createObject(TrackerObject.self)
         trackerObject.copy(from: tracker)
         trackerObject.category = categoryObject
+        
+        persistencyService.saveContext()
+    }
+    
+    func addPrepared(sections: [TrackerSection]) {
+        for section in sections {
+            let sectionObject = persistencyService.createObject(CategoryObject.self)
+            sectionObject.copy(from: section)
+            
+            section.trackers.forEach { tracker in
+                let trackerObject = persistencyService.createObject(TrackerObject.self)
+                trackerObject.copy(from: tracker)
+                
+                sectionObject.addToTrackers(trackerObject)
+            }
+        }
         
         persistencyService.saveContext()
     }

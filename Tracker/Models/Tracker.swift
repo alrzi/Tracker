@@ -59,45 +59,142 @@ extension Tracker {
     }
 }
 
-let mockSport = [
+let work = [
     Tracker(
-        name: "Run 1km",
-        emoji: "🥇",
-        color: "#FD4C49",
-        schedule: [1,3,5],
-        kind: .habit,
-        trackedDays: 2
-    ),
-    Tracker(
-        name: "Swim 1km",
-        emoji: "🏊‍♀️",
-        color: "#Fd881E",
-        schedule: [2,4,6],
-        kind: .habit,
-        trackedDays: 14
-    )
-]
-
-let mockReading = [
-    Tracker(
-        name: "Swift in depth",
-        emoji: "🚀",
-        color: "#FD4C49",
+        name: "Проверить пулРеквесты",
+        emoji: RandomEmojiService.emoji,
+        color: RandomHexColorService.randomHexString,
         schedule: WeekDay.allDaysOfWeek,
         kind: .occasional,
-        trackedDays: 4
+        trackedDays: 0
     ),
     Tracker(
-        name: "Swift apprentice",
-        emoji: "🚁",
-        color: "#8g72E6",
-        schedule: [2,4,6],
-        kind: .habit,
-        trackedDays: 5
+        name: "Задать вопросы",
+        emoji: RandomEmojiService.emoji,
+        color: RandomHexColorService.randomHexString,
+        schedule: WeekDay.allDaysOfWeek,
+        kind: .occasional,
+        trackedDays: 0
+    ),
+]
+
+let life = [
+    Tracker(
+        name: "Погулять в пакре",
+        emoji: RandomEmojiService.emoji,
+        color: RandomHexColorService.randomHexString,
+        schedule: WeekDay.allDaysOfWeek,
+        kind: .occasional,
+        trackedDays: 0
+    ),
+    Tracker(
+        name: "Поговорить с девушкой незнакомой",
+        emoji: RandomEmojiService.emoji,
+        color: RandomHexColorService.randomHexString,
+        schedule: WeekDay.allDaysOfWeek,
+        kind: .occasional,
+        trackedDays: 0
     )
 ]
 
-let mockCategories = [
-    TrackerSection(title: "Sport", trackers: mockSport),
-    TrackerSection(title: "Reading", trackers: mockReading)
+let cooking = [
+    Tracker(
+        name: "Приготовить что то вкусненькое",
+        emoji: RandomEmojiService.emoji,
+        color: RandomHexColorService.randomHexString,
+        schedule: [1],
+        kind: .habit,
+        trackedDays: 0
+    )
+]
+
+let movie = [
+    Tracker(
+        name: "Посмотреть фильм или мультик",
+        emoji: RandomEmojiService.emoji,
+        color: RandomHexColorService.randomHexString,
+        schedule: [1],
+        kind: .habit,
+        trackedDays: 0
+    )
+]
+
+let socialization = [
+    Tracker(
+        name: "Сходить в антикафе",
+        emoji: RandomEmojiService.emoji,
+        color: RandomHexColorService.randomHexString,
+        schedule: [2],
+        kind: .habit,
+        trackedDays: 0
+    )
+]
+
+let relations = [
+    Tracker(
+        name: "Позвонить родственникам",
+        emoji: RandomEmojiService.emoji,
+        color: RandomHexColorService.randomHexString,
+        schedule: [2],
+        kind: .habit,
+        trackedDays: 0
+    )
+]
+
+let adventure = [
+    Tracker(
+        name: "Погулять в новом месте",
+        emoji: RandomEmojiService.emoji,
+        color: RandomHexColorService.randomHexString,
+        schedule: [3],
+        kind: .habit,
+        trackedDays: 0
+    )
+]
+
+let books = [
+    Tracker(
+        name: "Почитать книгу",
+        emoji: RandomEmojiService.emoji,
+        color: RandomHexColorService.randomHexString,
+        schedule: [4],
+        kind: .habit,
+        trackedDays: 0
+    )
+]
+
+let hobbie = [
+    Tracker(
+        name: "Порефакторить проект",
+        emoji: RandomEmojiService.emoji,
+        color: RandomHexColorService.randomHexString,
+        schedule: [5],
+        kind: .habit,
+        trackedDays: 0
+    )
+]
+
+let englishClub = [
+    Tracker(
+        name: "Сходить на английский",
+        emoji: RandomEmojiService.emoji,
+        color: RandomHexColorService.randomHexString,
+        schedule: [6],
+//        isPinned: true, 
+        kind: .habit,
+        trackedDays: 0
+    )
+]
+
+let mockTrackerSections = [
+    TrackerSection(title: "Работа", trackers: work),
+    TrackerSection(title: "Жизнь", trackers: life),
+    TrackerSection(title: "Вкусная еда", trackers: cooking),
+    TrackerSection(title: "Кинематограф", trackers: movie),
+    TrackerSection(title: "Общение", trackers: socialization),
+    TrackerSection(title: "Родственники", trackers: relations),
+    TrackerSection(title: "Приключения", trackers: adventure),
+    TrackerSection(title: "Книги", trackers: books),
+    TrackerSection(title: "Хобби", trackers: hobbie),
+    TrackerSection(title: "Английский клуб", trackers: englishClub),
 ]

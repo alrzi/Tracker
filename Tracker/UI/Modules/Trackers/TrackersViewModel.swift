@@ -7,34 +7,39 @@
 
 import Combine
 import Foundation
-import CoreData.NSManagedObjectID
-import UIKit
 
 final class TrackersViewModel {    
     private let analyticsService: AnalyticsService
-    private let dataProvider: DataProviding
+    private let pinnedDataProvider: PinnedDataProvider
+    private let dataProvider: DataProvider
     private let trackerManager: TrackerManaging
     private let router: TrackersViewRouter
     
     private var cancellable: Set<AnyCancellable> = []
     
-    private var currentFilter: TrackerFilters = .forToday
-    private var currentDay: Date = .now
-    private var currentWeekdayString: String { currentDay.weekDayString }
-    private var currentDateString: String { currentDay.dateString }
+    private var currentFilter: CurrentValueSubject<TrackerFilters, Never> = .init(.forCurrentWeekDay)
+    private var date: Date = .now
+    private var weekDay: String { date.weekDayString }
     
     @Published private(set) var state: TrackersCollectionCellState = .empty
     
     init(
         analyticsService: AnalyticsService,
-        dataProvider: DataProviding,
+        pinnedDataProvider: PinnedDataProvider,
+        dataProvider: DataProvider,
         trackerManager: TrackerManaging,
         router: TrackersViewRouter
     ) {
         self.analyticsService = analyticsService
+        self.pinnedDataProvider = pinnedDataProvider
         self.dataProvider = dataProvider
         self.trackerManager = trackerManager
         self.router = router
+        
+        currentFilter
+            .dropFirst()
+            .sink { [weak self] _ in self?.handle(searchText: nil) }
+            .store(in: &cancellable)
         
         dataProvider.categoriesPublisher
             .sink { [weak self] sections in
@@ -63,18 +68,34 @@ final class TrackersViewModel {
                         )
                     }
                 }
-
-                self?.state.pinnedSection = !pinnedTrackers.isEmpty ? .init(title: "Pinned", trackers: pinnedTrackers) : nil
+                
+                if pinnedTrackers.isEmpty {
+                    self?.state.pinnedSection = nil
+                }
+                else {
+                    self?.state.pinnedSection = .init(title: "Pinned", trackers: pinnedTrackers)
+                }
+                              
                 self?.state.notPinnedSections = sectionsWithUnpinnedTrackers
             }
             .store(in: &cancellable)
         
-        do {
-            try dataProvider.fetch()
-        }
-        catch {
-            preconditionFailure("\(String(describing: self)) dataProvider.fetch")
-        }
+        try? dataProvider.fetch()
+//        try? pinnedDataProvider.fetch()
+        //        pinnedDataProvider.pinnedTrackersPublisher
+        //            .sink { [weak self] trackers in
+        //                guard let self else {
+        //                    return
+        //                }
+        //
+        //                if trackers.isEmpty {
+        //                    state.pinnedSection = nil
+        //                }
+        //                else {
+        //                    state.pinnedSection = .init(title: "Pinned", trackers: trackers)
+        //                }
+        //            }
+        //            .store(in: &cancellable)
     }
     
     func onAppear() {
@@ -84,7 +105,11 @@ final class TrackersViewModel {
     func onDisappear() {
         analyticsService.handleAnalitics(event: .screenClose(.main))
     }
-    
+}
+
+// MARK: - Нажатия
+
+extension TrackersViewModel {
     func onPinTracker(at indexPath: IndexPath) {
         guard let tracker = state.item(at: indexPath) else {
             return
@@ -118,7 +143,7 @@ final class TrackersViewModel {
         
         analyticsService.handleAnalitics(event: .trackItemClick(.main, .track))
         
-        trackerManager.saveAsCompleted(tracker: tracker, for: currentDay)
+        trackerManager.saveAsCompleted(tracker: tracker, for: date)
     }
     
     func onDeleteTracker(at indexPath: IndexPath) {
@@ -135,66 +160,54 @@ final class TrackersViewModel {
             preconditionFailure("\(String(describing: self)) onDeleteTracker(at indexPath: \(indexPath)")
         }
     }
-    
+}
+
+// MARK: - Поиск по тексту и дате
+
+extension TrackersViewModel {
     func onDateChanged(date: Date) {
-        currentDay = date
+        self.date = date
         
-        do {
-            try dataProvider.fetchTrackersFor(weekDay: currentWeekdayString)
-        }
-        catch {
-            print("🏹", error)
-        }
+        handle(searchText: nil)
     }
     
     func onSearchTextChange(text: String) {
         handle(searchText: text)
     }
     
-    func handle(searchText: String?) {
+    private func handle(searchText: String?) {
         do {
-            switch currentFilter {
-            case .all:
+            switch currentFilter.value {
+            case .forCurrentWeekDay:
+                // Work
                 if let searchText {
-                    try dataProvider.fetchTrackersWith(name: searchText, forWeekDay: currentWeekdayString)
+                    try dataProvider.fetchTrackersWith(name: searchText, weekDay: weekDay)
                 }
                 else {
-                    try dataProvider.fetchTrackersFor(weekDay: currentWeekdayString)
+                    try dataProvider.fetchTrackersFor(weekDay: weekDay)
                 }
                 
-            case .forToday:
-                currentDay = Date()
-                
+            case .completedForDate:
+                // Work
                 if let searchText {
-                    try dataProvider.fetchTrackersWith(name: searchText, forWeekDay: Date().weekDayString)
-                } 
-                else {
-                    try dataProvider.fetchTrackersFor(weekDay: currentWeekdayString)
-                }
-                
-            case .completed:
-                if let searchText {
-                    try dataProvider.fetchCompletedTrackersWith(name: searchText, forDate: currentDay)
+                    try dataProvider.fetchCompletedTrackersWith(name: searchText, date: date, weekDay: weekDay)
                 }
                 else {
-                    try dataProvider.fetchCompletedTrackersFor(date: currentDay)
+                    try dataProvider.fetchCompletedTrackersFor(date: date, weekDay: weekDay)
                 }
                 
-            case .uncompleted:
+            case .uncompletedForDate:
+                // Work
                 if let searchText {
-                    try dataProvider.fetchUncompletedTrackersWith(
-                        name: searchText,
-                        forWeekDay: currentWeekdayString,
-                        andForDate: currentDateString
-                    )
-                } 
+                    try dataProvider.fetchUncompletedTrackersWith(name: searchText, date: date, weekDay: weekDay)
+                }
                 else {
-                    try dataProvider.fetchUncompletedTrackersFor(weekDay: currentWeekdayString, andForDate: currentDateString)
+                    try dataProvider.fetchUncompletedTrackersFor(date: date, weekDay: weekDay)
                 }
             }
         }
         catch {
-            print(error)
+            preconditionFailure("\(String(describing: self)) handle(searchText:)")
         }
     }
 }
@@ -205,8 +218,8 @@ extension TrackersViewModel {
     func onFilterButton() {
         analyticsService.handleAnalitics(event: .filterItemClick(.main, .filter))
         
-        router.showFiltersAssembly(filter: currentFilter)
-            .sink { [weak self] in self?.currentFilter = $0 }
+        router.showFiltersAssembly(filter: currentFilter.value)
+            .sink { [weak self] in self?.currentFilter.value = $0 }
             .store(in: &cancellable)
     }
             
@@ -226,7 +239,7 @@ extension TrackersViewModel {
         
         analyticsService.handleAnalitics(event: .editItemClick(.main, .edit))
         
-        router.showTrackerUpdatingFlow(tracker: tracker, date: currentDay)
+        router.showTrackerUpdatingFlow(tracker: tracker, date: date)
             .print(String(describing: TrackersViewModel.self))
             .sink { _ in }
             .store(in: &cancellable)

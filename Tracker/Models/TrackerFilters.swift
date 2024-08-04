@@ -8,19 +8,17 @@
 import Foundation
 
 enum TrackerFilters: CaseIterable {
-    case all
-    case forToday
-    case completed
-    case uncompleted
+    case forCurrentWeekDay
+    case completedForDate
+    case uncompletedForDate
 }
 
 extension TrackerFilters: CustomStringConvertible {
     var description: String {
-        switch self {
-        case .all: Strings.Localizable.Filters.all
-        case .forToday: Strings.Localizable.Filters.today
-        case .completed: Strings.Localizable.Filters.completed
-        case .uncompleted: Strings.Localizable.Filters.notCompleted
+        switch self {        
+        case .forCurrentWeekDay: Strings.Localizable.Filters.today
+        case .completedForDate: Strings.Localizable.Filters.completed
+        case .uncompletedForDate: Strings.Localizable.Filters.notCompleted
         }
     }
 }

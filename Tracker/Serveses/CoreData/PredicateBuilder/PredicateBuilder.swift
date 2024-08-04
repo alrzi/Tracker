@@ -1,23 +1,6 @@
 import Foundation
 
-protocol TrackerPredicateBuilderProtocol {
-    func buildPredicateTrackersFor(weekDay: String) -> NSPredicate
-    func buildPredicateTrackersWith(name: String, forWeekDay weekDay: String) -> NSPredicate
-    func buildPredicateCompletedTrackersWith(name: String, forDate date: Date) -> NSPredicate
-    func buildPredicateCompletedTrackersFor(date: Date) -> NSPredicate
-    func buildPredicateUncompletedTrackersWith(name: String, forWeekDay weekDay: String, andForDate date: String) -> NSPredicate
-    func buildPredicateUncompletedTrackers(forWeekDay weekDay: String, andForDate date: String) -> NSPredicate
-}
-
-protocol TrackerRecordPredicateBuilderProtocol {
-    func buildPredicateIsCompletedFor(selectedDate date: Date, trackerWithId id: UUID) -> NSPredicate
-}
-
-protocol TrackerCategoryPredicateBuilderProtocol {
-    func buildPredicateCategory(name: String) -> NSPredicate
-}
-
-final class PredicateBuilder {
+struct PredicateBuilder {
     private let calendar: Calendar
     
     init(calendar: Calendar = .current) {
@@ -25,86 +8,78 @@ final class PredicateBuilder {
     }
 }
 
-extension PredicateBuilder: TrackerPredicateBuilderProtocol {
+extension PredicateBuilder {
     func buildPredicateTrackersFor(weekDay: String) -> NSPredicate {
         predicate(weekDay: weekDay)
     }
-
-    func buildPredicateTrackersWith(name: String, forWeekDay weekDay: String) -> NSPredicate {
-        let namePredicate = predicate(name: name)
-        let weekDayPredicate = predicate(weekDay: weekDay)
-
-        return NSCompoundPredicate(andPredicateWithSubpredicates: [
-            namePredicate, weekDayPredicate
-        ])
+    
+    func buildPredicateTrackersFor(isPinned: Bool) -> NSPredicate {
+        predicate(isPinned: isPinned)
     }
 
-    func buildPredicateCompletedTrackersWith(name: String, forDate date: Date) -> NSPredicate {
-        let namePredicate = predicate(name: name)
-        let completedForDatePredicate = predicateCompletedTrackersFor(date: date)
-
-        return NSCompoundPredicate(andPredicateWithSubpredicates: [
-            namePredicate, completedForDatePredicate
-        ])
-    }
-
-    func buildPredicateCompletedTrackersFor(date: Date) -> NSPredicate {
-        predicateCompletedTrackersFor(date: date)
-    }
-
-    func buildPredicateUncompletedTrackersWith(name: String, forWeekDay weekDay: String, andForDate date: String) -> NSPredicate {
-        let weekDayPredicate = predicate(weekDay: weekDay)
-        let uncompletedForDatePredicate = predicateUncompletedTrackersFor(date: date)
-        let neverTrackedPredicate = predicateNeverTrackedTracker()
-        let namePredicate = predicate(name: name)
-
-        let dontTrackedAndForDayOfWeek = NSCompoundPredicate(andPredicateWithSubpredicates: [
-            neverTrackedPredicate, weekDayPredicate, namePredicate
-        ])
-
-        let uncompletedAndForDayOfWeek = NSCompoundPredicate(andPredicateWithSubpredicates: [
-            uncompletedForDatePredicate, weekDayPredicate, namePredicate
-        ])
-
-        return NSCompoundPredicate(orPredicateWithSubpredicates: [
-            dontTrackedAndForDayOfWeek, uncompletedForDatePredicate
-        ])
-    }
-
-    func buildPredicateUncompletedTrackers(forWeekDay weekDay: String, andForDate date: String) -> NSPredicate {
-        let weekDayPredicate = predicate(weekDay: weekDay)
-        let uncompletedForDatePredicate = predicateUncompletedTrackersFor(date: date)
-        let neverTrackedPredicate = predicateNeverTrackedTracker()
-
-        let dontTrackedAndForDayOfWeek = NSCompoundPredicate(andPredicateWithSubpredicates: [
-            neverTrackedPredicate, weekDayPredicate
-        ])
-
-        let uncompletedAndForDayOfWeek = NSCompoundPredicate(andPredicateWithSubpredicates: [
-            uncompletedForDatePredicate, weekDayPredicate
-        ])
-
-        return NSCompoundPredicate(orPredicateWithSubpredicates: [
-            dontTrackedAndForDayOfWeek, uncompletedForDatePredicate
-        ])
-    }
-}
-
-extension PredicateBuilder: TrackerRecordPredicateBuilderProtocol {
-    func buildPredicateIsCompletedFor(selectedDate date: Date, trackerWithId id: UUID) -> NSPredicate {
-        let idPredicate = predicate(id: id)
-        let datePredicate = predicate(date: date)
-
-        return NSCompoundPredicate(
+    func buildPredicateTrackersWith(name: String, weekDay: String) -> NSPredicate {
+        NSCompoundPredicate(
             andPredicateWithSubpredicates: [
-                idPredicate,
-                datePredicate
+                predicate(name: name),
+                predicate(weekDay: weekDay)
+            ]
+        )
+    }
+
+    // MARK: - Completed
+    
+    func buildPredicateCompletedTrackersWith(name: String, date: Date) -> NSPredicate {
+        NSCompoundPredicate(
+            andPredicateWithSubpredicates: [
+                predicate(name: name),
+                predicateTrackersFor(date: date)
+            ]
+        )
+    }
+
+    func buildPredicateCompletedTrackersFor(date: Date, weekDay: String) -> NSPredicate {
+        NSCompoundPredicate(
+            andPredicateWithSubpredicates: [
+                predicate(weekDay: weekDay),
+                predicateTrackersFor(date: date)
+            ]
+        )
+    }
+
+    // MARK: - Uncompleted
+    
+    func buildPredicateUncompletedTrackersWith(name: String, date: Date, weekDay: String) -> NSPredicate {
+        NSCompoundPredicate(
+            andPredicateWithSubpredicates: [
+                predicate(name: name),
+                predicateUncompletedTrackersFor(date: date),
+                predicate(weekDay: weekDay),
+            ]
+        )
+    }
+
+    func buildPredicateUncompletedTrackersFor(date: Date, weekDay: String) -> NSPredicate {
+        NSCompoundPredicate(
+            andPredicateWithSubpredicates: [
+                predicate(weekDay: weekDay),
+                predicateUncompletedTrackersFor(date: date)
             ]
         )
     }
 }
 
-extension PredicateBuilder: TrackerCategoryPredicateBuilderProtocol {
+extension PredicateBuilder {
+    func buildPredicateIsCompletedFor(selectedDate date: Date, trackerWithId id: UUID) -> NSPredicate {
+        NSCompoundPredicate(
+            andPredicateWithSubpredicates: [
+                predicate(id: id),
+                predicate(date: date)
+            ]
+        )
+    }
+}
+
+extension PredicateBuilder {
     func buildPredicateCategory(name: String) -> NSPredicate {
         NSPredicate(
             format: "%K == %@",
@@ -123,6 +98,14 @@ private extension PredicateBuilder {
             weekDay
         )
     }
+    
+    func predicate(isPinned: Bool) -> NSPredicate {
+        NSPredicate(
+            format: "%K == %@",
+            #keyPath(TrackerObject.isPinned),
+            NSNumber(value: isPinned)
+        )
+    }
 
     func predicate(name: String) -> NSPredicate {
         NSPredicate(
@@ -139,16 +122,21 @@ private extension PredicateBuilder {
         )
     }
 
-    func predicateUncompletedTrackersFor(date: String) -> NSPredicate {
-        NSPredicate(
-            format: "SUBQUERY(%K, $record, $record.%K == %@).@count == 0",
+    func predicateUncompletedTrackersFor(date: Date) -> NSPredicate {
+        let startOfDay = calendar.startOfDay(for: date)
+        let endOfDay = calendar.date(byAdding: .day, value: 1, to: date) ?? date
+        
+        return NSPredicate(
+            format: "SUBQUERY(%K, $record, $record.%K >= %@ AND $record.%K < %@).@count == 0",
             #keyPath(TrackerObject.trackerRecord),
             #keyPath(RecordObject.date),
-            date
+            startOfDay as CVarArg,
+            #keyPath(RecordObject.date),
+            endOfDay as CVarArg
         )
     }
 
-    func predicateCompletedTrackersFor(date: Date) -> NSPredicate {
+    func predicateTrackersFor(date: Date) -> NSPredicate {
         let startOfDay = calendar.startOfDay(for: date)
         let endOfDay = calendar.date(byAdding: .day, value: 1, to: date) ?? date
         

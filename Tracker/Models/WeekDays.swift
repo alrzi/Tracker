@@ -4,7 +4,7 @@ import Foundation
 public enum WeekDay: Int64, CaseIterable {
     case monday, tuesday, wednesday, thursday, friday, saturday, sunday
     
-    // create set of ints 0..<7
+    // create set of ints 0...6
     static let allDaysOfWeek = Set(Self.allCases.map { Int($0.rawValue) })
     
     static var count: Int {

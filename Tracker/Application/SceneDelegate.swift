@@ -40,6 +40,11 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             recordRepository: recordRepository
         )
         
+        let pinnedTrackersDataProvider = PinnedDataProvider(
+            context: persistencyService.managedObjectContext,
+            trackerManager: trackerManager
+        )
+        
         let dataProvider = DataProvider(
             context: persistencyService.managedObjectContext, 
             trackerManager: trackerManager            
@@ -96,7 +101,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         )
         
         let trackersAssembly = TrackersAssembly(
-            analyticsService: analyticsService,
+            analyticsService: analyticsService, 
+            pinnedDataProvider: pinnedTrackersDataProvider,
             dataProvider: dataProvider,
             trackerManager: trackerManager, 
             trackerCreationFlowCoordinatorAssembly: trackerCreationFlowCoordinatorAssembly,

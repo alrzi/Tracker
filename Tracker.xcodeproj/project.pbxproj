@@ -39,6 +39,8 @@
 		F967CCF529E1B78900E3C811 /* ActionButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = F967CCF429E1B78900E3C811 /* ActionButton.swift */; };
 		F967CCF729E1BA8200E3C811 /* UIFont+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F967CCF629E1BA8200E3C811 /* UIFont+Extension.swift */; };
 		F967CCF929E1C75F00E3C811 /* FrameViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F967CCF829E1C75F00E3C811 /* FrameViewController.swift */; };
+		F968BB0C2C5FF4D200E50393 /* RandomEmojiService.swift in Sources */ = {isa = PBXBuildFile; fileRef = F968BB0B2C5FF4D200E50393 /* RandomEmojiService.swift */; };
+		F968BB0E2C5FF6F500E50393 /* RandomHexColorService.swift in Sources */ = {isa = PBXBuildFile; fileRef = F968BB0D2C5FF6F500E50393 /* RandomHexColorService.swift */; };
 		F96F65E929F05DE800C72A6A /* Tracker.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = F96F65E729F05DE800C72A6A /* Tracker.xcdatamodeld */; };
 		F970880C2A2E4C4A008DD1DE /* swiftgen.yml in Resources */ = {isa = PBXBuildFile; fileRef = F970880B2A2E4C4A008DD1DE /* swiftgen.yml */; };
 		F970EF092A0A6BC800AAAA84 /* AuthService.swift in Sources */ = {isa = PBXBuildFile; fileRef = F970EF082A0A6BC800AAAA84 /* AuthService.swift */; };
@@ -140,6 +142,7 @@
 		F99B2EAA2A2E51F4007B6E30 /* XCAssets+Generated.swift in Sources */ = {isa = PBXBuildFile; fileRef = F99B2EA82A2E51F4007B6E30 /* XCAssets+Generated.swift */; };
 		F99B2EAB2A2E51F4007B6E30 /* Strings+Generated.swift in Sources */ = {isa = PBXBuildFile; fileRef = F99B2EA92A2E51F4007B6E30 /* Strings+Generated.swift */; };
 		F9A68DF72A2F992D0074E1BC /* AnalyticsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9A68DF62A2F992D0074E1BC /* AnalyticsService.swift */; };
+		F9B16C922C5EB46D00713198 /* PinnedDataProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9B16C912C5EB46D00713198 /* PinnedDataProvider.swift */; };
 		F9B4C3052C5E1C4500521C0E /* ToNavigationFlowRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9B4C3032C5E1C4500521C0E /* ToNavigationFlowRouter.swift */; };
 		F9B4C3072C5E1D6F00521C0E /* With.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9B4C3062C5E1D6F00521C0E /* With.swift */; };
 		F9B4C3092C5E213400521C0E /* Holder.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9B4C3082C5E213400521C0E /* Holder.swift */; };
@@ -205,6 +208,8 @@
 		F967CCF429E1B78900E3C811 /* ActionButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActionButton.swift; sourceTree = "<group>"; };
 		F967CCF629E1BA8200E3C811 /* UIFont+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIFont+Extension.swift"; sourceTree = "<group>"; };
 		F967CCF829E1C75F00E3C811 /* FrameViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FrameViewController.swift; sourceTree = "<group>"; };
+		F968BB0B2C5FF4D200E50393 /* RandomEmojiService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RandomEmojiService.swift; sourceTree = "<group>"; };
+		F968BB0D2C5FF6F500E50393 /* RandomHexColorService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RandomHexColorService.swift; sourceTree = "<group>"; };
 		F96F65E829F05DE800C72A6A /* CoreDataTracker.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = CoreDataTracker.xcdatamodel; sourceTree = "<group>"; };
 		F970880B2A2E4C4A008DD1DE /* swiftgen.yml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.yaml; path = swiftgen.yml; sourceTree = "<group>"; };
 		F970EF082A0A6BC800AAAA84 /* AuthService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthService.swift; sourceTree = "<group>"; };
@@ -310,6 +315,7 @@
 		F99B2EA82A2E51F4007B6E30 /* XCAssets+Generated.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "XCAssets+Generated.swift"; sourceTree = "<group>"; };
 		F99B2EA92A2E51F4007B6E30 /* Strings+Generated.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Strings+Generated.swift"; sourceTree = "<group>"; };
 		F9A68DF62A2F992D0074E1BC /* AnalyticsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsService.swift; sourceTree = "<group>"; };
+		F9B16C912C5EB46D00713198 /* PinnedDataProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PinnedDataProvider.swift; sourceTree = "<group>"; };
 		F9B4C3032C5E1C4500521C0E /* ToNavigationFlowRouter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ToNavigationFlowRouter.swift; sourceTree = "<group>"; };
 		F9B4C3062C5E1D6F00521C0E /* With.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = With.swift; sourceTree = "<group>"; };
 		F9B4C3082C5E213400521C0E /* Holder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Holder.swift; sourceTree = "<group>"; };
@@ -652,6 +658,8 @@
 				F9A68DF62A2F992D0074E1BC /* AnalyticsService.swift */,
 				F970EF082A0A6BC800AAAA84 /* AuthService.swift */,
 				F967CCBF29E08C2F00E3C811 /* DataSource.swift */,
+				F968BB0B2C5FF4D200E50393 /* RandomEmojiService.swift */,
+				F968BB0D2C5FF6F500E50393 /* RandomHexColorService.swift */,
 				F9F1236329D9E25C0039D1B3 /* TrackerManager.swift */,
 				F923943A2C4CE73D00A40989 /* UserInput.swift */,
 				F96F65EA29F05E0000C72A6A /* CoreData */,
@@ -763,6 +771,7 @@
 			children = (
 				F98840DE29F1699F00422FD5 /* DataProvider.swift */,
 				F97D20A82C58113500F23191 /* DataProviding.swift */,
+				F9B16C912C5EB46D00713198 /* PinnedDataProvider.swift */,
 			);
 			path = TrackerProvider;
 			sourceTree = "<group>";
@@ -1296,6 +1305,7 @@
 				F9B926E529E85BEB00D98F28 /* Array+Extension.swift in Sources */,
 				F91B4C892C3F1E7F00227CA8 /* TrackerUpdatingFlowCoordinatorAssembly.swift in Sources */,
 				F970EF092A0A6BC800AAAA84 /* AuthService.swift in Sources */,
+				F968BB0E2C5FF6F500E50393 /* RandomHexColorService.swift in Sources */,
 				F98E13A72C39D63A00A20C97 /* ToNavigationModuleRouting.swift in Sources */,
 				F98E139A2C39D63A00A20C97 /* DefaultModalPresenter.swift in Sources */,
 				F909DB882C4459C4002D7CAC /* Entity.swift in Sources */,
@@ -1305,6 +1315,7 @@
 				F918018A29CEECCB00767F16 /* TrackersViewController.swift in Sources */,
 				F91D41FE2C54DE0C00CC77D6 /* StatisticCellViewModel.swift in Sources */,
 				F97D20A92C58113500F23191 /* DataProviding.swift in Sources */,
+				F968BB0C2C5FF4D200E50393 /* RandomEmojiService.swift in Sources */,
 				F9E2D0A62C52ED1E0025C747 /* CategoriesListViewModelError.swift in Sources */,
 				F967CCF529E1B78900E3C811 /* ActionButton.swift in Sources */,
 				F98E13972C39D63A00A20C97 /* WindowPresentationContext.swift in Sources */,
@@ -1342,6 +1353,7 @@
 				F98E13982C39D63A00A20C97 /* ModalPresentationStyle.swift in Sources */,
 				F98E13A12C39D63A00A20C97 /* Presenter.swift in Sources */,
 				F98E13B82C39DC8500A20C97 /* CategoryCreationAssembly.swift in Sources */,
+				F9B16C922C5EB46D00713198 /* PinnedDataProvider.swift in Sources */,
 				F9F1236429D9E25C0039D1B3 /* TrackerManager.swift in Sources */,
 				F91B4C882C3F1E7F00227CA8 /* TrackerUpdatingFlowCoordinator.swift in Sources */,
 				F93DBC4C2A1D2E8D00E9D7AB /* DaysUpdatingView.swift in Sources */,

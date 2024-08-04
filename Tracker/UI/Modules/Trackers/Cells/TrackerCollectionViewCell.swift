@@ -50,12 +50,11 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
         return label
     }()
     
-    private let addButton: UIButton = {
-        let button = UIButton(type: .system)
-        button.layer.cornerRadius = UIConstants.buttonSize / 2
-        button.layer.masksToBounds = true
-        return button
-    }()
+    private lazy var addButton = with(UIButton(type: .system)) {
+        $0.layer.cornerRadius = UIConstants.buttonSize / 2
+        $0.layer.masksToBounds = true
+        $0.addTarget(self, action: #selector(handleAddButtonTap), for: .touchUpInside)
+    }
     
     private let attachedSighView: UIImageView = {
         let imageView = UIImageView(image: Asset.Assets._15pin.image)
@@ -107,6 +106,7 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
         
     func configure(with info: Tracker) {
         let color = UIColor(hexString: info.color)
+        buttonState = .selected
         emojiLabel.text = info.emoji
         trackerNameLabel.text = info.name
         attachedSighView.isHidden = !info.isPinned
@@ -133,7 +133,6 @@ private extension TrackerCollectionViewCell {
         emojiContainerView.addSubviews(emojiLabel)
         trackerContainerView.addSubviews(emojiContainerView, trackerNameLabel, attachedSighView)
         contentView.addSubviews(trackerContainerView, trackedDaysLabel, addButton)
-        addButton.addTarget(self, action: #selector(handleAddButtonTap), for: .touchUpInside)
         let contextMenu = UIContextMenuInteraction(delegate: self)
         trackerContainerView.addInteraction(contextMenu)
     }

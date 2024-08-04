@@ -29,6 +29,8 @@ final class TrackerManager: TrackerManaging {
     ) {
         self.trackerRepository = trackerRepository
         self.recordRepository = recordRepository
+        
+//        trackerRepository.addPrepared(sections: mockTrackerSections)
     }
     
     // MARK: - Public methods

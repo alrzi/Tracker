@@ -7,7 +7,6 @@
 
 import UIKit
 import Combine
-import Combine
 
 public protocol ViewControllerAssembly {
     associatedtype ViewController: UIViewController
@@ -25,7 +24,7 @@ public protocol ViewControllerAssembly {
 
 public extension ViewControllerAssembly where Context == () {
     func assemble() -> ViewController {
-        return assemble(())
+        assemble(())
     }
 }
 

@@ -10,6 +10,7 @@ import UIKit
 final class TrackersAssembly: ViewControllerAssembly {
     typealias Context = ()
     
+    private let trackerFiltersDataStorage: TrackerFiltersDataStorage
     private let analyticsService: AnalyticsService
     private let pinnedDataProvider: PinnedDataProvider
     private let dataProvider: DataProvider
@@ -20,6 +21,7 @@ final class TrackersAssembly: ViewControllerAssembly {
     private let filtersAssembly: FiltersAssembly
     
     init(
+        trackerFiltersDataStorage: TrackerFiltersDataStorage,
         analyticsService: AnalyticsService,
         pinnedDataProvider: PinnedDataProvider,
         dataProvider: DataProvider,
@@ -28,6 +30,7 @@ final class TrackersAssembly: ViewControllerAssembly {
         trackerUpdatingFlowCoordinatorAssembly: TrackerUpdatingFlowCoordinatorAssembly,
         filtersAssembly: FiltersAssembly
     ) {
+        self.trackerFiltersDataStorage = trackerFiltersDataStorage
         self.analyticsService = analyticsService
         self.pinnedDataProvider = pinnedDataProvider
         self.dataProvider = dataProvider
@@ -48,7 +51,8 @@ final class TrackersAssembly: ViewControllerAssembly {
         )
         
         let viewModel = TrackersViewModel(
-            analyticsService: analyticsService, 
+            trackerFiltersDataStorage: trackerFiltersDataStorage,
+            analyticsService: analyticsService,
             pinnedDataProvider: pinnedDataProvider,
             dataProvider: dataProvider,
             trackerManager: trackerManager,

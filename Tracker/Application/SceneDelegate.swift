@@ -22,6 +22,15 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         let windowFromScene = UIWindow(windowScene: windowScene)
         
         // MARK: - Servises
+                
+        let sharedUserDefaults = UserDefaults(suiteName: "shared") ?? .standard
+        
+        let dataStorage = DataStorage(
+            jsonDecoder: JSONDecoder(),
+            jsonEncoder: JSONEncoder(),
+            userDefaults: .standard,
+            sharedUserDefaults: sharedUserDefaults
+        )
         
         let persistencyService = PersistencyService()
         
@@ -101,7 +110,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         )
         
         let trackersAssembly = TrackersAssembly(
-            analyticsService: analyticsService, 
+            trackerFiltersDataStorage: dataStorage,
+            analyticsService: analyticsService,
             pinnedDataProvider: pinnedTrackersDataProvider,
             dataProvider: dataProvider,
             trackerManager: trackerManager, 

@@ -27,6 +27,11 @@
 		F91D42012C54DE2A00CC77D6 /* StatisticTableData.swift in Sources */ = {isa = PBXBuildFile; fileRef = F91D42002C54DE2A00CC77D6 /* StatisticTableData.swift */; };
 		F92394392C4BA06100A40989 /* CategoryRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = F92394382C4BA06100A40989 /* CategoryRepository.swift */; };
 		F923943B2C4CE73D00A40989 /* UserInput.swift in Sources */ = {isa = PBXBuildFile; fileRef = F923943A2C4CE73D00A40989 /* UserInput.swift */; };
+		F92FED282C7A797C0000B106 /* DataStorageProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = F92FED272C7A797C0000B106 /* DataStorageProtocol.swift */; };
+		F92FED2A2C7A79B10000B106 /* DataStorageType.swift in Sources */ = {isa = PBXBuildFile; fileRef = F92FED292C7A79B10000B106 /* DataStorageType.swift */; };
+		F92FED2C2C7A79C80000B106 /* DataStorageKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = F92FED2B2C7A79C80000B106 /* DataStorageKey.swift */; };
+		F92FED2E2C7A7A4C0000B106 /* DataStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = F92FED2D2C7A7A4C0000B106 /* DataStorage.swift */; };
+		F92FED312C7A7E630000B106 /* TrackerFiltersDataStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = F92FED302C7A7E630000B106 /* TrackerFiltersDataStorage.swift */; };
 		F93160B52A2F7216003A96EC /* StatisticCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F93160B42A2F7216003A96EC /* StatisticCell.swift */; };
 		F93DBC4C2A1D2E8D00E9D7AB /* DaysUpdatingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F93DBC4B2A1D2E8D00E9D7AB /* DaysUpdatingView.swift */; };
 		F946FB562A1938CB00579E93 /* AlertPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = F946FB552A1938CB00579E93 /* AlertPresenter.swift */; };
@@ -196,6 +201,11 @@
 		F91D42002C54DE2A00CC77D6 /* StatisticTableData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatisticTableData.swift; sourceTree = "<group>"; };
 		F92394382C4BA06100A40989 /* CategoryRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryRepository.swift; sourceTree = "<group>"; };
 		F923943A2C4CE73D00A40989 /* UserInput.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserInput.swift; sourceTree = "<group>"; };
+		F92FED272C7A797C0000B106 /* DataStorageProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataStorageProtocol.swift; sourceTree = "<group>"; };
+		F92FED292C7A79B10000B106 /* DataStorageType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataStorageType.swift; sourceTree = "<group>"; };
+		F92FED2B2C7A79C80000B106 /* DataStorageKey.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataStorageKey.swift; sourceTree = "<group>"; };
+		F92FED2D2C7A7A4C0000B106 /* DataStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataStorage.swift; sourceTree = "<group>"; };
+		F92FED302C7A7E630000B106 /* TrackerFiltersDataStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerFiltersDataStorage.swift; sourceTree = "<group>"; };
 		F93160B42A2F7216003A96EC /* StatisticCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatisticCell.swift; sourceTree = "<group>"; };
 		F93DBC4B2A1D2E8D00E9D7AB /* DaysUpdatingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DaysUpdatingView.swift; sourceTree = "<group>"; };
 		F946FB552A1938CB00579E93 /* AlertPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlertPresenter.swift; sourceTree = "<group>"; };
@@ -288,7 +298,6 @@
 		F98E13802C39D63A00A20C97 /* ToPopoverModuleRouting.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ToPopoverModuleRouting.swift; sourceTree = "<group>"; };
 		F98E13822C39D63A00A20C97 /* PresentableModuleRouter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PresentableModuleRouter.swift; sourceTree = "<group>"; };
 		F98E13842C39D63A00A20C97 /* ToModuleRouting.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ToModuleRouting.swift; sourceTree = "<group>"; };
-		F98E13862C39D63A00A20C97 /* WaPresentation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WaPresentation.h; sourceTree = "<group>"; };
 		F98E13AD2C39D7E500A20C97 /* TrackerCreationViewRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerCreationViewRouter.swift; sourceTree = "<group>"; };
 		F98E13AF2C39D81400A20C97 /* TrackerCreationAssembly.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerCreationAssembly.swift; sourceTree = "<group>"; };
 		F98E13B12C39D8EB00A20C97 /* WeekDaysSelectionAssembly.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeekDaysSelectionAssembly.swift; sourceTree = "<group>"; };
@@ -512,6 +521,7 @@
 				F970EF072A0A6BB700AAAA84 /* Serveses */,
 				F97774ED29D4441A00959E7C /* UI */,
 				F967CCF329E1B6BE00E3C811 /* UIComponents */,
+				F92FED262C7A79660000B106 /* DataStorage */,
 				F98E13872C39D63A00A20C97 /* Presentation */,
 			);
 			path = Tracker;
@@ -565,6 +575,26 @@
 				F91D42002C54DE2A00CC77D6 /* StatisticTableData.swift */,
 			);
 			path = Items;
+			sourceTree = "<group>";
+		};
+		F92FED262C7A79660000B106 /* DataStorage */ = {
+			isa = PBXGroup;
+			children = (
+				F92FED2D2C7A7A4C0000B106 /* DataStorage.swift */,
+				F92FED2B2C7A79C80000B106 /* DataStorageKey.swift */,
+				F92FED272C7A797C0000B106 /* DataStorageProtocol.swift */,
+				F92FED292C7A79B10000B106 /* DataStorageType.swift */,
+				F92FED2F2C7A7E2C0000B106 /* TrackerFilters */,
+			);
+			path = DataStorage;
+			sourceTree = "<group>";
+		};
+		F92FED2F2C7A7E2C0000B106 /* TrackerFilters */ = {
+			isa = PBXGroup;
+			children = (
+				F92FED302C7A7E630000B106 /* TrackerFiltersDataStorage.swift */,
+			);
+			path = TrackerFilters;
 			sourceTree = "<group>";
 		};
 		F94C4B182C43C61700349CE0 /* Extensions */ = {
@@ -1010,7 +1040,6 @@
 		F98E13872C39D63A00A20C97 /* Presentation */ = {
 			isa = PBXGroup;
 			children = (
-				F98E13862C39D63A00A20C97 /* WaPresentation.h */,
 				F9B4C3082C5E213400521C0E /* Holder.swift */,
 				F91B4C8B2C3F1EE300227CA8 /* ReactiveFlowCoordinator.swift */,
 				F9B4C3062C5E1D6F00521C0E /* With.swift */,
@@ -1298,6 +1327,7 @@
 				F9B4C3072C5E1D6F00521C0E /* With.swift in Sources */,
 				F98E13902C39D63A00A20C97 /* ModalPresentation.swift in Sources */,
 				F91B4C8A2C3F1E7F00227CA8 /* TrackerUpdatingFlowCoordinatorRouter.swift in Sources */,
+				F92FED2C2C7A79C80000B106 /* DataStorageKey.swift in Sources */,
 				F97774E22C5E81AE00306BB1 /* TrackerCreationFlowCoordinatorAssembly.swift in Sources */,
 				F97774E729D3722F00959E7C /* Tracker.swift in Sources */,
 				F9C796F22C42719300212F79 /* FiltersAssembly.swift in Sources */,
@@ -1305,6 +1335,7 @@
 				F9B926E529E85BEB00D98F28 /* Array+Extension.swift in Sources */,
 				F91B4C892C3F1E7F00227CA8 /* TrackerUpdatingFlowCoordinatorAssembly.swift in Sources */,
 				F970EF092A0A6BC800AAAA84 /* AuthService.swift in Sources */,
+				F92FED2E2C7A7A4C0000B106 /* DataStorage.swift in Sources */,
 				F968BB0E2C5FF6F500E50393 /* RandomHexColorService.swift in Sources */,
 				F98E13A72C39D63A00A20C97 /* ToNavigationModuleRouting.swift in Sources */,
 				F98E139A2C39D63A00A20C97 /* DefaultModalPresenter.swift in Sources */,
@@ -1336,6 +1367,7 @@
 				F970EF0D2A0A725D00AAAA84 /* OnboardingPageViewController.swift in Sources */,
 				F9EC69BC29E2C76E00D77C5F /* CategoryTableViewCell.swift in Sources */,
 				F98E13942C39D63A00A20C97 /* Presentable.swift in Sources */,
+				F92FED312C7A7E630000B106 /* TrackerFiltersDataStorage.swift in Sources */,
 				F94C4B1C2C43C64100349CE0 /* NSCollectionLayoutItem+createLayout.swift in Sources */,
 				F98E143A2C3AA8D100A20C97 /* TabBarViewRouter.swift in Sources */,
 				F923943B2C4CE73D00A40989 /* UserInput.swift in Sources */,
@@ -1358,6 +1390,7 @@
 				F91B4C882C3F1E7F00227CA8 /* TrackerUpdatingFlowCoordinator.swift in Sources */,
 				F93DBC4C2A1D2E8D00E9D7AB /* DaysUpdatingView.swift in Sources */,
 				F98E13A32C39D63A00A20C97 /* ModalModuleRouter.swift in Sources */,
+				F92FED282C7A797C0000B106 /* DataStorageProtocol.swift in Sources */,
 				F98E13B02C39D81400A20C97 /* TrackerCreationAssembly.swift in Sources */,
 				F9B4C3052C5E1C4500521C0E /* ToNavigationFlowRouter.swift in Sources */,
 				F97774F129D44CD900959E7C /* TrackerTypeSelectionViewController.swift in Sources */,
@@ -1367,6 +1400,7 @@
 				F98E139D2C39D63A00A20C97 /* DefaultNavigationPresenter.swift in Sources */,
 				F98E13A52C39D63A00A20C97 /* NavigationPresentationConfiguration.swift in Sources */,
 				F97774E929D3728C00959E7C /* TrackerSection.swift in Sources */,
+				F92FED2A2C7A79B10000B106 /* DataStorageType.swift in Sources */,
 				F99767102A30B0A9009D0B65 /* StatisticViewModel.swift in Sources */,
 				F98E142B2C3A875300A20C97 /* TrackerTypeSelectionViewModel.swift in Sources */,
 				F9F1236A29DC282D0039D1B3 /* WeekDaysSelectionViewController.swift in Sources */,

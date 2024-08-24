@@ -8,7 +8,8 @@
 import Combine
 import Foundation
 
-final class TrackersViewModel {    
+final class TrackersViewModel {
+    private let trackerFiltersDataStorage: TrackerFiltersDataStorage
     private let analyticsService: AnalyticsService
     private let pinnedDataProvider: PinnedDataProvider
     private let dataProvider: DataProvider
@@ -17,27 +18,29 @@ final class TrackersViewModel {
     
     private var cancellable: Set<AnyCancellable> = []
     
-    private var currentFilter: CurrentValueSubject<TrackerFilters, Never> = .init(.forCurrentWeekDay)
+    private var currentFilter: CurrentValueSubject<TrackerFilters, Never>
     private var date: Date = .now
     private var weekDay: String { date.weekDayString }
     
     @Published private(set) var state: TrackersCollectionCellState = .empty
     
     init(
+        trackerFiltersDataStorage: TrackerFiltersDataStorage,
         analyticsService: AnalyticsService,
         pinnedDataProvider: PinnedDataProvider,
         dataProvider: DataProvider,
         trackerManager: TrackerManaging,
         router: TrackersViewRouter
     ) {
+        self.trackerFiltersDataStorage = trackerFiltersDataStorage
         self.analyticsService = analyticsService
         self.pinnedDataProvider = pinnedDataProvider
         self.dataProvider = dataProvider
         self.trackerManager = trackerManager
         self.router = router
+        self.currentFilter = .init(trackerFiltersDataStorage.trackerFilters)
         
         currentFilter
-            .dropFirst()
             .sink { [weak self] _ in self?.handle(searchText: nil) }
             .store(in: &cancellable)
         
@@ -219,7 +222,7 @@ extension TrackersViewModel {
         analyticsService.handleAnalitics(event: .filterItemClick(.main, .filter))
         
         router.showFiltersAssembly(filter: currentFilter.value)
-            .sink { [weak self] in self?.currentFilter.value = $0 }
+            .sink { [weak self] in self?.updateCurrentFilter($0) }
             .store(in: &cancellable)
     }
             
@@ -243,5 +246,10 @@ extension TrackersViewModel {
             .print(String(describing: TrackersViewModel.self))
             .sink { _ in }
             .store(in: &cancellable)
+    }
+    
+    private func updateCurrentFilter(_ filter: TrackerFilters) {
+        currentFilter.value = filter
+        trackerFiltersDataStorage.trackerFilters = filter
     }
 }

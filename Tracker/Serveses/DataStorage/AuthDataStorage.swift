@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import DataStorage
 
 protocol AuthDataStorage: AnyObject {
     var isUserLoggedIn: Bool { get set }

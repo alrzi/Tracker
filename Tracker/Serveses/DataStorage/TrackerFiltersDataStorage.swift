@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import DataStorage
 
 protocol TrackerFiltersDataStorage: AnyObject {
     var trackerFilters: TrackerFilters { get set }

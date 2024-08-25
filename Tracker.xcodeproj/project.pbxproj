@@ -26,10 +26,6 @@
 		F91D42012C54DE2A00CC77D6 /* StatisticTableData.swift in Sources */ = {isa = PBXBuildFile; fileRef = F91D42002C54DE2A00CC77D6 /* StatisticTableData.swift */; };
 		F92394392C4BA06100A40989 /* CategoryRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = F92394382C4BA06100A40989 /* CategoryRepository.swift */; };
 		F923943B2C4CE73D00A40989 /* UserInput.swift in Sources */ = {isa = PBXBuildFile; fileRef = F923943A2C4CE73D00A40989 /* UserInput.swift */; };
-		F92FED282C7A797C0000B106 /* DataStorageProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = F92FED272C7A797C0000B106 /* DataStorageProtocol.swift */; };
-		F92FED2A2C7A79B10000B106 /* DataStorageType.swift in Sources */ = {isa = PBXBuildFile; fileRef = F92FED292C7A79B10000B106 /* DataStorageType.swift */; };
-		F92FED2C2C7A79C80000B106 /* DataStorageKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = F92FED2B2C7A79C80000B106 /* DataStorageKey.swift */; };
-		F92FED2E2C7A7A4C0000B106 /* DataStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = F92FED2D2C7A7A4C0000B106 /* DataStorage.swift */; };
 		F92FED312C7A7E630000B106 /* TrackerFiltersDataStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = F92FED302C7A7E630000B106 /* TrackerFiltersDataStorage.swift */; };
 		F93160B52A2F7216003A96EC /* StatisticCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F93160B42A2F7216003A96EC /* StatisticCell.swift */; };
 		F93DBC4C2A1D2E8D00E9D7AB /* DaysUpdatingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F93DBC4B2A1D2E8D00E9D7AB /* DaysUpdatingView.swift */; };
@@ -44,6 +40,9 @@
 		F9551B1C2C7B2C1800DE3894 /* TrackType+eventParameters.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9551B1B2C7B2C1800DE3894 /* TrackType+eventParameters.swift */; };
 		F957BC342C7BA97F0047559E /* YMMYandexMetricaTracker.swift in Sources */ = {isa = PBXBuildFile; fileRef = F957BC332C7BA97F0047559E /* YMMYandexMetricaTracker.swift */; };
 		F957BC372C7BBD9A0047559E /* Presentation in Frameworks */ = {isa = PBXBuildFile; productRef = F957BC362C7BBD9A0047559E /* Presentation */; };
+		F957BC3A2C7BBF630047559E /* Presentation in Frameworks */ = {isa = PBXBuildFile; productRef = F957BC392C7BBF630047559E /* Presentation */; };
+		F957BC3D2C7BC06B0047559E /* DataStorage in Frameworks */ = {isa = PBXBuildFile; productRef = F957BC3C2C7BC06B0047559E /* DataStorage */; };
+		F957BC402C7BC17E0047559E /* DataStorage in Frameworks */ = {isa = PBXBuildFile; productRef = F957BC3F2C7BC17E0047559E /* DataStorage */; };
 		F967CCC029E08C2F00E3C811 /* DataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = F967CCBF29E08C2F00E3C811 /* DataSource.swift */; };
 		F967CCCD29E1604B00E3C811 /* WeekDays.swift in Sources */ = {isa = PBXBuildFile; fileRef = F967CCCC29E1604B00E3C811 /* WeekDays.swift */; };
 		F967CCF229E1B5CE00E3C811 /* CategoriesListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F967CCF129E1B5CE00E3C811 /* CategoriesListViewController.swift */; };
@@ -165,10 +164,6 @@
 		F91D42002C54DE2A00CC77D6 /* StatisticTableData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatisticTableData.swift; sourceTree = "<group>"; };
 		F92394382C4BA06100A40989 /* CategoryRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryRepository.swift; sourceTree = "<group>"; };
 		F923943A2C4CE73D00A40989 /* UserInput.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserInput.swift; sourceTree = "<group>"; };
-		F92FED272C7A797C0000B106 /* DataStorageProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataStorageProtocol.swift; sourceTree = "<group>"; };
-		F92FED292C7A79B10000B106 /* DataStorageType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataStorageType.swift; sourceTree = "<group>"; };
-		F92FED2B2C7A79C80000B106 /* DataStorageKey.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataStorageKey.swift; sourceTree = "<group>"; };
-		F92FED2D2C7A7A4C0000B106 /* DataStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataStorage.swift; sourceTree = "<group>"; };
 		F92FED302C7A7E630000B106 /* TrackerFiltersDataStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerFiltersDataStorage.swift; sourceTree = "<group>"; };
 		F93160B42A2F7216003A96EC /* StatisticCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatisticCell.swift; sourceTree = "<group>"; };
 		F93DBC4B2A1D2E8D00E9D7AB /* DaysUpdatingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DaysUpdatingView.swift; sourceTree = "<group>"; };
@@ -284,7 +279,10 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F957BC402C7BC17E0047559E /* DataStorage in Frameworks */,
 				F957BC372C7BBD9A0047559E /* Presentation in Frameworks */,
+				F957BC3A2C7BBF630047559E /* Presentation in Frameworks */,
+				F957BC3D2C7BC06B0047559E /* DataStorage in Frameworks */,
 				D14F4C1BCB15881B7C68AE5C /* Pods_Tracker.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -452,7 +450,6 @@
 				F97774ED29D4441A00959E7C /* UI */,
 				F967CCF329E1B6BE00E3C811 /* UIComponents */,
 				F9551B122C7B290600DE3894 /* TrackType */,
-				F92FED262C7A79660000B106 /* DataStorage */,
 			);
 			path = Tracker;
 			sourceTree = "<group>";
@@ -510,22 +507,10 @@
 		F92FED262C7A79660000B106 /* DataStorage */ = {
 			isa = PBXGroup;
 			children = (
-				F92FED2D2C7A7A4C0000B106 /* DataStorage.swift */,
-				F92FED2B2C7A79C80000B106 /* DataStorageKey.swift */,
-				F92FED272C7A797C0000B106 /* DataStorageProtocol.swift */,
-				F92FED292C7A79B10000B106 /* DataStorageType.swift */,
-				F92FED2F2C7A7E2C0000B106 /* TrackerFilters */,
-			);
-			path = DataStorage;
-			sourceTree = "<group>";
-		};
-		F92FED2F2C7A7E2C0000B106 /* TrackerFilters */ = {
-			isa = PBXGroup;
-			children = (
 				F92FED302C7A7E630000B106 /* TrackerFiltersDataStorage.swift */,
 				F9551B102C7B1EC500DE3894 /* AuthDataStorage.swift */,
 			);
-			path = TrackerFilters;
+			path = DataStorage;
 			sourceTree = "<group>";
 		};
 		F94C4B182C43C61700349CE0 /* Extensions */ = {
@@ -642,7 +627,6 @@
 		F970EF072A0A6BB700AAAA84 /* Serveses */ = {
 			isa = PBXGroup;
 			children = (
-				F957BC332C7BA97F0047559E /* YMMYandexMetricaTracker.swift */,
 				F946FB552A1938CB00579E93 /* AlertPresenter.swift */,
 				F970EF082A0A6BC800AAAA84 /* AuthService.swift */,
 				F967CCBF29E08C2F00E3C811 /* DataSource.swift */,
@@ -650,7 +634,9 @@
 				F968BB0D2C5FF6F500E50393 /* RandomHexColorService.swift */,
 				F9F1236329D9E25C0039D1B3 /* TrackerManager.swift */,
 				F923943A2C4CE73D00A40989 /* UserInput.swift */,
+				F957BC332C7BA97F0047559E /* YMMYandexMetricaTracker.swift */,
 				F96F65EA29F05E0000C72A6A /* CoreData */,
+				F92FED262C7A79660000B106 /* DataStorage */,
 			);
 			path = Serveses;
 			sourceTree = "<group>";
@@ -895,6 +881,9 @@
 			name = Tracker;
 			packageProductDependencies = (
 				F957BC362C7BBD9A0047559E /* Presentation */,
+				F957BC392C7BBF630047559E /* Presentation */,
+				F957BC3C2C7BC06B0047559E /* DataStorage */,
+				F957BC3F2C7BC17E0047559E /* DataStorage */,
 			);
 			productName = Tracker;
 			productReference = F918018229CEECCB00767F16 /* Tracker.app */;
@@ -928,7 +917,8 @@
 			mainGroup = F918017929CEECCB00767F16;
 			packageReferences = (
 				F93160B12A2F3A8B003A96EC /* XCRemoteSwiftPackageReference "swift-snapshot-testing" */,
-				F957BC352C7BBD990047559E /* XCLocalSwiftPackageReference "../../../Presentation" */,
+				F957BC382C7BBF620047559E /* XCLocalSwiftPackageReference "../../../Packages/Presentation" */,
+				F957BC3E2C7BC17E0047559E /* XCLocalSwiftPackageReference "../../../Packages/DataStorage" */,
 			);
 			productRefGroup = F918018329CEECCB00767F16 /* Products */;
 			projectDirPath = "";
@@ -1027,14 +1017,12 @@
 				F98E142F2C3A880200A20C97 /* TrackerTypeSelectionAssembly.swift in Sources */,
 				F9B4C30B2C5E252700521C0E /* ToNavigationFlowRouter+modal+window.swift in Sources */,
 				F91B4C8A2C3F1E7F00227CA8 /* TrackerUpdatingFlowCoordinatorRouter.swift in Sources */,
-				F92FED2C2C7A79C80000B106 /* DataStorageKey.swift in Sources */,
 				F97774E22C5E81AE00306BB1 /* TrackerCreationFlowCoordinatorAssembly.swift in Sources */,
 				F97774E729D3722F00959E7C /* Tracker.swift in Sources */,
 				F9C796F22C42719300212F79 /* FiltersAssembly.swift in Sources */,
 				F9B926E529E85BEB00D98F28 /* Array+Extension.swift in Sources */,
 				F91B4C892C3F1E7F00227CA8 /* TrackerUpdatingFlowCoordinatorAssembly.swift in Sources */,
 				F970EF092A0A6BC800AAAA84 /* AuthService.swift in Sources */,
-				F92FED2E2C7A7A4C0000B106 /* DataStorage.swift in Sources */,
 				F968BB0E2C5FF6F500E50393 /* RandomHexColorService.swift in Sources */,
 				F909DB882C4459C4002D7CAC /* Entity.swift in Sources */,
 				F9F1233E29D899050039D1B3 /* CreateTrackerCollectionEmojiCell.swift in Sources */,
@@ -1080,13 +1068,11 @@
 				F9F1236429D9E25C0039D1B3 /* TrackerManager.swift in Sources */,
 				F91B4C882C3F1E7F00227CA8 /* TrackerUpdatingFlowCoordinator.swift in Sources */,
 				F93DBC4C2A1D2E8D00E9D7AB /* DaysUpdatingView.swift in Sources */,
-				F92FED282C7A797C0000B106 /* DataStorageProtocol.swift in Sources */,
 				F98E13B02C39D81400A20C97 /* TrackerCreationAssembly.swift in Sources */,
 				F97774F129D44CD900959E7C /* TrackerTypeSelectionViewController.swift in Sources */,
 				F91D41FC2C54DD3000CC77D6 /* StatisticAssembly.swift in Sources */,
 				F97D20A72C580D0300F23191 /* Identifiers.swift in Sources */,
 				F97774E929D3728C00959E7C /* TrackerSection.swift in Sources */,
-				F92FED2A2C7A79B10000B106 /* DataStorageType.swift in Sources */,
 				F99767102A30B0A9009D0B65 /* StatisticViewModel.swift in Sources */,
 				F98E142B2C3A875300A20C97 /* TrackerTypeSelectionViewModel.swift in Sources */,
 				F9F1236A29DC282D0039D1B3 /* WeekDaysSelectionViewController.swift in Sources */,
@@ -1392,9 +1378,13 @@
 /* End XCConfigurationList section */
 
 /* Begin XCLocalSwiftPackageReference section */
-		F957BC352C7BBD990047559E /* XCLocalSwiftPackageReference "../../../Presentation" */ = {
+		F957BC382C7BBF620047559E /* XCLocalSwiftPackageReference "../../../Packages/Presentation" */ = {
 			isa = XCLocalSwiftPackageReference;
-			relativePath = ../../../Presentation;
+			relativePath = ../../../Packages/Presentation;
+		};
+		F957BC3E2C7BC17E0047559E /* XCLocalSwiftPackageReference "../../../Packages/DataStorage" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = ../../../Packages/DataStorage;
 		};
 /* End XCLocalSwiftPackageReference section */
 
@@ -1413,6 +1403,18 @@
 		F957BC362C7BBD9A0047559E /* Presentation */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = Presentation;
+		};
+		F957BC392C7BBF630047559E /* Presentation */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = Presentation;
+		};
+		F957BC3C2C7BC06B0047559E /* DataStorage */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = DataStorage;
+		};
+		F957BC3F2C7BC17E0047559E /* DataStorage */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = DataStorage;
 		};
 /* End XCSwiftPackageProductDependency section */
 

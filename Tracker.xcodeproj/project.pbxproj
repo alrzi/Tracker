@@ -38,6 +38,7 @@
 		F94C4B1A2C43C61F00349CE0 /* NSCollectionLayoutGroup+createLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = F94C4B192C43C61F00349CE0 /* NSCollectionLayoutGroup+createLayout.swift */; };
 		F94C4B1C2C43C64100349CE0 /* NSCollectionLayoutItem+createLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = F94C4B1B2C43C64100349CE0 /* NSCollectionLayoutItem+createLayout.swift */; };
 		F94D0D192C430C6800D57C80 /* TrackersCollectionCellState.swift in Sources */ = {isa = PBXBuildFile; fileRef = F94D0D182C430C6800D57C80 /* TrackersCollectionCellState.swift */; };
+		F9551B112C7B1EC500DE3894 /* AuthDataStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9551B102C7B1EC500DE3894 /* AuthDataStorage.swift */; };
 		F967CCC029E08C2F00E3C811 /* DataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = F967CCBF29E08C2F00E3C811 /* DataSource.swift */; };
 		F967CCCD29E1604B00E3C811 /* WeekDays.swift in Sources */ = {isa = PBXBuildFile; fileRef = F967CCCC29E1604B00E3C811 /* WeekDays.swift */; };
 		F967CCF229E1B5CE00E3C811 /* CategoriesListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F967CCF129E1B5CE00E3C811 /* CategoriesListViewController.swift */; };
@@ -212,6 +213,7 @@
 		F94C4B192C43C61F00349CE0 /* NSCollectionLayoutGroup+createLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSCollectionLayoutGroup+createLayout.swift"; sourceTree = "<group>"; };
 		F94C4B1B2C43C64100349CE0 /* NSCollectionLayoutItem+createLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSCollectionLayoutItem+createLayout.swift"; sourceTree = "<group>"; };
 		F94D0D182C430C6800D57C80 /* TrackersCollectionCellState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackersCollectionCellState.swift; sourceTree = "<group>"; };
+		F9551B102C7B1EC500DE3894 /* AuthDataStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthDataStorage.swift; sourceTree = "<group>"; };
 		F967CCBF29E08C2F00E3C811 /* DataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataSource.swift; sourceTree = "<group>"; };
 		F967CCCC29E1604B00E3C811 /* WeekDays.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeekDays.swift; sourceTree = "<group>"; };
 		F967CCF129E1B5CE00E3C811 /* CategoriesListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoriesListViewController.swift; sourceTree = "<group>"; };
@@ -593,6 +595,7 @@
 			isa = PBXGroup;
 			children = (
 				F92FED302C7A7E630000B106 /* TrackerFiltersDataStorage.swift */,
+				F9551B102C7B1EC500DE3894 /* AuthDataStorage.swift */,
 			);
 			path = TrackerFilters;
 			sourceTree = "<group>";
@@ -1368,6 +1371,7 @@
 				F9EC69BC29E2C76E00D77C5F /* CategoryTableViewCell.swift in Sources */,
 				F98E13942C39D63A00A20C97 /* Presentable.swift in Sources */,
 				F92FED312C7A7E630000B106 /* TrackerFiltersDataStorage.swift in Sources */,
+				F9551B112C7B1EC500DE3894 /* AuthDataStorage.swift in Sources */,
 				F94C4B1C2C43C64100349CE0 /* NSCollectionLayoutItem+createLayout.swift in Sources */,
 				F98E143A2C3AA8D100A20C97 /* TabBarViewRouter.swift in Sources */,
 				F923943B2C4CE73D00A40989 /* UserInput.swift in Sources */,

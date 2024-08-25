@@ -1,31 +1,21 @@
 import Foundation
 
-final class AuthService {
-    private let userDefaults: UserDefaults
-    
-    var isLoggedIn: Bool {
-        get {
-            userDefaults.bool(forKey: Key.isLogin.rawValue)
-        }
-        set {
-            userDefaults.set(newValue, forKey: Key.isLogin.rawValue)
-        }
-    }
-    
-    init(userDefaults: UserDefaults = UserDefaults()) {
-        self.userDefaults = userDefaults
-    }
-   
-    func login(completion: @escaping (Bool) -> Void) {
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-            self.isLoggedIn = true
-            completion(true)
-        }
-    }
+protocol AuthServiceProtocol {
+    func login(completion: @escaping (Bool) -> Void)
 }
 
-private extension AuthService {
-    enum Key: String {
-        case isLogin
+final class AuthService: AuthServiceProtocol {
+    private let authDataStorage: AuthDataStorage
+    
+    init(authDataStorage: AuthDataStorage) {
+        self.authDataStorage = authDataStorage
+    }
+    
+    func login(completion: @escaping (Bool) -> Void) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1) { [authDataStorage] in
+            authDataStorage.isUserLoggedIn = true
+            
+            completion(true)
+        }
     }
 }

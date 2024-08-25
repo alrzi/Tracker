@@ -14,16 +14,23 @@ protocol TrackerFiltersDataStorage: AnyObject {
 extension TrackerFiltersDataStorage where Self: DataStorageProtocol {
     var trackerFilters: TrackerFilters {
         get {
-            getCodableValue(key: ChecklistDataStorageKey.trackerFilter, storage: .standard) ?? .completedForDate
+            getCodableValue(
+                key: TrackerFiltersDataStorageKey.trackerFilter,
+                storage: .standard
+            ) ?? .completedForDate
         }
         set {
-            setCodableValue(newValue, key: ChecklistDataStorageKey.trackerFilter, storage: .standard)            
+            setCodableValue(
+                newValue,
+                key: TrackerFiltersDataStorageKey.trackerFilter,
+                storage: .standard
+            )
         }
     }
 }
 
 extension DataStorage: TrackerFiltersDataStorage { }
 
-private enum ChecklistDataStorageKey: String, DataStorageKey {
+private enum TrackerFiltersDataStorageKey: String, DataStorageKey {
     case trackerFilter
 }

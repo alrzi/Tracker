@@ -1,17 +1,13 @@
 final class SplashViewModel {
-    private let authService: AuthService
+    private let authService: AuthServiceProtocol
     private let router: SplashViewRouter
 
     init(
-        authService: AuthService,
+        authService: AuthServiceProtocol,
         router: SplashViewRouter
     ) {
         self.authService = authService
         self.router = router
-    }
-
-    func isUserLoggedIn() -> Bool {
-        authService.isLoggedIn
     }
 
     func loginUser() {

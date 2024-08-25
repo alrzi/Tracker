@@ -59,7 +59,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             trackerManager: trackerManager            
         )
         
-        let authService = AuthService()
+        let authService = AuthService(authDataStorage: dataStorage)
         let analyticsService = AnalyticsService()
         
         let categoryRepository = CategoryRepository(

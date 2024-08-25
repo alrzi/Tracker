@@ -7,6 +7,7 @@
 
 import Foundation
 import UIKit
+import Presentation
 
 final class StatisticAssembly: ViewControllerAssembly {
     typealias Context = ()

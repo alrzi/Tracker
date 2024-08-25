@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Presentation
 
 final class TrackerCreationAssembly: ViewControllerAssembly {
     typealias Context = LifecycleManagingContext<TrackerCreationViewModel.Action, Never, CreateTrackerMode>

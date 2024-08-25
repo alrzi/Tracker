@@ -25,13 +25,11 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         
         let analyticsTracker = YMMYandexMetricaAnaliticsTracker()
         
-        let sharedUserDefaults = UserDefaults(suiteName: "shared") ?? .standard
-        
         let dataStorage = DataStorage(
             jsonDecoder: JSONDecoder(),
             jsonEncoder: JSONEncoder(),
             userDefaults: .standard,
-            sharedUserDefaults: sharedUserDefaults
+            sharedUserDefaults: UserDefaults(suiteName: "shared") ?? .standard
         )
         
         let persistencyService = PersistencyService()

@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Presentation
 
 final class TrackerTypeSelectionAssembly: ViewControllerAssembly {
     typealias Context = LifecycleManagingContext<TrackerKind, Never, ()>

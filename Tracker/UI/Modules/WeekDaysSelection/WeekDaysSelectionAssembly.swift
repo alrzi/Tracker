@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Presentation
 
 final class WeekDaysSelectionAssembly: ViewControllerAssembly {
     typealias WeekDays = Set<Int>

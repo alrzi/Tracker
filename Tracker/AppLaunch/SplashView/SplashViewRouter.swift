@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import Presentation
 
 final class SplashViewRouter {
     private let tabBarAssembly: TabBarAssembly

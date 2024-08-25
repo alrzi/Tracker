@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Presentation
 
 final class CategoryListAssembly: ViewControllerAssembly {
     typealias Output = CategoriesListViewModel.Output

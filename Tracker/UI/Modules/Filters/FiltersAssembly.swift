@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Presentation
 
 final class FiltersAssembly: ViewControllerAssembly {
     typealias Context = LifecycleManagingContext<TrackerFilters, Never, TrackerFilters>

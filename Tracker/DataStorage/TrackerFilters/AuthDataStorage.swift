@@ -27,4 +27,3 @@ extension DataStorage: AuthDataStorage { }
 private enum AuthDataStorageKey: String, DataStorageKey {
     case isUserLoggedIn
 }
-

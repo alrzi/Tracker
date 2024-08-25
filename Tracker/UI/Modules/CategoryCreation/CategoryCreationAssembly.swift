@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Presentation
 
 final class CategoryCreationAssembly: ViewControllerAssembly {
     typealias Context = LifecycleManagingContext<(), Never, CategoryCreationViewModel.Mode>

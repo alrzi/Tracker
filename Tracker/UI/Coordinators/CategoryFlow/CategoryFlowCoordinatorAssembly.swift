@@ -6,6 +6,7 @@
 //
 
 import Combine
+import Presentation
 
 final class CategoryFlowCoordinatorAssembly {
     private let categoryListAssembly: CategoryListAssembly

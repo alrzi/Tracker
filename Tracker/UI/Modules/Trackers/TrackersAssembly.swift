@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Presentation
 
 final class TrackersAssembly: ViewControllerAssembly {
     typealias Context = ()

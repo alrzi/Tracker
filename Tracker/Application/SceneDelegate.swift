@@ -22,7 +22,9 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         let windowFromScene = UIWindow(windowScene: windowScene)
         
         // MARK: - Servises
-                
+        
+        let analyticsTracker = YMMYandexMetricaAnaliticsTracker()
+        
         let sharedUserDefaults = UserDefaults(suiteName: "shared") ?? .standard
         
         let dataStorage = DataStorage(
@@ -59,8 +61,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             trackerManager: trackerManager            
         )
         
-        let authService = AuthService(authDataStorage: dataStorage)
-        let analyticsService = AnalyticsService()
+        let authService = AuthService(authDataStorage: dataStorage)        
         
         let categoryRepository = CategoryRepository(
             persistencyService: persistencyService,
@@ -110,8 +111,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         )
         
         let trackersAssembly = TrackersAssembly(
-            trackerFiltersDataStorage: dataStorage,
-            analyticsService: analyticsService,
+            trackerFiltersDataStorage: dataStorage, 
+            analyticsTracker: analyticsTracker,
             pinnedDataProvider: pinnedTrackersDataProvider,
             dataProvider: dataProvider,
             trackerManager: trackerManager, 

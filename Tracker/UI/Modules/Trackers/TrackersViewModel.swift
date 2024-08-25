@@ -10,7 +10,7 @@ import Foundation
 
 final class TrackersViewModel {
     private let trackerFiltersDataStorage: TrackerFiltersDataStorage
-    private let analyticsService: AnalyticsService
+    private let analyticsTracker: AnalyticsTracking
     private let pinnedDataProvider: PinnedDataProvider
     private let dataProvider: DataProvider
     private let trackerManager: TrackerManaging
@@ -26,14 +26,14 @@ final class TrackersViewModel {
     
     init(
         trackerFiltersDataStorage: TrackerFiltersDataStorage,
-        analyticsService: AnalyticsService,
+        analyticsTracker: AnalyticsTracking,
         pinnedDataProvider: PinnedDataProvider,
         dataProvider: DataProvider,
         trackerManager: TrackerManaging,
         router: TrackersViewRouter
     ) {
         self.trackerFiltersDataStorage = trackerFiltersDataStorage
-        self.analyticsService = analyticsService
+        self.analyticsTracker = analyticsTracker
         self.pinnedDataProvider = pinnedDataProvider
         self.dataProvider = dataProvider
         self.trackerManager = trackerManager
@@ -102,11 +102,7 @@ final class TrackersViewModel {
     }
     
     func onAppear() {
-        analyticsService.handleAnalitics(event: .screenOpen(.main))
-    }
-    
-    func onDisappear() {
-        analyticsService.handleAnalitics(event: .screenClose(.main))
+        analyticsTracker.track(event: .trackers(event: .onAppear))
     }
 }
 
@@ -117,6 +113,8 @@ extension TrackersViewModel {
         guard let tracker = state.item(at: indexPath) else {
             return
         }
+        
+        analyticsTracker.track(event: .trackers(event: .action(.onTrackerPin)))
         
         do {
             try trackerManager.pin(tracker: tracker)
@@ -131,6 +129,8 @@ extension TrackersViewModel {
             return
         }
         
+        analyticsTracker.track(event: .trackers(event: .action(.onTrackerPin)))
+        
         do {
             try trackerManager.unPin(tracker: tracker)
         }
@@ -144,8 +144,6 @@ extension TrackersViewModel {
             return
         }
         
-        analyticsService.handleAnalitics(event: .trackItemClick(.main, .track))
-        
         trackerManager.saveAsCompleted(tracker: tracker, for: date)
     }
     
@@ -154,7 +152,7 @@ extension TrackersViewModel {
             return
         }
         
-        analyticsService.handleAnalitics(event: .deleteItemClick(.main, .delete))
+        analyticsTracker.track(event: .trackers(event: .action(.onTrackerDelete)))
         
         do {
             try trackerManager.deleteTrackerBy(id: tracker.id)
@@ -219,7 +217,7 @@ extension TrackersViewModel {
 
 extension TrackersViewModel {
     func onFilterButton() {
-        analyticsService.handleAnalitics(event: .filterItemClick(.main, .filter))
+        analyticsTracker.track(event: .trackers(event: .action(.onChooseFilter)))
         
         router.showFiltersAssembly(filter: currentFilter.value)
             .sink { [weak self] in self?.updateCurrentFilter($0) }
@@ -227,7 +225,7 @@ extension TrackersViewModel {
     }
             
     func onCreateTracker() {
-        analyticsService.handleAnalitics(event: .addTracker(.main, .addTrack))
+        analyticsTracker.track(event: .trackers(event: .action(.onAddTracker)))
         
         router.showTrackerUpdatingFlow()
             .print(String(describing: TrackersViewModel.self))
@@ -240,7 +238,7 @@ extension TrackersViewModel {
             return
         }
         
-        analyticsService.handleAnalitics(event: .editItemClick(.main, .edit))
+        analyticsTracker.track(event: .trackers(event: .action(.onTrackerEdit)))
         
         router.showTrackerUpdatingFlow(tracker: tracker, date: date)
             .print(String(describing: TrackersViewModel.self))

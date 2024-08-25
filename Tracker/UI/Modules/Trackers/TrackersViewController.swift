@@ -102,12 +102,6 @@ final class TrackersViewController: UIViewController {
         
         viewModel.onAppear()
     }
-
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-        
-        viewModel.onDisappear()
-    }
     
     @objc 
     private func onFilterButton() {

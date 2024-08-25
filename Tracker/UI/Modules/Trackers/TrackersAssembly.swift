@@ -11,7 +11,7 @@ final class TrackersAssembly: ViewControllerAssembly {
     typealias Context = ()
     
     private let trackerFiltersDataStorage: TrackerFiltersDataStorage
-    private let analyticsService: AnalyticsService
+    private let analyticsTracker: AnalyticsTracking
     private let pinnedDataProvider: PinnedDataProvider
     private let dataProvider: DataProvider
     private let trackerManager: TrackerManaging
@@ -22,7 +22,7 @@ final class TrackersAssembly: ViewControllerAssembly {
     
     init(
         trackerFiltersDataStorage: TrackerFiltersDataStorage,
-        analyticsService: AnalyticsService,
+        analyticsTracker: AnalyticsTracking,
         pinnedDataProvider: PinnedDataProvider,
         dataProvider: DataProvider,
         trackerManager: TrackerManaging,
@@ -31,7 +31,7 @@ final class TrackersAssembly: ViewControllerAssembly {
         filtersAssembly: FiltersAssembly
     ) {
         self.trackerFiltersDataStorage = trackerFiltersDataStorage
-        self.analyticsService = analyticsService
+        self.analyticsTracker = analyticsTracker
         self.pinnedDataProvider = pinnedDataProvider
         self.dataProvider = dataProvider
         self.trackerManager = trackerManager
@@ -52,7 +52,7 @@ final class TrackersAssembly: ViewControllerAssembly {
         
         let viewModel = TrackersViewModel(
             trackerFiltersDataStorage: trackerFiltersDataStorage,
-            analyticsService: analyticsService,
+            analyticsTracker: analyticsTracker,
             pinnedDataProvider: pinnedDataProvider,
             dataProvider: dataProvider,
             trackerManager: trackerManager,

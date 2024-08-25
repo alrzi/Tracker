@@ -39,6 +39,11 @@
 		F94C4B1C2C43C64100349CE0 /* NSCollectionLayoutItem+createLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = F94C4B1B2C43C64100349CE0 /* NSCollectionLayoutItem+createLayout.swift */; };
 		F94D0D192C430C6800D57C80 /* TrackersCollectionCellState.swift in Sources */ = {isa = PBXBuildFile; fileRef = F94D0D182C430C6800D57C80 /* TrackersCollectionCellState.swift */; };
 		F9551B112C7B1EC500DE3894 /* AuthDataStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9551B102C7B1EC500DE3894 /* AuthDataStorage.swift */; };
+		F9551B142C7B291100DE3894 /* TrackType.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9551B132C7B291100DE3894 /* TrackType.swift */; };
+		F9551B172C7B2AC400DE3894 /* TrackersEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9551B162C7B2AC400DE3894 /* TrackersEvent.swift */; };
+		F9551B1A2C7B2BCE00DE3894 /* TrackType+eventName.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9551B192C7B2BCE00DE3894 /* TrackType+eventName.swift */; };
+		F9551B1C2C7B2C1800DE3894 /* TrackType+eventParameters.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9551B1B2C7B2C1800DE3894 /* TrackType+eventParameters.swift */; };
+		F957BC342C7BA97F0047559E /* YMMYandexMetricaTracker.swift in Sources */ = {isa = PBXBuildFile; fileRef = F957BC332C7BA97F0047559E /* YMMYandexMetricaTracker.swift */; };
 		F967CCC029E08C2F00E3C811 /* DataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = F967CCBF29E08C2F00E3C811 /* DataSource.swift */; };
 		F967CCCD29E1604B00E3C811 /* WeekDays.swift in Sources */ = {isa = PBXBuildFile; fileRef = F967CCCC29E1604B00E3C811 /* WeekDays.swift */; };
 		F967CCF229E1B5CE00E3C811 /* CategoriesListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F967CCF129E1B5CE00E3C811 /* CategoriesListViewController.swift */; };
@@ -147,7 +152,6 @@
 		F99792522C4461750086E42C /* RecordObject.swift in Sources */ = {isa = PBXBuildFile; fileRef = F99792512C4461750086E42C /* RecordObject.swift */; };
 		F99B2EAA2A2E51F4007B6E30 /* XCAssets+Generated.swift in Sources */ = {isa = PBXBuildFile; fileRef = F99B2EA82A2E51F4007B6E30 /* XCAssets+Generated.swift */; };
 		F99B2EAB2A2E51F4007B6E30 /* Strings+Generated.swift in Sources */ = {isa = PBXBuildFile; fileRef = F99B2EA92A2E51F4007B6E30 /* Strings+Generated.swift */; };
-		F9A68DF72A2F992D0074E1BC /* AnalyticsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9A68DF62A2F992D0074E1BC /* AnalyticsService.swift */; };
 		F9B16C922C5EB46D00713198 /* PinnedDataProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9B16C912C5EB46D00713198 /* PinnedDataProvider.swift */; };
 		F9B4C3052C5E1C4500521C0E /* ToNavigationFlowRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9B4C3032C5E1C4500521C0E /* ToNavigationFlowRouter.swift */; };
 		F9B4C3072C5E1D6F00521C0E /* With.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9B4C3062C5E1D6F00521C0E /* With.swift */; };
@@ -214,6 +218,11 @@
 		F94C4B1B2C43C64100349CE0 /* NSCollectionLayoutItem+createLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSCollectionLayoutItem+createLayout.swift"; sourceTree = "<group>"; };
 		F94D0D182C430C6800D57C80 /* TrackersCollectionCellState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackersCollectionCellState.swift; sourceTree = "<group>"; };
 		F9551B102C7B1EC500DE3894 /* AuthDataStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthDataStorage.swift; sourceTree = "<group>"; };
+		F9551B132C7B291100DE3894 /* TrackType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackType.swift; sourceTree = "<group>"; };
+		F9551B162C7B2AC400DE3894 /* TrackersEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackersEvent.swift; sourceTree = "<group>"; };
+		F9551B192C7B2BCE00DE3894 /* TrackType+eventName.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TrackType+eventName.swift"; sourceTree = "<group>"; };
+		F9551B1B2C7B2C1800DE3894 /* TrackType+eventParameters.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TrackType+eventParameters.swift"; sourceTree = "<group>"; };
+		F957BC332C7BA97F0047559E /* YMMYandexMetricaTracker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YMMYandexMetricaTracker.swift; sourceTree = "<group>"; };
 		F967CCBF29E08C2F00E3C811 /* DataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataSource.swift; sourceTree = "<group>"; };
 		F967CCCC29E1604B00E3C811 /* WeekDays.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeekDays.swift; sourceTree = "<group>"; };
 		F967CCF129E1B5CE00E3C811 /* CategoriesListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoriesListViewController.swift; sourceTree = "<group>"; };
@@ -325,7 +334,6 @@
 		F99792512C4461750086E42C /* RecordObject.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordObject.swift; sourceTree = "<group>"; };
 		F99B2EA82A2E51F4007B6E30 /* XCAssets+Generated.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "XCAssets+Generated.swift"; sourceTree = "<group>"; };
 		F99B2EA92A2E51F4007B6E30 /* Strings+Generated.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Strings+Generated.swift"; sourceTree = "<group>"; };
-		F9A68DF62A2F992D0074E1BC /* AnalyticsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsService.swift; sourceTree = "<group>"; };
 		F9B16C912C5EB46D00713198 /* PinnedDataProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PinnedDataProvider.swift; sourceTree = "<group>"; };
 		F9B4C3032C5E1C4500521C0E /* ToNavigationFlowRouter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ToNavigationFlowRouter.swift; sourceTree = "<group>"; };
 		F9B4C3062C5E1D6F00521C0E /* With.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = With.swift; sourceTree = "<group>"; };
@@ -523,6 +531,7 @@
 				F970EF072A0A6BB700AAAA84 /* Serveses */,
 				F97774ED29D4441A00959E7C /* UI */,
 				F967CCF329E1B6BE00E3C811 /* UIComponents */,
+				F9551B122C7B290600DE3894 /* TrackType */,
 				F92FED262C7A79660000B106 /* DataStorage */,
 				F98E13872C39D63A00A20C97 /* Presentation */,
 			);
@@ -626,6 +635,33 @@
 			path = CellState;
 			sourceTree = "<group>";
 		};
+		F9551B122C7B290600DE3894 /* TrackType */ = {
+			isa = PBXGroup;
+			children = (
+				F9551B132C7B291100DE3894 /* TrackType.swift */,
+				F9551B152C7B2AB900DE3894 /* Events */,
+				F9551B182C7B2BBA00DE3894 /* Extensions */,
+			);
+			path = TrackType;
+			sourceTree = "<group>";
+		};
+		F9551B152C7B2AB900DE3894 /* Events */ = {
+			isa = PBXGroup;
+			children = (
+				F9551B162C7B2AC400DE3894 /* TrackersEvent.swift */,
+			);
+			path = Events;
+			sourceTree = "<group>";
+		};
+		F9551B182C7B2BBA00DE3894 /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				F9551B192C7B2BCE00DE3894 /* TrackType+eventName.swift */,
+				F9551B1B2C7B2C1800DE3894 /* TrackType+eventParameters.swift */,
+			);
+			path = Extensions;
+			sourceTree = "<group>";
+		};
 		F967CCC929E0929600E3C811 /* Cells */ = {
 			isa = PBXGroup;
 			children = (
@@ -687,8 +723,8 @@
 		F970EF072A0A6BB700AAAA84 /* Serveses */ = {
 			isa = PBXGroup;
 			children = (
+				F957BC332C7BA97F0047559E /* YMMYandexMetricaTracker.swift */,
 				F946FB552A1938CB00579E93 /* AlertPresenter.swift */,
-				F9A68DF62A2F992D0074E1BC /* AnalyticsService.swift */,
 				F970EF082A0A6BC800AAAA84 /* AuthService.swift */,
 				F967CCBF29E08C2F00E3C811 /* DataSource.swift */,
 				F968BB0B2C5FF4D200E50393 /* RandomEmojiService.swift */,
@@ -1355,14 +1391,15 @@
 				F98E13972C39D63A00A20C97 /* WindowPresentationContext.swift in Sources */,
 				F97E8FE229E3FF82002BB0C8 /* CGFloat+Extension.swift in Sources */,
 				F98E139C2C39D63A00A20C97 /* TransitionNavigationControllerPresenter.swift in Sources */,
-				F9A68DF72A2F992D0074E1BC /* AnalyticsService.swift in Sources */,
 				F97E3C0D29FEC053001C252E /* CategoryViewModel.swift in Sources */,
 				F98E13AC2C39D63A00A20C97 /* ToModuleRouting.swift in Sources */,
+				F9551B142C7B291100DE3894 /* TrackType.swift in Sources */,
 				F967CCC029E08C2F00E3C811 /* DataSource.swift in Sources */,
 				F9053E792A2C806400C93CC7 /* CategoryCreationViewModel.swift in Sources */,
 				F909DB8D2C445BC5002D7CAC /* TrackerObject.swift in Sources */,
 				F978FA982A2A610C002F415F /* SplashViewModel.swift in Sources */,
 				F97774E42C5E820700306BB1 /* TrackerCreationFlowCoordinatorRouter.swift in Sources */,
+				F957BC342C7BA97F0047559E /* YMMYandexMetricaTracker.swift in Sources */,
 				F97D20AC2C581C6A00F23191 /* CreateTrackerMode.swift in Sources */,
 				F91D42012C54DE2A00CC77D6 /* StatisticTableData.swift in Sources */,
 				F98E138F2C39D63A00A20C97 /* LifecycleManagingContextProtocol.swift in Sources */,
@@ -1423,6 +1460,7 @@
 				F98181E92C5AC8330058CD10 /* PredicateBuilder.swift in Sources */,
 				F97774EF29D4456100959E7C /* TrackerCollectionHeader.swift in Sources */,
 				F98E13AA2C39D63A00A20C97 /* ToPopoverModuleRouting.swift in Sources */,
+				F9551B172C7B2AC400DE3894 /* TrackersEvent.swift in Sources */,
 				F9F1233C29D899050039D1B3 /* CreateTrackerCollectionColorCell.swift in Sources */,
 				F98840DF29F1699F00422FD5 /* DataProvider.swift in Sources */,
 				F98E13912C39D63A00A20C97 /* NavigationPresentationType.swift in Sources */,
@@ -1440,6 +1478,8 @@
 				F98235CF29FBD1E700B7CEEC /* OnboardingViewController.swift in Sources */,
 				F9C796F02C426F9E00212F79 /* TrackerFilters.swift in Sources */,
 				F98E13A82C39D63A00A20C97 /* PopoverPresentationConfiguration.swift in Sources */,
+				F9551B1C2C7B2C1800DE3894 /* TrackType+eventParameters.swift in Sources */,
+				F9551B1A2C7B2BCE00DE3894 /* TrackType+eventName.swift in Sources */,
 				F98E13A92C39D63A00A20C97 /* PopoverModuleRouter.swift in Sources */,
 				F98E13A42C39D63A00A20C97 /* ToModalModuleRouting.swift in Sources */,
 				F967CCF929E1C75F00E3C811 /* FrameViewController.swift in Sources */,

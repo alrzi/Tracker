@@ -239,7 +239,7 @@ extension TrackersViewController: TrackerCollectionViewCellDelegate {
         guard let indexPath = collectionView.indexPath(for: cell) else { 
             return
         }
-                
+        
         viewModel.onPinTracker(at: indexPath)
     }
     

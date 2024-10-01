@@ -6,22 +6,22 @@
 //
 
 import Foundation
-import YandexMobileMetrica
+import AppMetricaCore
 
 protocol AnalyticsTracking {
     func track(event: TrackType)
 }
 
 final class YMMYandexMetricaAnaliticsTracker: AnalyticsTracking {
-    private let tracker: YMMYandexMetrica.Type
+    private let tracker: AppMetrica.Type
     
     init(
-        tracker: YMMYandexMetrica.Type = YMMYandexMetrica.self,
+        tracker: AppMetrica.Type = AppMetrica.self,
         configuration: Credentials = .current
     ) {
         self.tracker = tracker
                 
-        guard let configuration = YMMYandexMetricaConfiguration(apiKey: configuration.apiKey) else {
+        guard let configuration = AppMetricaConfiguration(apiKey: configuration.apiKey) else {
             return
         }
         
@@ -29,7 +29,7 @@ final class YMMYandexMetricaAnaliticsTracker: AnalyticsTracking {
     }
     
     func track(event: TrackType) {        
-        tracker.reportEvent(event.name, parameters: event.properties)
+        tracker.reportEvent(name: event.name, parameters: event.properties)
     }
 }
 

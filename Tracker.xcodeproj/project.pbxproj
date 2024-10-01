@@ -142,8 +142,6 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		90003960EBE3DE9E0500D2BE /* Pods_Tracker.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Tracker.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		ED63C7EF66FAEB751E0D5348 /* Pods_TrackerTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_TrackerTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		F9053E782A2C806400C93CC7 /* CategoryCreationViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryCreationViewModel.swift; sourceTree = "<group>"; };
 		F909DB852C4459BD002D7CAC /* PersistencyService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PersistencyService.swift; sourceTree = "<group>"; };
 		F909DB872C4459C4002D7CAC /* Entity.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Entity.swift; sourceTree = "<group>"; };
@@ -294,15 +292,6 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		E28BC347E8C0228B7EC5F3D8 /* Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-				90003960EBE3DE9E0500D2BE /* Pods_Tracker.framework */,
-				ED63C7EF66FAEB751E0D5348 /* Pods_TrackerTests.framework */,
-			);
-			name = Frameworks;
-			sourceTree = "<group>";
-		};
 		F909DB8A2C445B97002D7CAC /* Objects */ = {
 			isa = PBXGroup;
 			children = (
@@ -418,7 +407,6 @@
 				F970880B2A2E4C4A008DD1DE /* swiftgen.yml */,
 				F918018429CEECCB00767F16 /* Tracker */,
 				F93E19502CAC3AA80006F56E /* TrackerTests */,
-				E28BC347E8C0228B7EC5F3D8 /* Frameworks */,
 				F918018329CEECCB00767F16 /* Products */,
 			);
 			sourceTree = "<group>";

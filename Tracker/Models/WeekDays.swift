@@ -13,25 +13,25 @@ public enum WeekDay: Int64, CaseIterable {
     
     var abbreviationLong: String {
         switch self {
-        case .monday: return Strings.Localizable.Schedule.monday
-        case .tuesday: return Strings.Localizable.Schedule.tuesday
-        case .wednesday: return Strings.Localizable.Schedule.wednesday
-        case .thursday: return Strings.Localizable.Schedule.thursday
-        case .friday: return Strings.Localizable.Schedule.friday
-        case .saturday: return Strings.Localizable.Schedule.saturday
-        case .sunday: return Strings.Localizable.Schedule.sunday
+        case .monday: Strings.Localizable.Schedule.monday
+        case .tuesday: Strings.Localizable.Schedule.tuesday
+        case .wednesday: Strings.Localizable.Schedule.wednesday
+        case .thursday: Strings.Localizable.Schedule.thursday
+        case .friday: Strings.Localizable.Schedule.friday
+        case .saturday: Strings.Localizable.Schedule.saturday
+        case .sunday: Strings.Localizable.Schedule.sunday
         }
     }
     
     var abbreviationShort: String {
         switch self {
-        case .monday: return Strings.Localizable.Schedule.mon
-        case .tuesday: return Strings.Localizable.Schedule.tue
-        case .wednesday: return Strings.Localizable.Schedule.wed
-        case .thursday: return Strings.Localizable.Schedule.thu
-        case .friday: return Strings.Localizable.Schedule.fri
-        case .saturday: return Strings.Localizable.Schedule.sat
-        case .sunday: return Strings.Localizable.Schedule.sun
+        case .monday: Strings.Localizable.Schedule.mon
+        case .tuesday: Strings.Localizable.Schedule.tue
+        case .wednesday: Strings.Localizable.Schedule.wed
+        case .thursday: Strings.Localizable.Schedule.thu
+        case .friday: Strings.Localizable.Schedule.fri
+        case .saturday: Strings.Localizable.Schedule.sat
+        case .sunday: Strings.Localizable.Schedule.sun
         }
     }
 }
@@ -43,6 +43,16 @@ extension WeekDay: Comparable {
 }
 
 extension Set<Int> {
+    static func fromString(_ str: String) -> Set<Int>? {
+        let maxElement = 6
+        let elements = str
+            .components(separatedBy: ", ") // turn to array of string numbers
+            .compactMap { Int($0.trimmingCharacters(in: .whitespaces)) }
+            .filter { 0...maxElement ~= $0 } // filter to have only numbers from 0..<7
+        
+        return Set(elements) // turn to set
+    }
+    
     func weekdayStringShort() -> String {
         if self == WeekDay.allDaysOfWeek {
             return Strings.Localizable.Schedule.everyday
@@ -63,15 +73,5 @@ extension Set<Int> {
             .sorted() // sort Comparable
             .map { String($0) } // map(transform) to string
             .joined(separator: ", ") // joing with coma
-    }
-
-    static func fromString(_ str: String) -> Set<Int>? {
-        let maxElement = 6
-        let elements = str
-            .components(separatedBy: ", ") // turn to array of string numbers
-            .compactMap { Int($0.trimmingCharacters(in: .whitespaces)) }
-            .filter { 0...maxElement ~= $0 } // filter to have only numbers from 0..<7
-        
-        return Set(elements) // turn to set
     }
 }

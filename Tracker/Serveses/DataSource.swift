@@ -30,7 +30,7 @@ struct DataSourceImpl {
             "🙌", "🍔", "🥦", "🏓", "🥇",
             "🎸", "🏝️", "😪"
         ]),
-        .colorSection(items: CollectionViewColors.array)
+        .colorSection(items: CollectionViewColors.allCases)
     ]
     
     private var firstRowData: [TableData] {
@@ -131,10 +131,6 @@ enum CollectionViewData {
 }
 
 enum CollectionViewColors: String, CaseIterable {
-    static var array: [CollectionViewColors] {
-        CollectionViewColors.allCases
-    }
-    
     case color0 = "#FD4C49"
     case color1 = "#FF881E"
     case color2 = "#007BFA"

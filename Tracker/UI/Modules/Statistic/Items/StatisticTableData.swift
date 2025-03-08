@@ -15,10 +15,10 @@ enum StatisticTableData {
 
     var title: String {
         switch self {
-        case .bestPeriod: Strings.Localizable.Statistic.bestPeriod
-        case .idealDays: Strings.Localizable.Statistic.idealDays
-        case .completedTrackers: Strings.Localizable.Statistic.completed
-        case .averageValue: Strings.Localizable.Statistic.avarageValue
+        case .bestPeriod: "Strings.Localizable.Statistic.bestPeriod"
+        case .idealDays: "Strings.Localizable.Statistic.idealDays"
+        case .completedTrackers: "Strings.Localizable.Statistic.completed"
+        case .averageValue: "Strings.Localizable.Statistic.avarageValue"
         }
     }
     

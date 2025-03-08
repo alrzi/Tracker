@@ -3,7 +3,7 @@ import Combine
 
 final class CategoryCreationViewController: FrameViewController {
     private lazy var textField: TrackerUITextField = {
-        let view = TrackerUITextField(text: Strings.Localizable.NewCategory.enterName)
+        let view = TrackerUITextField(text: "Strings.Localizable.NewCategory.enterName")
         view.delegate = self
         return view
     }()
@@ -19,7 +19,7 @@ final class CategoryCreationViewController: FrameViewController {
         let view = UILabel()
         view.numberOfLines = .zero
         view.font = .regular17
-        view.textColor = Asset.Colors.myRed.color
+        view.textColor = .red
         view.textAlignment = .center
         return view
     }()
@@ -33,10 +33,10 @@ final class CategoryCreationViewController: FrameViewController {
         self.viewModel = viewModel
         
         super.init(
-            title: Strings.Localizable.NewCategory.new,
+            title: "Strings.Localizable.NewCategory.new",
             buttonCenter: ActionButton(
                 colorType: .grey,
-                title: Strings.Localizable.NewCategory.ready
+                title: "Strings.Localizable.NewCategory.ready"
             )
         )
     }
@@ -118,7 +118,7 @@ private extension CategoryCreationViewController {
             buttonCenter?.colorType = .black
         
         case .unavailable:
-            warningCharactersLabel.text = Strings.Localizable.NewCategory.alreadyExist
+            warningCharactersLabel.text = "Strings.Localizable.NewCategory.alreadyExist"
             warningCharactersLabel.textColor = .systemRed
             buttonCenter?.colorType = .grey
         

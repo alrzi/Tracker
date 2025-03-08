@@ -9,7 +9,7 @@ final class CategoriesListViewController: FrameViewController {
         view.contentInset.top = UIConstants.topInset
         view.separatorInset.left = 16
         view.separatorInset.right = 16
-        view.separatorColor = Asset.Colors.myGray.color
+        view.separatorColor = .gray
         view.backgroundColor = .clear
         view.showsVerticalScrollIndicator = false
         view.register(cellClass: CategoryTableViewCell.self)
@@ -45,10 +45,10 @@ final class CategoriesListViewController: FrameViewController {
         self.viewModel = viewModel
         
         super.init(
-            title: Strings.Localizable.Category.category,
+            title: "Strings.Localizable.Category.category",
             buttonCenter: ActionButton(
                 colorType: .black,
-                title: Strings.Localizable.Category.addNew
+                title: "Strings.Localizable.Category.addNew"
             )
         )
     }
@@ -155,14 +155,18 @@ extension CategoriesListViewController: UIContextMenuInteractionDelegate {
             self.tableView.separatorColor = .clear
         }
 
-        let updateAction = UIAction(title: Strings.Localizable.Context.update) { [weak self] _ in
-            guard let self = self else { return }
+        let updateAction = UIAction(title: "Strings.Localizable.Context.update") { [weak self] _ in
+            guard let self else {
+                return
+            }
             self.viewModel.onUpdateCategory(at: indexPath)
         }
         
-        let deleteAction = UIAction(title: Strings.Localizable.Context.delete, attributes: .destructive) { [weak self] _ in
-            guard let self = self else { return }
-            alertPresenter.show(message:  Strings.Localizable.Alert.confirmationCategory) { [weak self] in
+        let deleteAction = UIAction(title: "Strings.Localizable.Context.delete", attributes: .destructive) { [weak self] _ in
+            guard let self else {
+                return
+            }
+            alertPresenter.show(message:  "Strings.Localizable.Alert.confirmationCategory") { [weak self] in
                 self?.viewModel.deleteCategoryAt(indexPath: indexPath)
             }
         }
@@ -173,7 +177,7 @@ extension CategoriesListViewController: UIContextMenuInteractionDelegate {
             identifier: nil,
             previewProvider: nil
         ) { _ in
-            return menu
+            menu
         }
     }
 
@@ -183,7 +187,7 @@ extension CategoriesListViewController: UIContextMenuInteractionDelegate {
         animator: UIContextMenuInteractionAnimating?
     ) {
         UIView.animate(withDuration: 0.3) {
-            self.tableView.separatorColor = Asset.Colors.myGray.color
+            self.tableView.separatorColor = .gray
         }
     }
 }

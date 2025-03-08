@@ -91,7 +91,7 @@ private extension CreateTrackerCollectionColorCell {
     func configureCell() {
         switch cellState {
         case .selected:
-            let image = Asset.Assets._09cellBorder.image
+            let image = UIImage(named: "09cellBorder")!
                 .withTintColor(colorView.backgroundColor ?? .clear, renderingMode: .alwaysOriginal)
             UIView.animate(withDuration: 0.3, delay: 0) {
                 self.highlightedImage.image = image

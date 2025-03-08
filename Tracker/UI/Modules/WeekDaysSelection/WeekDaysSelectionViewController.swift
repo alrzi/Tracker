@@ -4,8 +4,8 @@ final class WeekDaysSelectionViewController: FrameViewController {
     private lazy var tableView: UITableView = {
         let view = UITableView()
         view.contentInset.top = UIConstants.topInset
-        view.separatorColor = Asset.Colors.myGray.color
-        view.backgroundColor = Asset.Colors.myWhite.color
+        view.separatorColor = .gray
+        view.backgroundColor = .white
         view.allowsSelection = true
         view.separatorStyle = .singleLine
         view.showsVerticalScrollIndicator = false
@@ -32,8 +32,8 @@ final class WeekDaysSelectionViewController: FrameViewController {
         self.weekDaysToShow = weekDaysToShow
         
         super.init(
-            title: Strings.Localizable.schedule,
-            buttonCenter: ActionButton(colorType: .black, title: Strings.Localizable.Schedule.ready)
+            title: "Strings.Localizable.schedule",
+            buttonCenter: ActionButton(colorType: .black, title:" Strings.Localizable.Schedule.ready")
         )
     }
     

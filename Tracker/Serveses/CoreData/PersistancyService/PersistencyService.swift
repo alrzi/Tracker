@@ -99,12 +99,6 @@ public extension PersistencyService {
         
         return []
     }
-    
-    func fetchObject<T: NSManagedObject>(with fetchRequest: NSFetchRequest<T>) async throws -> [T] {
-        try await managedObjectContext.perform {
-            return try self.managedObjectContext.fetch(fetchRequest)
-        }
-    }
 
     func fetchCount<T: NSManagedObject>(with fetchRequest: NSFetchRequest<T>) -> Int {
         do {
@@ -183,5 +177,22 @@ public extension PersistencyService {
         catch {
             return nil
         }
+    }
+    
+    
+    func fetchObject<T: NSManagedObject>(with fetchRequest: NSFetchRequest<T>) async throws -> [T] {
+        try await managedObjectContext.perform {
+            return try self.managedObjectContext.fetch(fetchRequest)
+        }
+    }
+    
+    func fetchObjects<T: NSManagedObject>(_ type: T.Type) async throws -> [T] where T: Entity {
+        let fetchRequest = NSFetchRequest<T>(entityName: type.entityName)
+        
+        return try await managedObjectContext.perform {
+            return try self.managedObjectContext.fetch(fetchRequest)
+        }
+        
+        return []
     }
 }

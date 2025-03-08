@@ -77,7 +77,7 @@ extension UICollectionView {
     ) {
         // if cell selected first time
         if let newIndexPath = self.indexPathsForSelectedItems?.first {
-            guard let previouslySelectedIndexPath = previouslySelectedIndexPath else {
+            guard let previouslySelectedIndexPath else {
                 if let cell = self.cellForItem(at: newIndexPath) as? T {
                     cell.highlight()
                     configureSelectedCell?(cell.content)

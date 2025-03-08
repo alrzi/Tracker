@@ -27,13 +27,13 @@ final class DaysUpdaitingView: UIView {
     
     private let incrementButton: UIButton = {
         let view = UIButton()
-        view.setImage(Asset.Assets._17increment.image, for: .normal)
+        view.setImage(UIImage(named: "03onboardingBlue")!, for: .normal)
         return view
     }()
     
     private let decrementButton: UIButton = {
         let view = UIButton()
-        view.setImage(Asset.Assets._16decrement.image, for: .normal)
+        view.setImage(UIImage(named: "03onboardingBlue")!, for: .normal)
         return view
     }()
     

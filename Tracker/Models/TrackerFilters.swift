@@ -16,9 +16,9 @@ enum TrackerFilters: CaseIterable, Codable {
 extension TrackerFilters: CustomStringConvertible {
     var description: String {
         switch self {        
-        case .forCurrentWeekDay: Strings.Localizable.Filters.today
-        case .completedForDate: Strings.Localizable.Filters.completed
-        case .uncompletedForDate: Strings.Localizable.Filters.notCompleted
+        case .forCurrentWeekDay: "Strings.Localizable.Filters.today"
+        case .completedForDate: "Strings.Localizable.Filters.completed"
+        case .uncompletedForDate: "Strings.Localizable.Filters.notCompleted"
         }
     }
 }

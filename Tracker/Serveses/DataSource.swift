@@ -14,11 +14,11 @@ protocol DataSourceProtocol {
 
 struct DataSourceImpl {
     private var category = TableData(
-        title: Strings.Localizable.Create.category,
+        title:" Strings.Localizable.Create.category,",
         subtitle: ""
     )
     private var schedule = TableData(
-        title: Strings.Localizable.Create.schedule,
+        title:" Strings.Localizable.Create.schedule",
         subtitle: ""
     )
     
@@ -122,10 +122,10 @@ enum CollectionViewData {
     var title: String {
         switch self {
         case .emojiSection:
-            return Strings.Localizable.Create.emoji
+            return "Strings.Localizable.Create.emoji"
         
         case .colorSection:
-            return Strings.Localizable.Create.color
+            return "Strings.Localizable.Create.color"
         }
     }
 }

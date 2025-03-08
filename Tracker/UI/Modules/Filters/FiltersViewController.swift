@@ -7,7 +7,7 @@ final class FiltersViewController: FrameViewController {
     private lazy var dataSource = UITableViewDiffableDataSource<Int, TrackerFilters>(tableView: tableView) { [weak self] collectionView, indexPath, filter in
         let cell = collectionView.dequeueReusableCell(for: indexPath)
         cell.textLabel?.text = filter.description
-        cell.backgroundColor = Asset.Colors.myBackground.color
+        cell.backgroundColor = .systemBackground
         cell.selectionStyle = .none
         if TrackerFilters.allCases[indexPath.row] == self?.currentFilter {
             cell.accessoryType = .checkmark
@@ -26,7 +26,7 @@ final class FiltersViewController: FrameViewController {
         view.contentInset.top = UIConstants.topInset
         view.separatorInset.left = .leadingInset
         view.separatorInset.right = .leadingInset
-        view.separatorColor = Asset.Colors.myGray.color
+        view.separatorColor = .gray
         view.backgroundColor = .clear
         view.showsVerticalScrollIndicator = false
         view.delegate = self
@@ -51,7 +51,7 @@ final class FiltersViewController: FrameViewController {
         self.currentFilter = filter
         self.onFilterSelected = onFilterSelected
         
-        super.init(title: Strings.Localizable.Filters.title, buttonCenter: .none)
+        super.init(title: "Strings.Localizable.Filters.title", buttonCenter: .none)
     }
     
     required init?(coder: NSCoder) {

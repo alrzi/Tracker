@@ -107,7 +107,7 @@ final class TrackerCreationViewModel: ObservableObject {
         )
         
         updateTrackedDaysViewModel = UpdateTrackedDaysViewModel(
-            trackedDays: Strings.Localizable.daysNumber(3),
+            trackedDays: "Strings.Localizable.daysNumber(3)",
             isTrackedForToday: false
         )
                 

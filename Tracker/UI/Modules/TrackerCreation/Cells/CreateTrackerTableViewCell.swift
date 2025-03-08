@@ -3,7 +3,9 @@ import UIKit
 final class CreateTrackerTableViewCell: UITableViewCell {
     // MARK: - Public
     func configure(with info: TableData?) {
-        guard let info = info else { return }
+        guard let info else {
+            return
+        }
         titleLabelName.text = info.title
         subtitleLabelName.text = info.subtitle
     }
@@ -11,21 +13,21 @@ final class CreateTrackerTableViewCell: UITableViewCell {
     // MARK: - Private properties
     private let accessoryImageView: UIImageView = {
         let view = UIImageView()
-        view.image = Asset.Assets._10chevron.image
-            .withTintColor(Asset.Colors.myGray.color, renderingMode: .alwaysOriginal)
+        view.image = UIImage(named: "10chevron")!
+            .withTintColor(.gray, renderingMode: .alwaysOriginal)
         return view
     }()
     
     private let titleLabelName: UILabel = {
         let view = UILabel()
-        view.textColor = Asset.Colors.myBlack.color
+        view.textColor = .black
         view.font = UIFont.systemFont(ofSize: 17, weight: .regular)
         return view
     }()
     
     private let subtitleLabelName: UILabel = {
         let view = UILabel()
-        view.textColor = Asset.Colors.myGray.color
+        view.textColor = .gray
         view.font = .regular17
         return view
     }()
@@ -54,7 +56,7 @@ final class CreateTrackerTableViewCell: UITableViewCell {
 private extension CreateTrackerTableViewCell {
     func setupUI() {
         contentView.addSubviews(stackView, accessoryImageView)
-        contentView.backgroundColor = Asset.Colors.myBackground.color
+        contentView.backgroundColor = .systemBackground
         selectionStyle = .none
         stackView.addSubviews(titleLabelName, subtitleLabelName)
         

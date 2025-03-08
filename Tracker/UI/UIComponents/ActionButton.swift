@@ -71,19 +71,19 @@ final class ActionButton: UIButton {
        
         switch colorType {
         case .black:
-            backgroundColor = Asset.Colors.myBlack.color
-            setTitleColor(Asset.Colors.myWhite.color, for: .normal)
+            backgroundColor = .black
+            setTitleColor(.white, for: .normal)
             setTitle(title, for: .normal)
         
         case .red:
-            backgroundColor = Asset.Colors.myWhite.color
+            backgroundColor = .white
             layer.borderWidth = 1
-            layer.borderColor = Asset.Colors.myRed.color.cgColor
-            setTitleColor(Asset.Colors.myRed.color, for: .normal)
+            layer.borderColor = UIColor.red.cgColor
+            setTitleColor(.red, for: .normal)
             setTitle(title, for: .normal)
         
         case .grey:
-            backgroundColor = Asset.Colors.myGray.color
+            backgroundColor = .gray
             setTitleColor(.white, for: .normal)
             setTitle(title, for: .normal)
         

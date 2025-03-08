@@ -13,8 +13,8 @@ final class TrackerUITextField: UIView {
         let view = UITextField()
         // Style
         view.font = .regular17
-        view.textColor = Asset.Colors.myBlack.color
-        view.backgroundColor = Asset.Colors.myBackground.color
+        view.textColor = .black
+        view.backgroundColor = .systemBackground
         view.layer.cornerRadius = .cornerRadius
         view.layer.masksToBounds = true
         

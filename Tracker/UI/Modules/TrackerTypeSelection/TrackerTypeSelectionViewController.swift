@@ -3,7 +3,7 @@ import UIKit
 final class TrackerTypeSelectionViewController: UIViewController {
     private lazy var nameOfScreenLabel: UILabel = {
         let label = UILabel()
-        label.text = Strings.Localizable.Choosing.tracker
+        label.text = "Strings.Localizable.Choosing.tracker"
         label.font = .medium16
         label.textAlignment = .center
         return label
@@ -19,7 +19,7 @@ final class TrackerTypeSelectionViewController: UIViewController {
     private lazy var habitButton: ActionButton = {
         let habitButton = ActionButton(
             colorType: .black,
-            title: Strings.Localizable.Choosing.trackerType1
+            title: "Strings.Localizable.Choosing.trackerType1"
         )
         habitButton.addTarget(self, action: #selector(habitButtonTaped), for: .touchUpInside)
         return habitButton
@@ -28,7 +28,7 @@ final class TrackerTypeSelectionViewController: UIViewController {
     private lazy var irregularEventButton: ActionButton = {
         let irregularEventButton = ActionButton(
             colorType: .black,
-            title: Strings.Localizable.Choosing.trackerType2
+            title: "Strings.Localizable.Choosing.trackerType2"
         )
         irregularEventButton.addTarget(self, action: #selector(irregularEventButtonTapped), for: .touchUpInside)
         return irregularEventButton
@@ -83,7 +83,7 @@ private extension TrackerTypeSelectionViewController {
     func setupUI() {
         stackView.addSubviews(habitButton, irregularEventButton)
         view.addSubviews(nameOfScreenLabel, stackView)
-        view.backgroundColor = Asset.Colors.myWhite.color
+        view.backgroundColor = UIColor.white
     }
     
     func setupLayout() {

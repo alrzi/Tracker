@@ -17,12 +17,12 @@ final class AlertPresenter {
     func show(message: String?, deleteAction: (() -> Void)? = nil) {
         let alertController = UIAlertController(title: nil, message: message, preferredStyle: .actionSheet)
         
-        let deleteAction = UIAlertAction(title: Strings.Localizable.Alert.delete, style: .destructive) { _ in
+        let deleteAction = UIAlertAction(title: "Strings.Localizable.Alert.delete", style: .destructive) { _ in
             deleteAction?()
         }
         alertController.addAction(deleteAction)
         
-        let cancelAction = UIAlertAction(title: Strings.Localizable.Alert.cancel, style: .cancel)
+        let cancelAction = UIAlertAction(title: "Strings.Localizable.Alert.cancel", style: .cancel)
         alertController.addAction(cancelAction)
         
         presentingViewController.present(alertController, animated: true, completion: nil)

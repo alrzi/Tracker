@@ -45,13 +45,13 @@ final class UserInputCollector {
                 let (weekDays, kind) = value.1
                 
                 guard 
-                    let name = name,
+                    let name,
                     !name.isEmpty,
-                    let emoji = emoji,
+                    let emoji,
                     !emoji.isEmpty,
-                    let color = color,
+                    let color,
                     !color.isEmpty,
-                    let category = category,
+                    let category,
                     !category.title.isEmpty,
                     !weekDays.isEmpty
                 else {

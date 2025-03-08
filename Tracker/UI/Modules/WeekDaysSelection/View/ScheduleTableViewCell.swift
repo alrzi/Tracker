@@ -24,15 +24,15 @@ final class ScheduleTableViewCell: UITableViewCell {
     // MARK: - Private properties
     private lazy var weakDayLabel: UILabel = {
         let view = UILabel()
-        view.textColor = Asset.Colors.myBlack.color
+        view.textColor = .black
         view.font = .regular17
         return view
     }()
     
     private lazy var weakDaySwitch: UISwitch = {
         let weakDaySwitch = UISwitch()
-        weakDaySwitch.onTintColor = Asset.Colors.myBlue.color
-        weakDaySwitch.backgroundColor = Asset.Colors.myLightGrey.color
+        weakDaySwitch.onTintColor = .blue
+        weakDaySwitch.backgroundColor = UIColor.lightGray
         weakDaySwitch.layer.cornerRadius = .cornerRadius
         weakDaySwitch.layer.masksToBounds = true
         weakDaySwitch.addTarget(self, action: #selector(handleWeakDaySwitch), for: .touchUpInside)
@@ -76,7 +76,7 @@ private extension ScheduleTableViewCell {
     func setupUI() {
         stackView.addSubviews(weakDayLabel, weakDaySwitch)
         contentView.addSubviews(stackView)
-        contentView.backgroundColor = Asset.Colors.myBackground.color
+        contentView.backgroundColor = .systemBackground
         
         selectionStyle = .none
         

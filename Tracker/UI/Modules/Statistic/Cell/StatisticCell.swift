@@ -19,7 +19,7 @@ final class StatisticTableViewCell: UITableViewCell {
     private let daysLabel: UILabel = {
         let label = UILabel()
         label.font = .bold34
-        label.textColor = Asset.Colors.myBlack.color
+        label.textColor = .black
         label.numberOfLines = 1
         return label
     }()
@@ -27,7 +27,7 @@ final class StatisticTableViewCell: UITableViewCell {
     private let descriptionLabel: UILabel = {
         let label = UILabel()
         label.font = .medium12
-        label.textColor = Asset.Colors.myBlack.color
+        label.textColor = .black
         label.numberOfLines = 1
         return label
     }()
@@ -59,7 +59,7 @@ final class StatisticTableViewCell: UITableViewCell {
     }
 
     func setupUI() {
-        contentView.backgroundColor = Asset.Colors.myWhite.color
+        contentView.backgroundColor = .white
         contentView.addSubviews(container)
         container.addSubviews(daysLabel, descriptionLabel)
         container.layer.cornerRadius = 16
@@ -85,9 +85,9 @@ final class StatisticTableViewCell: UITableViewCell {
     func addGradient() {
         gradient.frame =  CGRect(origin: CGPoint.zero, size: container.frame.size)
         gradient.colors = [
-            Asset.Colors.gradientRed.color.cgColor,
-            Asset.Colors.gradientGreen.color.cgColor,
-            Asset.Colors.gradientBlue.color.cgColor
+            UIColor.green.cgColor,
+            UIColor.green.cgColor,
+            UIColor.green.cgColor
         ]
         gradient.startPoint = CGPoint(x: 0, y: 0)
         gradient.endPoint = CGPoint(x: 1, y: 0)

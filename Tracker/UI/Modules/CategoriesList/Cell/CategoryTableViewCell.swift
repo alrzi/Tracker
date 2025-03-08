@@ -19,7 +19,7 @@ final class CategoryTableViewCell: UITableViewCell {
     // MARK: - Private properties
     private let categoryName: UILabel = {
         let view = UILabel()
-        view.textColor = Asset.Colors.myBlack.color
+        view.textColor = .black
         view.font = .regular17
         return view
     }()
@@ -54,7 +54,7 @@ private extension CategoryTableViewCell {
     func setupUI() {
         stackView.addSubviews(categoryName, selectedCategory)
         contentView.addSubviews(stackView)
-        contentView.backgroundColor = Asset.Colors.myBackground.color
+        contentView.backgroundColor = .systemBackground
         selectionStyle = .none
     }
     

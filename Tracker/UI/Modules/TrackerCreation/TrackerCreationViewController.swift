@@ -19,7 +19,7 @@ final class TrackerCreationViewController: UIViewController {
     
     private lazy var titleTextfield: TrackerUITextField = {
         let view = TrackerUITextField(
-            text: Strings.Localizable.Create.enterName
+            text: "Strings.Localizable.Create.enterName"
         )
         view.delegate = self
         return view
@@ -27,17 +27,17 @@ final class TrackerCreationViewController: UIViewController {
     
     private lazy var warningCharactersLabel: UILabel = {
         let view = UILabel()
-        view.text = Strings.Localizable.Create.restriction
+        view.text = "Strings.Localizable.Create.restriction"
         view.font = .regular17
-        view.textColor = Asset.Colors.myRed.color
+        view.textColor = .red
         view.textAlignment = .center
         return view
     }()
     
     private lazy var tableView: UITableView = {
         let view = UITableView()
-        view.separatorColor = Asset.Colors.myGray.color
-        view.backgroundColor = Asset.Colors.myWhite.color
+        view.separatorColor = .gray
+        view.backgroundColor = .white
         view.layer.cornerRadius = .cornerRadius
         view.register(cellClass: CreateTrackerTableViewCell.self)
         view.delegate = self
@@ -72,7 +72,7 @@ final class TrackerCreationViewController: UIViewController {
     private lazy var cancelButton: ActionButton = {
         let view = ActionButton(
             colorType: .red,
-            title: Strings.Localizable.Create.cancel
+            title: "Strings.Localizable.Create.cancel"
         )
         view.addTarget(self, action: #selector(cancelButtonTapped), for: .touchUpInside)
         return view
@@ -81,7 +81,7 @@ final class TrackerCreationViewController: UIViewController {
     private lazy var createButton: ActionButton = {
         let view = ActionButton(
             colorType: .grey,
-            title: Strings.Localizable.Create.createNew
+            title: "Strings.Localizable.Create.createNew"
         )
         view.addTarget(self, action: #selector(createButtonTapped), for: .touchUpInside)
         return view
@@ -213,12 +213,12 @@ private extension TrackerCreationViewController {
     func setupUI() {
         mainScrollView.showsVerticalScrollIndicator = false
         
-        title = Strings.Localizable.Create.newHabit
+        title = "Strings.Localizable.Create.newHabit"
     }
     
     func setupLayout() {
         view.addSubviews(container, buttonStackView)
-        view.backgroundColor = Asset.Colors.myWhite.color
+        view.backgroundColor = .white
         
         buttonStackView.addSubviews(cancelButton, createButton)
         container.addSubviews(mainScrollView)
@@ -277,7 +277,9 @@ private extension TrackerCreationViewController {
     }
     
     func updateCollectionView(with viewModel: UpdateTrackerViewModel?) {
-        guard let viewModel = viewModel else { return }
+        guard let viewModel else {
+            return
+        }
         
         selectedEmojiIndexPath = viewModel.emoji
         selectedColorIndexPath = viewModel.color

@@ -64,7 +64,7 @@ private extension CreateTrackerCollectionEmojiCell {
     func configureCell() {
         switch cellState {
         case .selected:
-            contentView.backgroundColor = Asset.Colors.myLightGrey.color
+            contentView.backgroundColor = .lightGray
         
         case .unselected:
             contentView.backgroundColor = .clear

@@ -15,7 +15,7 @@ final class TrackersViewController: UIViewController {
         $0.datePickerMode = .date
         $0.locale = Locale.current
         $0.tintColor = .systemBlue
-        $0.backgroundColor = Asset.Colors.myWhite.color
+        $0.backgroundColor = .white
         $0.layer.cornerRadius = 16
         $0.layer.masksToBounds = true
         $0.setContentHuggingPriority(.defaultHigh, for: .horizontal)
@@ -30,14 +30,14 @@ final class TrackersViewController: UIViewController {
     private lazy var filterButton: UIButton = with {
         $0.layer.cornerRadius = .cornerRadius
         $0.layer.masksToBounds = true
-        $0.setTitle(Strings.Localizable.Filters.title, for: .normal)
+        $0.setTitle("Strings.Localizable.Filters.title", for: .normal)
         $0.titleLabel?.font = .regular17
-        $0.backgroundColor = Asset.Colors.myBlue.color
+        $0.backgroundColor = .blue
         $0.addTarget(self, action: #selector(onFilterButton), for: .touchUpInside)
     }
     
     private lazy var collectionView = with(UICollectionView(frame: .zero, collectionViewLayout: createLayout())) {
-        $0.backgroundColor = Asset.Colors.myWhite.color
+        $0.backgroundColor = .white
         $0.allowsSelection = true
     }
     
@@ -124,8 +124,8 @@ final class TrackersViewController: UIViewController {
 
 private extension TrackersViewController {
     func setupUI() {
-        view.backgroundColor = Asset.Colors.myWhite.color
-        title = Strings.Localizable.Main.trackers
+        view.backgroundColor = .white
+        title = "Strings.Localizable.Main.trackers"
         navigationController?.navigationBar.prefersLargeTitles = true
         
         view.addSubviews(collectionView, placeholderView, filterButton)
@@ -133,7 +133,7 @@ private extension TrackersViewController {
     
     func createNavigationItems() {
         navigationItem.leftBarButtonItem = UIBarButtonItem(
-            image: Asset.Assets._06plus.image,
+            image: UIImage(named: "06plus")!,
             style: .plain,
             target: self,
             action: #selector(onPlusButton)
@@ -248,7 +248,7 @@ extension TrackersViewController: TrackerCollectionViewCellDelegate {
             return
         }
                         
-        alertPresenter.show(message: Strings.Localizable.Alert.confirmationTracker) { [viewModel] in
+        alertPresenter.show(message: "Strings.Localizable.Alert.confirmationTracker") { [viewModel] in
             viewModel.onDeleteTracker(at: indexPath)
         }
     }

@@ -15,14 +15,14 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
         view.layer.cornerRadius = UIConstants.trackerCornerRadius
         view.layer.masksToBounds = true
         view.layer.borderWidth = UIConstants.trackerBorderWidth
-        view.layer.borderColor = Asset.Colors.myCellBorderColor.color.cgColor
-        view.backgroundColor = Asset.Colors.myBlue.color
+        view.layer.borderColor = UIColor.orange.cgColor
+        view.backgroundColor = .blue
         return view
     }()
     
     private let trackerNameLabel: UILabel = {
         let label = UILabel()
-        label.textColor = Asset.Colors.myWhite.color
+        label.textColor = .white
         label.font = .medium12
         label.numberOfLines = .zero
         label.textAlignment = .left
@@ -39,7 +39,7 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
     
     private let emojiContainerView: UIView = {
         let view = UIView()
-        view.backgroundColor = Asset.Colors.myTranspatent.color
+        view.backgroundColor = .clear
         view.layer.cornerRadius = UIConstants.emojiContainerSize / 2
         view.layer.masksToBounds = true
         return view
@@ -47,7 +47,7 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
     
     private let trackedDaysLabel: UILabel = {
         let label = UILabel()
-        label.textColor = Asset.Colors.myBlack.color
+        label.textColor = .black
         return label
     }()
     
@@ -58,7 +58,7 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
     }
     
     private let attachedSighView: UIImageView = {
-        let imageView = UIImageView(image: Asset.Assets._15pin.image)
+        let imageView = UIImageView(image: UIImage(named: "15pin")!)
         imageView.isHidden = true
         imageView.contentMode = .scaleAspectFit
         return imageView
@@ -114,11 +114,11 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
         trackerContainerView.backgroundColor = color
         addButton.backgroundColor = color
         isAttached = info.isPinned
-        trackedDaysLabel.text = Strings.Localizable.daysNumber(info.trackedDays)
+        trackedDaysLabel.text = "Strings.Localizable.daysNumber(info.trackedDays)"
     }
             
     func configure(with trackedDays: Int, isCompleted: Bool) {
-        trackedDaysLabel.text = Strings.Localizable.daysNumber(trackedDays)
+        trackedDaysLabel.text = "Strings.Localizable.daysNumber(trackedDays)"
         buttonState = isCompleted ? .selected : .unselected
     }
     
@@ -212,16 +212,16 @@ private extension TrackerCollectionViewCell {
     func configureButton() {
         switch buttonState {
         case .selected:
-            let image = Asset.Assets._11done.image
+            let image = UIImage(named: "11done")!
                 .withRenderingMode(.alwaysOriginal)
-                .withTintColor(Asset.Colors.myWhite.color)
+                .withTintColor(.white)
             addButton.setImage(image, for: .normal)
             addButton.alpha = 0.3
        
         case .unselected:
-            let image = Asset.Assets._06plus.image
+            let image = UIImage(named: "06plus")!
                 .withRenderingMode(.alwaysOriginal)
-                .withTintColor(Asset.Colors.myWhite.color)
+                .withTintColor(.white)
             addButton.setImage(image, for: .normal)
             addButton.alpha = 1
         }
@@ -233,26 +233,26 @@ extension TrackerCollectionViewCell: UIContextMenuInteractionDelegate {
         _ interaction: UIContextMenuInteraction,
         configurationForMenuAtLocation location: CGPoint
     ) -> UIContextMenuConfiguration? {
-        let title = isAttached ? Strings.Localizable.Context.unpin : Strings.Localizable.Context.pin
+        let title = isAttached ? "Strings.Localizable.Context.unpin" : "Strings.Localizable.Context.pin"
        
         let attachAction = UIAction(title: title) { [weak self] _ in
-            guard let self = self else {
+            guard let self else {
                 return
             }
             
             self.pendingAction = isAttached ? .unattach : .attach
         }
         
-        let updateAction = UIAction(title: Strings.Localizable.Context.update) { [weak self] _ in
-            guard let self = self else { 
+        let updateAction = UIAction(title: "Strings.Localizable.Context.update") { [weak self] _ in
+            guard let self else {
                 return
             }
             
             self.delegate?.didUpdateTracker(for: self)
         }
         
-        let deleteAction = UIAction(title: Strings.Localizable.Context.delete, attributes: .destructive) { [weak self] _ in
-            guard let self = self else {
+        let deleteAction = UIAction(title: "Strings.Localizable.Context.delete", attributes: .destructive) { [weak self] _ in
+            guard let self else {
                 return
             }
             
@@ -262,7 +262,7 @@ extension TrackerCollectionViewCell: UIContextMenuInteractionDelegate {
         let menu = UIMenu(title: "", children: [attachAction, updateAction, deleteAction])
         
         return UIContextMenuConfiguration( identifier: nil, previewProvider: nil) { _ in
-            return menu
+            menu
         }
     }
            
@@ -271,7 +271,7 @@ extension TrackerCollectionViewCell: UIContextMenuInteractionDelegate {
         willEndFor configuration: UIContextMenuConfiguration,
         animator: UIContextMenuInteractionAnimating?
     ) {
-        guard let pendingAction = pendingAction else {
+        guard let pendingAction else {
             return
         }
         

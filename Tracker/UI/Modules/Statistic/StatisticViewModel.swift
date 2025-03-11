@@ -1,16 +1,17 @@
 import Foundation
 import Combine
+import TrackerDomain
 
 final class StatisticViewModel {
-    private let recordRepository: RecordRepository
-    private let trackerManager: TrackerManaging
+    private let recordRepository: RecordRepositoryProtocol
+    private let trackerManager: any TrackerManaging
     
     @Published private(set) var isAnyTrackers = false
     private(set) var statisticData: [StatisticTableData] = []
     
     init(
-        recordRepository: RecordRepository,
-        trackerManager: TrackerManaging
+        recordRepository: RecordRepositoryProtocol,
+        trackerManager: some TrackerManaging
     ) {
         self.recordRepository = recordRepository
         self.trackerManager = trackerManager

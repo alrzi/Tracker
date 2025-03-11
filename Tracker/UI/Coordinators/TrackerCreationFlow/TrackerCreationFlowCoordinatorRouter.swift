@@ -8,6 +8,7 @@
 import Combine
 import Foundation
 import Presentation
+import TrackerDomain
 
 final class TrackerCreationFlowCoordinatorRouter {
     private let trackerTypeSelectionAssembly: TrackerTypeSelectionAssembly
@@ -25,7 +26,7 @@ final class TrackerCreationFlowCoordinatorRouter {
         self.presentationContext = presentationContext
     }
     
-    func showTrackerTypeSelection() -> AnyPublisher<TrackerKind, Never> {
+    func showTrackerTypeSelection() -> AnyPublisher<Tracker.Kind, Never> {
         NavigationModuleRouter(
             assembly: trackerTypeSelectionAssembly,
             presentationContext: presentationContext
@@ -33,7 +34,7 @@ final class TrackerCreationFlowCoordinatorRouter {
         .route(presentationConfiguration: .init(type: .replaceAll, animated: false))
     }
     
-    func showTrackerCreation(kind: TrackerKind) -> AnyPublisher<(), Never> {
+    func showTrackerCreation(kind: Tracker.Kind) -> AnyPublisher<(), Never> {
         trackerUpdatingFlowCoordinatorAssembly.assemble(
             mode: .create(kind),
             presentationContext: presentationContext

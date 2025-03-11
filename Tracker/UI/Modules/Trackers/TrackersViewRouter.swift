@@ -8,6 +8,7 @@
 import Combine
 import UIKit
 import Presentation
+import TrackerDomain
 
 final class TrackersViewRouter {
     private let trackerCreationFlowCoordinatorAssembly: TrackerCreationFlowCoordinatorAssembly

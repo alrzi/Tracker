@@ -31,7 +31,7 @@ final class TabBarViewController: UITabBarController {
         ]
         
         TabItem.allCases.enumerated().forEach { index, item in
-            viewControllers?[safe: index]?.tabBarItem = .init(tabItem: item)
+            viewControllers?.elementOrNil(at: index)?.tabBarItem = .init(tabItem: item)
         }
         
         let standardAppearance = UITabBarAppearance()

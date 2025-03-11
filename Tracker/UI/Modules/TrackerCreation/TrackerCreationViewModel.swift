@@ -1,5 +1,5 @@
-import CoreData
 import Combine
+import TrackerDomain
 
 protocol TrackerCreationViewModelProtocol {
     var numberOfTableViewRows: Int { get }
@@ -27,7 +27,7 @@ protocol TrackerCreationViewModelProtocol {
 final class TrackerCreationViewModel: ObservableObject {
     private let userInputCollector: UserInputCollector
     private var dataSource: DataSourceProtocol
-    private let trackerManager: TrackerManaging
+    private let trackerManager: any TrackerManaging
     
     private let resultObserver: PassthroughSubject<Action, Never>
     private var cancellable: Set<AnyCancellable> = []
@@ -47,7 +47,7 @@ final class TrackerCreationViewModel: ObservableObject {
     init(
         userInputCollector: UserInputCollector,
         dataSource: DataSourceProtocol = DataSourceImpl(),
-        trackerManager: TrackerManaging,
+        trackerManager: some TrackerManaging,
         resultObserver: PassthroughSubject<Action, Never>,
         mode: CreateTrackerMode
     ) {
@@ -119,7 +119,7 @@ final class TrackerCreationViewModel: ObservableObject {
 //        userInputCollector.insert(.category(.init(title: category, trackers: [])))
     }
     
-    func createOrUpdateTracker() {
+    func createOrUpdateTracker() async {
         guard let tracker, let categoryId else {
             return
         }
@@ -127,7 +127,7 @@ final class TrackerCreationViewModel: ObservableObject {
         switch mode {
         case .create:
             do {
-                try trackerManager.addCategory(withId: categoryId, toTracker: tracker)
+                try await trackerManager.addCategory(withId: categoryId, toTracker: tracker)
                 
                 resultObserver.send(.onCreateTracker)                
             }

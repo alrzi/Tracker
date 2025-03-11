@@ -81,7 +81,9 @@ extension TrackerUITextField: UITextFieldDelegate {
     
     func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
         let currentText = textField.text ?? ""
-        guard let stringRange = Range(range, in: currentText) else { return false }
+        guard let stringRange = Range(range, in: currentText) else {
+            return false
+        }
         let updatedText = currentText.replacingCharacters(in: stringRange, with: string)
         let newLength = currentText.count + string.count - range.length
         return delegate?.isChangeText(text: updatedText, newLength: newLength) ?? true

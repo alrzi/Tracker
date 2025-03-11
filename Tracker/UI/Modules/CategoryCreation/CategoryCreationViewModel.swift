@@ -1,8 +1,9 @@
 import Foundation
 import Combine
+import TrackerDomain
 
 final class CategoryCreationViewModel {
-    private let categoryRepository: CategoryRepository
+    private let categoryRepository: CategoryRepositoryProtocol
     
     private let onCreateCategory: () -> Void
     private let onDeinit: () -> Void
@@ -13,7 +14,7 @@ final class CategoryCreationViewModel {
     @Published private(set) var canCreate = false
  
     init(
-        categoryRepository: CategoryRepository,
+        categoryRepository: CategoryRepositoryProtocol,
         mode: Mode,
         onCreateCategory: @escaping () -> Void,
         onDeinit: @escaping () -> Void

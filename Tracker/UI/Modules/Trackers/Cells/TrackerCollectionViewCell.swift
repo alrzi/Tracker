@@ -1,5 +1,6 @@
 import UIKit
 import Presentation
+import TrackerDomain
 
 protocol TrackerCollectionViewCellDelegate: AnyObject {
     func didMarkTrackerCompleted(for cell: TrackerCollectionViewCell)

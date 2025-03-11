@@ -1,4 +1,5 @@
 import UIKit
+import TrackerDomain
 
 protocol ScheduleTableViewCellDelegate: AnyObject {
     func weekDaySelected(_ weekDay: Int)

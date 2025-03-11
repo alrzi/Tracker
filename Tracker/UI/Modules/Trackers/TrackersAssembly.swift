@@ -7,15 +7,14 @@
 
 import UIKit
 import Presentation
+import TrackerDomain
 
 final class TrackersAssembly: ViewControllerAssembly {
     typealias Context = ()
     
     private let trackerFiltersDataStorage: TrackerFiltersDataStorage
     private let analyticsTracker: AnalyticsTracking
-    private let pinnedDataProvider: PinnedDataProvider
-    private let dataProvider: DataProvider
-    private let trackerManager: TrackerManaging
+    private let trackerManager: any TrackerManaging
     
     private let trackerCreationFlowCoordinatorAssembly: TrackerCreationFlowCoordinatorAssembly
     private let trackerUpdatingFlowCoordinatorAssembly: TrackerUpdatingFlowCoordinatorAssembly
@@ -24,23 +23,20 @@ final class TrackersAssembly: ViewControllerAssembly {
     init(
         trackerFiltersDataStorage: TrackerFiltersDataStorage,
         analyticsTracker: AnalyticsTracking,
-        pinnedDataProvider: PinnedDataProvider,
-        dataProvider: DataProvider,
-        trackerManager: TrackerManaging,
+        trackerManager: some TrackerManaging,
         trackerCreationFlowCoordinatorAssembly: TrackerCreationFlowCoordinatorAssembly,
         trackerUpdatingFlowCoordinatorAssembly: TrackerUpdatingFlowCoordinatorAssembly,
         filtersAssembly: FiltersAssembly
     ) {
         self.trackerFiltersDataStorage = trackerFiltersDataStorage
         self.analyticsTracker = analyticsTracker
-        self.pinnedDataProvider = pinnedDataProvider
-        self.dataProvider = dataProvider
         self.trackerManager = trackerManager
         self.trackerCreationFlowCoordinatorAssembly = trackerCreationFlowCoordinatorAssembly
         self.trackerUpdatingFlowCoordinatorAssembly = trackerUpdatingFlowCoordinatorAssembly
         self.filtersAssembly = filtersAssembly
     }
     
+    @MainActor
     func assemble(_ context: Context) -> UIViewController {
         let presentationContext = NavigationPresentationContext()
         
@@ -54,8 +50,6 @@ final class TrackersAssembly: ViewControllerAssembly {
         let viewModel = TrackersViewModel(
             trackerFiltersDataStorage: trackerFiltersDataStorage,
             analyticsTracker: analyticsTracker,
-            pinnedDataProvider: pinnedDataProvider,
-            dataProvider: dataProvider,
             trackerManager: trackerManager,
             router: router
         )

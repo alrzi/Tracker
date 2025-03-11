@@ -8,16 +8,17 @@
 import Foundation
 import UIKit
 import Presentation
+import TrackerDomain
 
 final class StatisticAssembly: ViewControllerAssembly {
     typealias Context = ()
     
-    private let recordRepository: RecordRepository
-    private let trackerManager: TrackerManaging
+    private let recordRepository: any RecordRepositoryProtocol
+    private let trackerManager: any TrackerManaging
     
     init(
-        recordRepository: RecordRepository,
-        trackerManager: TrackerManaging
+        recordRepository: some RecordRepositoryProtocol,
+        trackerManager: some TrackerManaging
     ) {
         self.recordRepository = recordRepository
         self.trackerManager = trackerManager

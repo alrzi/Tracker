@@ -7,6 +7,7 @@
 
 import UIKit
 import Presentation
+import TrackerDomain
 
 final class SplashViewAssembly: ViewControllerAssembly {
     typealias Context = UIWindow
@@ -17,11 +18,11 @@ final class SplashViewAssembly: ViewControllerAssembly {
         
     // MARK: - Managers
     
-    private let authService: AuthService
+    private let authService: AuthServiceProtocol
     
     init(
         tabBarAssembly: TabBarAssembly,
-        authService: AuthService
+        authService: AuthServiceProtocol
     ) {
         self.tabBarAssembly = tabBarAssembly
         self.authService = authService

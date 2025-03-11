@@ -1,5 +1,6 @@
 import Foundation
 import UIKit
+import TrackerDomain
 
 final class FiltersViewController: FrameViewController {
     typealias Snapshot = NSDiffableDataSourceSnapshot<Int, TrackerFilters>

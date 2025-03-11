@@ -7,6 +7,7 @@
 
 import Combine
 import Presentation
+import TrackerDomain
 
 struct TrackerUpdatingFlowCoordinator: ReactiveFlowCoordinator {
     private let userInputCollector: UserInputCollector

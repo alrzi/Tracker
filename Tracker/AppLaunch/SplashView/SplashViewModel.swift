@@ -1,3 +1,5 @@
+import TrackerDomain
+
 final class SplashViewModel {
     private let authService: AuthServiceProtocol
     private let router: SplashViewRouter

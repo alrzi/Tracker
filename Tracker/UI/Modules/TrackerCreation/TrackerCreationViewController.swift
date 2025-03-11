@@ -200,7 +200,9 @@ final class TrackerCreationViewController: UIViewController {
     }
 
     @objc private func createButtonTapped() {
-        viewModel.createOrUpdateTracker()
+        Task {
+            await viewModel.createOrUpdateTracker()
+        }
         
 //        feedbackGenerator.impactOccurred()
 //        createButton.shakeSelf()

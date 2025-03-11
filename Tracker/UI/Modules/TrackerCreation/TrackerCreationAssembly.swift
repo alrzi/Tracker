@@ -7,6 +7,7 @@
 
 import UIKit
 import Presentation
+import TrackerDomain
 
 final class TrackerCreationAssembly: ViewControllerAssembly {
     typealias Context = LifecycleManagingContext<TrackerCreationViewModel.Action, Never, CreateTrackerMode>
@@ -18,7 +19,7 @@ final class TrackerCreationAssembly: ViewControllerAssembly {
     private let chooseScheduleAssembly: WeekDaysSelectionAssembly
     
     init(
-        trackerManager: any TrackerManaging,
+        trackerManager: some TrackerManaging,
         userInputCollector: UserInputCollector,
         categoryFlowCoordinatorAssembly: CategoryFlowCoordinatorAssembly,
         chooseScheduleAssembly: WeekDaysSelectionAssembly

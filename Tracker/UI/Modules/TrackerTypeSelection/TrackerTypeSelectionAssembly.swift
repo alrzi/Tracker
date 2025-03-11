@@ -7,9 +7,10 @@
 
 import UIKit
 import Presentation
+import TrackerDomain
 
 final class TrackerTypeSelectionAssembly: ViewControllerAssembly {
-    typealias Context = LifecycleManagingContext<TrackerKind, Never, ()>
+    typealias Context = LifecycleManagingContext<Tracker.Kind, Never, ()>
     
     private let createTrackerAssembly: TrackerCreationAssembly
     

@@ -6,6 +6,7 @@
 //
 
 import Combine
+import TrackerDomain
 
 enum UserInputValue: Hashable {
     case name(String?)
@@ -13,7 +14,7 @@ enum UserInputValue: Hashable {
     case emoji(String?)
     case weekDays(Set<Int>)
     case category(TrackerSection?)
-    case kind(TrackerKind)
+    case kind(Tracker.Kind)
 }
 
 final class UserInputCollector {
@@ -22,7 +23,7 @@ final class UserInputCollector {
     private let emoji: CurrentValueSubject<String?, Never> = .init(nil)
     private let trackerCategory: CurrentValueSubject<TrackerSection?, Never> = .init(nil)
     private let weekDays: CurrentValueSubject<Set<Int>, Never> = .init([])
-    private let kind: CurrentValueSubject<TrackerKind, Never> = .init(.habit)
+    private let kind: CurrentValueSubject<Tracker.Kind, Never> = .init(.habit)
     
     private let trackerSubject = PassthroughSubject<Tracker, Never>()
     var trackerPublisher: some Publisher<Tracker, Never> { trackerSubject }
@@ -63,8 +64,10 @@ final class UserInputCollector {
                     emoji: emoji,
                     color: color,
                     schedule: weekDays,
+                    isPinned: false,
                     kind: kind,
-                    trackedDays: .zero
+                    trackedDays: .zero,
+                    categoryId: category.id
                 )
             }            
             .sink { [weak self] in self?.trackerSubject.send($0) }
@@ -87,7 +90,7 @@ final class UserInputCollector {
         case .emoji(let string): emoji.send(string)
         case .weekDays(let set): weekDays.send(set)
         case .category(let category): trackerCategory.send(category)
-        case .kind(let trackerKind): kind.send(trackerKind)
+        case .kind(let tracker): kind.send(tracker)
         }
     }
     

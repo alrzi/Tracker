@@ -1,8 +1,9 @@
-import CoreData
+
 import Combine
+import TrackerDomain
 
 final class CategoriesListViewModel: ObservableObject {
-    private let categoryRepository: CategoryRepository
+    private let categoryRepository: any CategoryRepositoryProtocol
     
     let onAction: (Output) -> Void
     let onCategorySelected: (TrackerSection) -> Void
@@ -10,7 +11,7 @@ final class CategoriesListViewModel: ObservableObject {
     @Published private(set) var categoryViewModels: [CategoryViewModel] = []
     
     init(
-        categoryRepository: CategoryRepository,
+        categoryRepository: some CategoryRepositoryProtocol,
         onAction: @escaping (Output) -> Void,
         onCategorySelected: @escaping (TrackerSection) -> Void
     ) {

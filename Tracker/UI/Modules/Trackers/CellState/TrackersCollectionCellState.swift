@@ -7,6 +7,7 @@
 
 import Foundation
 import UIKit
+import TrackerDomain
 
 struct TrackersCollectionCellState {
     var pinnedSection: TrackerSection?
@@ -20,7 +21,7 @@ extension TrackersCollectionCellState {
     
     static let empty: Self = .init()
     
-    var sections: [SectionIdentifier] {
+    private var sections: [SectionIdentifier] {
         var sectionIdentifiers: [SectionIdentifier] = []
         
         if pinnedSection != nil {

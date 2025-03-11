@@ -6,17 +6,18 @@
 //
 
 import Combine
+import TrackerDomain
 
 final class TrackerTypeSelectionViewModel {
-    private let resultObserver: PassthroughSubject<TrackerKind, Never>
+    private let resultObserver: PassthroughSubject<Tracker.Kind, Never>
     
     init(
-        resultObserver: PassthroughSubject<TrackerKind, Never>
+        resultObserver: PassthroughSubject<Tracker.Kind, Never>
     ) {
         self.resultObserver = resultObserver
     }
     
-    func onCreateTracker(of kind: TrackerKind) {
+    func onCreateTracker(of kind: Tracker.Kind) {
         resultObserver.send(kind)
     }
     

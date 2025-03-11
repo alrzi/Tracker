@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import TrackerDomain
 
 enum CategoriesListViewModelError: Error {
     case onCategorySelected(TrackerSection)

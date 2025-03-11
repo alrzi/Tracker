@@ -1,4 +1,5 @@
 import UIKit
+import TrackerDomain
 
 final class WeekDaysSelectionViewController: FrameViewController {
     private lazy var tableView: UITableView = {

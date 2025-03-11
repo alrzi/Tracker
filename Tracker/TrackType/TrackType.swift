@@ -6,25 +6,7 @@
 //
 
 import Foundation
-
-/// Событие отслеживания
-public protocol TrackableEvent {
-    /// Название события
-    var name: String { get }
-    
-    /// Свойства события
-    var properties: [AnyHashable: Any]? { get }
-}
-
-protocol TrackingEvent {
-    var name: String { get }
-    var parameters: [String: Any]? { get }
-}
-
-protocol TrackableType {
-    var trackTitle: String { get }
-}
-
+import TrackerDomain
 
 enum TrackType: TrackableEvent {
     case trackers(event: TrackersEvent)

@@ -6,7 +6,8 @@
 //
 
 import UIKit
-import DataStorage
+import TrackerData
+import TrackerDomain
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     var window: UIWindow?
@@ -24,49 +25,20 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         
         // MARK: - Servises
         
-        let analyticsTracker = YMMYandexMetricaAnaliticsTracker()
+        let analyticsTracker = TrackerDataContainer.analyticsTracker
+        let trackerFiltersDataStorage = TrackerDataContainer.trackerFiltersDataStorage
+        let authDataStorage = TrackerDataContainer.authDataStorage
+        let recordRepository = TrackerDataContainer.recordRepository
+        let trackerRepository = TrackerDataContainer.trackerRepository
+        let categoryRepository = TrackerDataContainer.categoryRepository
         
-        let dataStorage = DataStorage(
-            jsonDecoder: JSONDecoder(),
-            jsonEncoder: JSONEncoder(),
-            userDefaults: .standard,
-            sharedUserDefaults: UserDefaults(suiteName: "shared") ?? .standard
-        )
-        
-        let persistencyService = PersistencyService()
-        
-        let recordRepository = RecordRepository(
-            persistencyService: persistencyService,
-            predicateBuilder: .init()
-        )
-        
-        let trackerRepository = TrackerRepository(
-            persistencyService: persistencyService,
-            predicateBuilder: .init()
-        )
-        
-        let trackerManager = TrackerManager(
+        let trackerManager = TrackerDomainContainer.trackerManager(
             trackerRepository: trackerRepository,
-            recordRepository: recordRepository
+            recordRepository: recordRepository,
+            category: categoryRepository
         )
         
-        let pinnedTrackersDataProvider = PinnedDataProvider(
-            context: persistencyService.managedObjectContext,
-            trackerManager: trackerManager
-        )
-        
-        let dataProvider = DataProvider(
-            context: persistencyService.managedObjectContext, 
-            trackerManager: trackerManager            
-        )
-        
-        let authService = AuthService(authDataStorage: dataStorage)        
-        
-        let categoryRepository = CategoryRepository(
-            persistencyService: persistencyService,
-            predicateBuilder: .init()
-        )
-        
+        let authService = TrackerDomainContainer.authService(dataStorage: authDataStorage)
         let userInputCollector: UserInputCollector = .init()
         
         // MARK: - Assembly
@@ -110,10 +82,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         )
         
         let trackersAssembly = TrackersAssembly(
-            trackerFiltersDataStorage: dataStorage, 
-            analyticsTracker: analyticsTracker,
-            pinnedDataProvider: pinnedTrackersDataProvider,
-            dataProvider: dataProvider,
+            trackerFiltersDataStorage: trackerFiltersDataStorage,
+            analyticsTracker: analyticsTracker,            
             trackerManager: trackerManager, 
             trackerCreationFlowCoordinatorAssembly: trackerCreationFlowCoordinatorAssembly,
             trackerUpdatingFlowCoordinatorAssembly: trackerUpdatingFlowCoordinatorAssembly,

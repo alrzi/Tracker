@@ -1,4 +1,5 @@
 import Foundation
+import TrackerDomain
 
 struct CategoryViewModel: Hashable {
     static func == (lhs: CategoryViewModel, rhs: CategoryViewModel) -> Bool {

@@ -7,13 +7,14 @@
 
 import UIKit
 import Presentation
+import TrackerDomain
 
 final class CategoryCreationAssembly: ViewControllerAssembly {
     typealias Context = LifecycleManagingContext<(), Never, CategoryCreationViewModel.Mode>
     
-    private let categoryRepository: CategoryRepository
+    private let categoryRepository: CategoryRepositoryProtocol
     
-    init(categoryRepository: CategoryRepository) {
+    init(categoryRepository: CategoryRepositoryProtocol) {
         self.categoryRepository = categoryRepository
     }
     

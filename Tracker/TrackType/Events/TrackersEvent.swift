@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import TrackerDomain
 
 enum TrackersEvent {
     case onAppear
@@ -35,10 +36,10 @@ extension TrackersEvent: TrackingEvent {
     var parameters: [String: Any]? {
         switch self {
         case .onAppear:
-            return nil
+            nil
             
         case .action(let action):
-            return [
+            [
                 "action": action.trackTitle
             ]
         }

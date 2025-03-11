@@ -7,14 +7,15 @@
 
 import UIKit
 import Presentation
+import TrackerDomain
 
 final class CategoryListAssembly: ViewControllerAssembly {
     typealias Output = CategoriesListViewModel.Output
     typealias Context = LifecycleManagingContext<Output, CategoriesListViewModelError, ()>
     
-    private let categoryRepository: CategoryRepository
+    private let categoryRepository: CategoryRepositoryProtocol
     
-    init(categoryRepository: CategoryRepository) {
+    init(categoryRepository: CategoryRepositoryProtocol) {
         self.categoryRepository = categoryRepository
     }
     

@@ -1,8 +1,9 @@
 import UIKit
-import CoreData
 import Combine
 import Presentation
+import TrackerDomain
 
+@MainActor
 final class TrackersViewController: UIViewController {
     typealias DataSource = UICollectionViewDiffableDataSource<TrackersSectionID, TrackersSectionItemID>
     typealias CellRegistration = UICollectionView.CellRegistration<TrackerCollectionViewCell, TrackersSectionItemID>
@@ -224,15 +225,19 @@ extension TrackersViewController: TrackerCollectionViewCellDelegate {
             return
         }
         
-        viewModel.onTrackerMarkCompleted(at: indexPath)
+        Task {
+            await viewModel.onTrackerMarkCompleted(at: indexPath)
+        }
     }
     
     func didPinTracker(for cell: TrackerCollectionViewCell) {
         guard let indexPath = collectionView.indexPath(for: cell) else {
             return
         }
-                
-        viewModel.onPinTracker(at: indexPath)
+              
+        Task {
+            await viewModel.onPinTracker(at: indexPath)
+        }
     }
     
     func didUnPinTracker(for cell: TrackerCollectionViewCell) {
@@ -240,16 +245,21 @@ extension TrackersViewController: TrackerCollectionViewCellDelegate {
             return
         }
         
-        viewModel.onPinTracker(at: indexPath)
+        Task {
+            await viewModel.onPinTracker(at: indexPath)
+        }
     }
     
     func didDeleteTracker(for cell: TrackerCollectionViewCell) {
         guard let indexPath = collectionView.indexPath(for: cell) else { 
             return
         }
-                        
+              
+        
         alertPresenter.show(message: "Strings.Localizable.Alert.confirmationTracker") { [viewModel] in
-            viewModel.onDeleteTracker(at: indexPath)
+            Task {
+                await viewModel.onDeleteTracker(at: indexPath)
+            }
         }
     }
     

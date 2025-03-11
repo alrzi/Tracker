@@ -6,9 +6,10 @@
 //
 
 import Foundation
+import TrackerDomain
 
 enum CreateTrackerMode {
-    case create(TrackerKind)
+    case create(Tracker.Kind)
     case update(Tracker, Date)
     
     var tracker: Tracker? {

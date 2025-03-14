@@ -24,6 +24,7 @@ final class StatisticAssembly: ViewControllerAssembly {
         self.trackerManager = trackerManager
     }
     
+    @MainActor
     func assemble(_ context: Context) -> UIViewController {
         let viewModel = StatisticViewModel(
             recordRepository: recordRepository,

@@ -10,6 +10,7 @@ public struct Tracker: Hashable, Identifiable, Sendable {
     public let kind: Kind
     public let trackedDays: Int
     public let categoryId: UUID
+    public let isCompleted: Bool
     
     public init(
         id: UUID = UUID(),
@@ -20,7 +21,8 @@ public struct Tracker: Hashable, Identifiable, Sendable {
         isPinned: Bool,
         kind: Kind,
         trackedDays: Int,
-        categoryId: UUID
+        categoryId: UUID,
+        isCompleted: Bool = false
     ) {
         self.id = id
         self.name = name
@@ -31,6 +33,7 @@ public struct Tracker: Hashable, Identifiable, Sendable {
         self.kind = kind
         self.trackedDays = trackedDays
         self.categoryId = categoryId
+        self.isCompleted = isCompleted
     }
 }
 
@@ -67,6 +70,21 @@ public extension Tracker {
             kind: kind,
             trackedDays: trackedDays,
             categoryId: categoryId
+        )
+    }
+    
+    func with(isCompleted: Bool) -> Self {
+        Tracker(
+            id: id,
+            name: name,
+            emoji: emoji,
+            color: color,
+            schedule: weekDays,
+            isPinned: isPinned,
+            kind: kind,
+            trackedDays: trackedDays,
+            categoryId: categoryId,
+            isCompleted: isCompleted
         )
     }
 }

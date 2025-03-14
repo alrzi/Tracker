@@ -15,3 +15,20 @@ public struct TrackerSection: Hashable, Identifiable, Sendable {
         self.trackers = trackers
     }
 }
+
+public extension TrackerSection {
+    func insertingTracker(_ tracker: Tracker, at index: Int) -> TrackerSection {
+        var updatedTrackers = trackers
+        updatedTrackers.insert(tracker, at: index)
+        return TrackerSection(id: id, title: title, trackers: updatedTrackers)
+    }
+        
+    func removingTracker(at index: Int) -> TrackerSection {
+        guard index >= 0 && index < trackers.count else {
+            return self
+        }
+        var updatedTrackers = trackers
+        updatedTrackers.remove(at: index)
+        return TrackerSection(id: id, title: title, trackers: updatedTrackers)
+    }
+}

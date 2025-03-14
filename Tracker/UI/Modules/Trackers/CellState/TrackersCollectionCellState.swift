@@ -10,8 +10,7 @@ import UIKit
 import TrackerDomain
 
 struct TrackersCollectionCellState {
-    var pinnedSection: TrackerSection?
-    var notPinnedSections: [TrackerSection]?
+    var trackerSections: [TrackerSection] = []
 }
  
 extension TrackersCollectionCellState {
@@ -21,72 +20,34 @@ extension TrackersCollectionCellState {
     
     static let empty: Self = .init()
     
-    private var sections: [SectionIdentifier] {
-        var sectionIdentifiers: [SectionIdentifier] = []
-        
-        if pinnedSection != nil {
-            sectionIdentifiers.append(.pinned)
-        }
-        
-        if let notPinnedSections {
-            notPinnedSections.enumerated().forEach {
-                sectionIdentifiers.append(.notPinned($0.offset, $0.element.id))
-            }
-        }
-        
-        return sectionIdentifiers
-    }
-    
     var snapshot: Snapshot {
         var snapshot = Snapshot()
-        
-        if let pinnedSection {
-            snapshot.appendSections([.pinned])
-            snapshot.appendItems(pinnedSection.trackers.map { .tracker($0.id) }, toSection: .pinned)
+               
+        trackerSections.enumerated().forEach {
+            snapshot.appendSections([.sections($0.offset, $0.element.id)])
+            snapshot.appendItems($0.element.trackers.map { .tracker($0.id) }, toSection: .sections($0.offset, $0.element.id))
         }
-        
-        if let notPinnedSections {
-            notPinnedSections.enumerated().forEach {
-                snapshot.appendSections([.notPinned($0.offset, $0.element.id)])
-                snapshot.appendItems($0.element.trackers.map { .tracker($0.id) }, toSection: .notPinned($0.offset, $0.element.id))
-            }
-        }
-        
+            
         return snapshot
     }
     
     func item(at indexPath: IndexPath) -> Tracker? {
-        guard let sectionID = sections.elementOrNil(at: indexPath.section) else {
+        guard let section = snapshot.sectionIdentifiers.elementOrNil(at: indexPath.section) else {
             return nil
         }
-        
-        switch sectionID {
-        case .pinned:
-            let tracker = pinnedSection?.trackers.elementOrNil(at: indexPath.item)
-            
-            return tracker
-            
-        case .notPinned(let index, _):
-            let section = notPinnedSections?.elementOrNil(at: index)
-            let tracker = section?.trackers.elementOrNil(at: indexPath.item)
-            
-            return tracker
+               
+        return switch section {
+        case .sections(let index, _): trackerSections.elementOrNil(at: index)?.trackers.elementOrNil(at: indexPath.item)
         }
     }
     
     func sectionTitle(at indexPath: IndexPath) -> String? {
-        guard let sectionID = sections.elementOrNil(at: indexPath.section) else {
+        guard let section = snapshot.sectionIdentifiers.elementOrNil(at: indexPath.section) else {
             return nil
         }
         
-        switch sectionID {
-        case .pinned:
-            return pinnedSection?.title
-            
-        case .notPinned(let index, _):
-            let section = notPinnedSections?.elementOrNil(at: index)
-           
-            return section?.title
+        return switch section {
+        case .sections(let index, _): trackerSections.elementOrNil(at: index)?.title
         }
     }
 }

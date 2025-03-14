@@ -1,7 +1,7 @@
-
 import Combine
 import TrackerDomain
 
+@MainActor
 final class CategoriesListViewModel: ObservableObject {
     private let categoryRepository: any CategoryRepositoryProtocol
     
@@ -22,10 +22,15 @@ final class CategoriesListViewModel: ObservableObject {
 }
 
 extension CategoriesListViewModel {
-    func getAllCategories() {
-        let categories = categoryRepository.getAllCategories()
-        
-        categoryViewModels = categories.map(CategoryViewModel.init)
+    func getAllCategories() async {
+        do {
+            let categories = try await categoryRepository.getAllSections(weekDay:  Date().weekDayString)
+            
+            categoryViewModels = categories.map(CategoryViewModel.init)
+        }
+        catch {
+            debugPrint(error)
+        }
     }
     
     func categorySelected(at indexPath: IndexPath) {
@@ -40,18 +45,18 @@ extension CategoriesListViewModel {
         onAction(.onUpdateCategory(category.id))
     }
     
-    func deleteCategoryAt(indexPath: IndexPath) {
+    func deleteCategoryAt(indexPath: IndexPath) async {
         let category = categoryViewModels[indexPath.row]
         
         do {
-            try categoryRepository.deleteCategory(with: category.id)
+            try await categoryRepository.deleteCategory(with: category.id)
         }
         catch {
             debugPrint("Can not deleteCategory")
             preconditionFailure()
         }
         
-        getAllCategories()
+        await getAllCategories()
     }
     
     func getCategoryAt(indexPath: IndexPath) -> CategoryViewModel {

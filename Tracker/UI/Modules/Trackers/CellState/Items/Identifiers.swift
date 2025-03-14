@@ -8,8 +8,7 @@
 import Foundation
 
 enum TrackersSectionID: Hashable {
-    case pinned
-    case notPinned(Int, UUID)
+    case sections(Int, UUID)
 }
 
 enum TrackersSectionItemID: Hashable {

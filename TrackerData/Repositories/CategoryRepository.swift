@@ -9,75 +9,114 @@ import Foundation
 import TrackerDomain
 import CoreData.NSFetchRequest
 
-final class CategoryRepository {
+final class CategoryRepository: CategoryRepositoryProtocol {
     private let persistencyService: PersistencyService
-    private let predicateBuilder: PredicateBuilder
     
-    init(
-        persistencyService: PersistencyService,
-        predicateBuilder: PredicateBuilder
-    ) {
+    init(persistencyService: PersistencyService) {
         self.persistencyService = persistencyService
-        self.predicateBuilder = predicateBuilder
     }
-}
-
-extension CategoryRepository: CategoryRepositoryProtocol {
-    func save() {
+    
+    // MARK: - Create
+    
+    func createSection(_ sections: TrackerSection) async {
+        let object = await persistencyService.createObject(CategoryObject.self)
+        object.copy(from: sections)
         
+        await persistencyService.saveContext()
     }
     
-    func getCategory(by id: UUID) throws -> TrackerSection {
-        .init(title: "", trackers: [])
+    func createSections(_ sections: [TrackerSection]) async {
+        for section in sections {
+            let sectionObject = await persistencyService.createObject(CategoryObject.self)
+            sectionObject.copy(from: section)
+            
+            for tracker in section.trackers {
+                let trackerObject = await persistencyService.createObject(TrackerObject.self)
+                trackerObject.copy(from: tracker)
+                
+                sectionObject.addToTrackers(trackerObject)
+            }
+        }
+        
+        await persistencyService.saveContext()
     }
+        
+    // MARK: - Read
     
-    func getAllCategories() -> [TrackerSection] {
-        let objects = persistencyService.fetchObjects(CategoryObject.self)
+    func getAllSections(weekDay: String) async throws -> [TrackerSection] {
+        let request = FetchRequestBuilder<CategoryObject>.by(weekDay: weekDay).build()
+        
+        let objects = try await persistencyService.fetchObjects(with: request)
         let categories = objects.map(TrackerSection.init)
         return categories
     }
     
     func getCategory(by id: UUID) async throws -> TrackerSection {
-        let fetchRequest = NSFetchRequest<CategoryObject>(entityName: CategoryObject.entityName)
-        fetchRequest.predicate = predicateBuilder.buildPredicateCategoryId(id: id)
+        let request = FetchRequestBuilder<CategoryObject>.by(id: id).build()
         
-        guard let object = try await persistencyService.fetchObjects(with: fetchRequest).first else {
+        guard let object = try await persistencyService.fetchObject(with: request) else {
             throw CategoryRepositoryError.noTrackerForId
         }
         
         return .init(id: object.id, title: object.title, trackers: [])
     }
     
-    func createCategory(_ category: TrackerSection) {
-        let object = persistencyService.createObject(CategoryObject.self)
-        object.copy(from: category)
-        
-        persistencyService.saveContext()
-    }       
+    // MARK: - Update
     
-    func updateCategory(_ category: TrackerSection) throws {
-        guard let object = persistencyService.fetchObject(CategoryObject.self, by: \.id, value: category.id)?.first else {
+    func updateCategory(_ category: TrackerSection) async throws {
+        let request = FetchRequestBuilder<CategoryObject>.by(id: category.id).build()
+        
+        guard let object = try await persistencyService.fetchObject(with: request) else {
             throw CategoryRepositoryError.noTrackerForId
         }
         
         object.copy(from: category)
         
-        persistencyService.saveContext()
+        await persistencyService.saveContext()
     }
     
-    func deleteCategory(with id: UUID) throws {
-        guard let object = persistencyService.fetchObject(CategoryObject.self, by: \.id, value: id)?.first else {
+    // MARK: - Delete
+    
+    func deleteCategory(with id: UUID) async throws {
+        let request = FetchRequestBuilder<CategoryObject>.by(id: id).build()
+        
+        guard let object = try await persistencyService.fetchObject(with: request) else {
             throw CategoryRepositoryError.noTrackerForId
         }
         
-        persistencyService.removeObject(object)
+        await persistencyService.removeObject(object)
         
-        persistencyService.saveContext()
+        await persistencyService.saveContext()
     }
     
-    func deleteAll() {
-        persistencyService.deleteAllObjects(CategoryObject.self)
+    func deleteAll() async throws {
+        try await persistencyService.deleteAllObjects(CategoryObject.self)
         
-        persistencyService.saveContext()
+        await persistencyService.saveContext()
     }
 }
+
+// MARK: - Requests
+
+private extension FetchRequestBuilder where T: CategoryObject {
+    static func by(id: UUID) -> FetchRequestBuilder<T> {
+        Self()
+            .setPredicate(
+                StaticPredicateBuilder<T>()
+                    .filter(by: \.id, value: id, comparison: .equal)
+                    .build()
+            )
+            .setSortDescriptors([.init(keyPath: \T.title, ascending: true)])
+    }
+    
+    static func by(weekDay: String) -> FetchRequestBuilder<T> {
+        Self()
+            .setPredicate(
+                StaticPredicateBuilder<T>()
+                    .subpredicate(by: \.trackers, subKeyPath: \.weekDays, subValue: weekDay, comparison: .contains)
+                    .build()
+            )
+            .setSortDescriptors([.init(keyPath: \T.title, ascending: true)])
+    }
+}
+

@@ -47,7 +47,7 @@ let life = [
         emoji: RandomEmojiService.emoji,
         color: RandomHexColorService.randomHexString,
         schedule: WeekDay.allDaysOfWeek,
-        isPinned: true,
+        isPinned: false,
         kind: .occasional,
         trackedDays: 0,
         categoryId: .init()
@@ -60,7 +60,7 @@ let cooking = [
         emoji: RandomEmojiService.emoji,
         color: RandomHexColorService.randomHexString,
         schedule: [1],
-        isPinned: true,
+        isPinned: false,
         kind: .habit,
         trackedDays: 0,
         categoryId: .init()
@@ -73,7 +73,7 @@ let movie = [
         emoji: RandomEmojiService.emoji,
         color: RandomHexColorService.randomHexString,        
         schedule: [1],
-        isPinned: true,
+        isPinned: false,
         kind: .habit,
         trackedDays: 0,
         categoryId: .init()
@@ -86,7 +86,7 @@ let socialization = [
         emoji: RandomEmojiService.emoji,
         color: RandomHexColorService.randomHexString,
         schedule: [2],
-        isPinned: true,
+        isPinned: false,
         kind: .habit,
         trackedDays: 0,
         categoryId: .init()
@@ -99,7 +99,7 @@ let relations = [
         emoji: RandomEmojiService.emoji,
         color: RandomHexColorService.randomHexString,
         schedule: [2],
-        isPinned: true,
+        isPinned: false,
         kind: .habit,
         trackedDays: 0,
         categoryId: .init()
@@ -151,7 +151,7 @@ let englishClub = [
         emoji: RandomEmojiService.emoji,
         color: RandomHexColorService.randomHexString,
         schedule: [6],
-        isPinned: true,
+        isPinned: false,
         kind: .habit,
         trackedDays: 0,
         categoryId: .init()
@@ -160,13 +160,28 @@ let englishClub = [
 
 let mockTrackerSections = [
     TrackerSection(title: "Работа", trackers: work),
-    TrackerSection(title: "Жизнь", trackers: life),
-    TrackerSection(title: "Вкусная еда", trackers: cooking),
-    TrackerSection(title: "Кинематограф", trackers: movie),
-    TrackerSection(title: "Общение", trackers: socialization),
-    TrackerSection(title: "Родственники", trackers: relations),
-    TrackerSection(title: "Приключения", trackers: adventure),
-    TrackerSection(title: "Книги", trackers: books),
-    TrackerSection(title: "Хобби", trackers: hobbie),
+//    TrackerSection(title: "Жизнь", trackers: life),
+//    TrackerSection(title: "Вкусная еда", trackers: cooking),
+//    TrackerSection(title: "Кинематограф", trackers: movie),
+//    TrackerSection(title: "Общение", trackers: socialization),
+//    TrackerSection(title: "Родственники", trackers: relations),
+//    TrackerSection(title: "Приключения", trackers: adventure),
+//    TrackerSection(title: "Книги", trackers: books),
+//    TrackerSection(title: "Хобби", trackers: hobbie),
     TrackerSection(title: "Английский клуб", trackers: englishClub),
 ]
+
+
+func createMockTrackerRecords() -> [TrackerRecord] {
+    var records: [TrackerRecord] = []
+    
+    for tracker in work {
+        let record = TrackerRecord(
+            id: tracker.id,
+            date: .now
+        )
+        records.append(record)
+    }       
+    
+    return records
+}

@@ -31,15 +31,15 @@ final class CategoryCreationViewModel {
 }
 
 extension CategoryCreationViewModel {
-    func createButtonTapped() {
+    func createButtonTapped() async {
         if case .available(let name) = categoryNameStatus {
             switch mode {
             case .create:
-                categoryRepository.createCategory(.init(title: name, trackers: []))
+                await categoryRepository.createSection(.init(title: name, trackers: []))
                 
             case .update(let id):
                 do {
-                    try categoryRepository.updateCategory(.init(id: id, title: name, trackers: []))
+                    try await categoryRepository.updateCategory(.init(id: id, title: name, trackers: []))
                 }
                 catch {
                     preconditionFailure()

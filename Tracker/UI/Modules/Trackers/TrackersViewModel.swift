@@ -44,25 +44,20 @@ final class TrackersViewModel {
             .store(in: &cancellable)
         
         stateUpdateTask = Task {
-            try await trackerManager.getAllPinnedTrackers()
+            try await trackerManager.fetchAllSectionedTrackers()
             
-            for try await trackers in trackerManager.pinnedTrackers {
-                if trackers.isEmpty {
-                    state.pinnedSection = nil
-                }
-                else {
-                    state.pinnedSection = .init(title: "Pinned", trackers: trackers)
-                }
+            for try await section in trackerManager.sections {
+                state.trackerSections = section
             }
         }
         
-        stateUpdateSectionsTask = Task {
-            try await trackerManager.getAllRegularTrackers()
-            
-            for try await section in trackerManager.sections {
-                state.notPinnedSections = section
-            }
-        }
+//        Task {
+//            await trackerManager.addSections(mockTrackerSections)
+//            
+//            for i in createMockTrackerRecords() {
+//                try await trackerManager.toggleIsCompleted(for: i.id, for: i.date)
+//            }
+//        }
     }
     
     func onAppear() {
@@ -114,7 +109,12 @@ extension TrackersViewModel {
             return
         }
         
-        trackerManager.saveAsCompleted(tracker: tracker, for: date)
+        do {
+            try await trackerManager.toggleIsCompleted(for: tracker.id, for: date)
+        }
+        catch {
+            debugPrint(error)
+        }
     }
     
     func onDeleteTracker(at indexPath: IndexPath) async {

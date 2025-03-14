@@ -11,7 +11,6 @@ internal import DataStorage
 
 public enum TrackerDataContainer {
     static let persistencyService = PersistencyService()
-    static let predicateBuilder = PredicateBuilder()
     static let dataStorage = DataStorage(
         jsonDecoder: JSONDecoder(),
         jsonEncoder: JSONEncoder(),
@@ -33,22 +32,19 @@ public enum TrackerDataContainer {
     
     public static var trackerRepository: TrackerRepositoryProtocol {
         TrackerRepository(
-            persistencyService: persistencyService,
-            predicateBuilder: predicateBuilder
+            persistencyService: persistencyService
         )
     }
     
     public static var categoryRepository: CategoryRepositoryProtocol {
         CategoryRepository(
-            persistencyService: persistencyService,
-            predicateBuilder: predicateBuilder
+            persistencyService: persistencyService
         )
     }
     
     public static var recordRepository: RecordRepositoryProtocol {
         RecordRepository(
-            persistencyService: persistencyService,
-            predicateBuilder: predicateBuilder
+            persistencyService: persistencyService
         )
     }
 }

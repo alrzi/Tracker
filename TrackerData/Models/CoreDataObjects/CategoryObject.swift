@@ -12,7 +12,7 @@ import CoreData
 public class CategoryObject: NSManagedObject {
     @NSManaged public var id: UUID
     @NSManaged public var title: String
-    @NSManaged public var trackers: NSSet
+    @NSManaged public var trackers: Set<TrackerObject>
 }
 
 extension CategoryObject: Entity {
@@ -22,7 +22,7 @@ extension CategoryObject: Entity {
 extension CategoryObject {
     func copy(from category: TrackerSection) {
         self.id = category.id
-        self.title = category.title        
+        self.title = category.title
     }
 }
 
@@ -31,7 +31,7 @@ extension TrackerSection {
         self.init(
             id: object.id,
             title: object.title,
-            trackers: object.trackers.allObjects.compactMap { $0 as? TrackerObject }.map(Tracker.init)
+            trackers: []
         )
     }
 }

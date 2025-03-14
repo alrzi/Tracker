@@ -108,19 +108,14 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
         
     func configure(with info: Tracker) {
         let color = UIColor(hexString: info.color)
-        buttonState = .selected
+        buttonState = info.isCompleted ? .selected : .unselected
         emojiLabel.text = info.emoji
-        trackerNameLabel.text = info.name
+        trackerNameLabel.text = "T"
         attachedSighView.isHidden = !info.isPinned
         trackerContainerView.backgroundColor = color
         addButton.backgroundColor = color
         isAttached = info.isPinned
-        trackedDaysLabel.text = "Strings.Localizable.daysNumber(info.trackedDays)"
-    }
-            
-    func configure(with trackedDays: Int, isCompleted: Bool) {
-        trackedDaysLabel.text = "Strings.Localizable.daysNumber(trackedDays)"
-        buttonState = isCompleted ? .selected : .unselected
+        trackedDaysLabel.text = info.trackedDays.formatted(.number)
     }
     
     @objc

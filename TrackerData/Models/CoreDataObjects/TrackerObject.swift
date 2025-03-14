@@ -18,7 +18,7 @@ public class TrackerObject: NSManagedObject {
     @NSManaged public var weekDays: String
     @NSManaged public var kind: TrackerKind
     @NSManaged public var category: CategoryObject
-    @NSManaged public var trackerRecord: NSSet?
+    @NSManaged public var trackerRecord: Set<RecordObject>
 }
 
 extension TrackerObject: Entity {
@@ -44,10 +44,10 @@ extension Tracker {
             name: object.name,
             emoji: object.emoji,
             color: object.color,
-            schedule: Set.fromString(object.weekDays) ?? .init(),
+            schedule: Set.fromString(object.weekDays),
             isPinned: object.isPinned,
             kind: object.kind.toKind(),
-            trackedDays: object.trackerRecord?.count ?? 0,
+            trackedDays: object.trackerRecord.count,
             categoryId: object.category.id
         )
     }

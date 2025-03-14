@@ -16,7 +16,7 @@ public enum TrackerDomainContainer {
         TrackerManager(
             trackerRepository: trackerRepository,
             recordRepository: recordRepository,
-            category: category
+            categoryRepository: category
         )
     }
     

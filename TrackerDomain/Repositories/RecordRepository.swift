@@ -8,8 +8,12 @@
 import Foundation
 
 public protocol RecordRepositoryProtocol: Sendable {
-    var numberOfCompletedTrackers: Int { get }
+    // Create/Delete
+    func createOrDeleteIfPresent(for trackerId: UUID, date: Date) async throws
     
-    func getTrackedDaysFor(id: UUID) -> Int
-    func removeOrAddRecordOf(tracker: Tracker, forParticularDay date: Date)
+    // Read
+    var numberOfCompletedTrackers: Int { get async throws }
+    
+    func isCompletedFor(selectedDay date: Date, trackerWithId id: UUID) async throws -> Bool
+    func getTrackedDaysFor(id: UUID) async throws -> Int        
 }

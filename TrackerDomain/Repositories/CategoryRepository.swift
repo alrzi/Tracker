@@ -11,11 +11,19 @@ public enum CategoryRepositoryError: Error {
     case noTrackerForId
 }
 
-public protocol CategoryRepositoryProtocol {
-    func getAllCategories() -> [TrackerSection]
-    func getCategory(by id: UUID) throws -> TrackerSection
+public protocol CategoryRepositoryProtocol: Sendable {
+    // Create
+    func createSection(_ section: TrackerSection) async
+    func createSections(_ sections: [TrackerSection]) async
     
-    func createCategory(_ category: TrackerSection)
-    func updateCategory(_ category: TrackerSection) throws
-    func deleteCategory(with id: UUID) throws
+    // Read
+    func getAllSections(weekDay: String) async throws -> [TrackerSection]
+    func getCategory(by id: UUID) async throws -> TrackerSection
+    
+    // Update
+    func updateCategory(_ category: TrackerSection) async throws
+    
+    // Delete
+    func deleteCategory(with id: UUID) async throws
+    func deleteAll() async throws
 }

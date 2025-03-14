@@ -1,29 +1,24 @@
 import Foundation
 
 public protocol TrackerManaging: Sendable {
-    associatedtype StateSequence: AsyncSequence where StateSequence.Element == [Tracker]
     associatedtype StateSectionSequence: AsyncSequence where StateSectionSequence.Element == [TrackerSection]
     
-    var pinnedTrackers: StateSequence { get }
     var sections: StateSectionSequence { get }
-    
-    func getAllRegularTrackers() async throws
-    func getAllPinnedTrackers() async throws
-    func addCategory(withId id: UUID, toTracker tracker: Tracker) async throws
+        
+    func addSection(withId id: UUID, toTracker tracker: Tracker) async throws
     func togglePin(for tracker: Tracker) async throws    
-    func delete(tracker: Tracker) async throws
-    func daysTracked(for tracker: Tracker) -> Int
-    func isCompleted(tracker: Tracker, for date: Date) -> Bool
-    func saveAsCompleted(tracker: Tracker, for date: Date)
+    func delete(tracker: Tracker) async throws    
+    func isCompleted(tracker: Tracker, for date: Date) async throws -> Bool
+    func toggleIsCompleted(for trackerId: UUID, for date: Date) async throws
+    func addSections(_ sections: [TrackerSection]) async
+    func daysTracked(for tracker: Tracker) async throws -> Int
+    func fetchAllSectionedTrackers() async throws
 }
 
 final class TrackerManager: TrackerManaging {
     private let trackerRepository: TrackerRepositoryProtocol
     private let recordRepository: RecordRepositoryProtocol
-    private let category: CategoryRepositoryProtocol
-    
-    private let mutablePinnedTrackers = ObservableActor<[Tracker]>([])
-    let pinnedTrackers: ReadOnlyObservableWrapper<[Tracker]>
+    private let categoryRepository: CategoryRepositoryProtocol
     
     private let mutableSections = ObservableActor<[TrackerSection]>([])
     let sections: ReadOnlyObservableWrapper<[TrackerSection]>
@@ -31,88 +26,94 @@ final class TrackerManager: TrackerManaging {
     init(
         trackerRepository: TrackerRepositoryProtocol,
         recordRepository: RecordRepositoryProtocol,
-        category: CategoryRepositoryProtocol
+        categoryRepository: CategoryRepositoryProtocol
     ) {
         self.trackerRepository = trackerRepository
         self.recordRepository = recordRepository
-        self.category = category
-        
-        pinnedTrackers = mutablePinnedTrackers.readOnly()
+        self.categoryRepository = categoryRepository
+               
         sections = mutableSections.readOnly()
-        
-//        trackerRepository.addPrepared(sections: mockTrackerSections)
     }
     
-    // MARK: - Public methods
+    // MARK: - Create
     
-    func getAllPinnedTrackers() async throws {
-        let pinnedTrackers = try await trackerRepository.getAllTrackers(isPinned: true)
-        
-        await mutablePinnedTrackers.setIfNeeded(value: pinnedTrackers)
+    func addSection(withId id: UUID, toTracker tracker: Tracker) async throws {
+        try await trackerRepository.addSection(withId: id, toTracker: tracker)
+        try await fetchAllSectionedTrackers()
     }
     
-    func getAllRegularTrackers() async throws {
-        let regularTrackers = try await trackerRepository.getAllTrackers(isPinned: false)
+    func addSections(_ sections: [TrackerSection]) async {
+        await categoryRepository.createSections(sections)
+    }
+    
+    // MARK: - Read
+    
+    func fetchAllSectionedTrackers() async throws {
+        let weekDay: String = "0, 1, 2, 3, 4, 5, 6"
         
-        var categoriesDict: [UUID: TrackerSection] = [:]
+        let sections = try await categoryRepository.getAllSections(weekDay: weekDay)
         
-        for tracker in regularTrackers where categoriesDict[tracker.categoryId] == nil {
-            let category = try await category.getCategory(by: tracker.categoryId)
-            categoriesDict[tracker.categoryId] = category
-        }
+        async let pinned = trackerRepository.getAllTrackers(isPinned: true)
         
-        for tracker in regularTrackers {
-            if let section = categoriesDict[tracker.categoryId] {
-                var updatedTrackers = section.trackers
-                updatedTrackers.append(tracker)
-                                
-                let updatedSection = TrackerSection(
-                    id: section.id,
-                    title: section.title,
-                    trackers: updatedTrackers
-                )
-                categoriesDict[tracker.categoryId] = updatedSection
+        async let regular = withThrowingTaskGroup(of: TrackerSection?.self, returning: [TrackerSection].self) { [trackerRepository] group in
+            for section in sections {
+                group.addTask {
+                    let trackers = try await trackerRepository.getAllTrackersForCategory(category: section.id, isPinned: false, weekDay: weekDay)
+                    
+                    if trackers.isEmpty {
+                        return nil
+                    }
+                    else {
+                        return TrackerSection(
+                            id: section.id,
+                            title: section.title,
+                            trackers: trackers
+                        )
+                    }
+                }
+            }
+            
+            return try await group.reduce(into: []) { accumulatedSections, section in
+                if let validSection = section {
+                    accumulatedSections.append(validSection)
+                }
             }
         }
         
-        await mutableSections.setIfNeeded(value: Array(categoriesDict.values))
+        let tempPinned = try await pinned
+        var tempSections = try await regular
+        
+        if !tempPinned.isEmpty {
+            tempSections.insert(.init(title: "Pinned", trackers: tempPinned), at: 0)
+        }
+        
+        await mutableSections.setIfNeeded(value: tempSections)
     }
     
-    func delete(tracker: Tracker) async throws {
-        try await trackerRepository.deleteTracker(with: tracker.id)
-        
-        if tracker.isPinned {
-            try await getAllPinnedTrackers()
-        }
-        else {
-            try await getAllRegularTrackers()
-        }
+    func daysTracked(for tracker: Tracker) async throws -> Int {
+        try await recordRepository.getTrackedDaysFor(id: tracker.id)
     }
+    
+    func isCompleted(tracker: Tracker, for date: Date) async throws -> Bool {
+        try await recordRepository.isCompletedFor(selectedDay: date, trackerWithId: tracker.id)
+    }
+    
+    // MARK: - Update
     
     func togglePin(for tracker: Tracker) async throws {
         try await trackerRepository.updateTracker(tracker.toggleIsPinned())
-        try await updateAll()
+        try await fetchAllSectionedTrackers()
     }
     
-    func updateAll() async throws {
-        try await getAllPinnedTrackers()
-        try await getAllRegularTrackers()
+    func toggleIsCompleted(for trackerId: UUID, for date: Date) async throws {
+        try await recordRepository.createOrDeleteIfPresent(for: trackerId, date: date)
+        try await fetchAllSectionedTrackers()
     }
     
-    func daysTracked(for tracker: Tracker) -> Int {
-        recordRepository.getTrackedDaysFor(id: tracker.id)
-    }
+    // MARK: - Delete
     
-    func isCompleted(tracker: Tracker, for date: Date) -> Bool {
-//        recordRepository.isCompletedFor(selectedDay: date, trackerWithId: tracker.id)
-        false
-    }
-    
-    func saveAsCompleted(tracker: Tracker, for date: Date) {
-        recordRepository.removeOrAddRecordOf(tracker: tracker, forParticularDay: date)
-    }
-    
-    func addCategory(withId id: UUID, toTracker tracker: Tracker) async throws {
-//        try await trackerRepository.addCategory(withId: id, toTracker: tracker)
+    func delete(tracker: Tracker) async throws {
+        try await trackerRepository.deleteTracker(with: tracker.id)
+        try await fetchAllSectionedTrackers()
     }
 }

@@ -18,7 +18,7 @@ protocol TrackerCreationViewModelProtocol {
     func onCancel()
     
     // Data source
-    func addCategory(header: String)
+    func addSection(header: String)
     func setSchedule(schedule: Set<Int>)
     func numberOfItemsInSection(_ section: Int) -> Int
     func getSection(_ indexPath: IndexPath) -> CollectionViewData
@@ -72,7 +72,7 @@ final class TrackerCreationViewModel: ObservableObject {
         
         userInputCollector.categoryPublisher
             .sink { [weak self] in
-                self?.dataSource.addCategoryHeader($0.title)
+                self?.dataSource.addSectionHeader($0.title)
                 self?.categoryHeader = $0.title
                 self?.categoryId = $0.id
             }
@@ -115,7 +115,7 @@ final class TrackerCreationViewModel: ObservableObject {
         
         userInputCollector.setTracker(tracker)
         
-//        dataSource.addCategoryHeader(category)
+//        dataSource.addSectionHeader(category)
 //        userInputCollector.insert(.category(.init(title: category, trackers: [])))
     }
     
@@ -127,7 +127,7 @@ final class TrackerCreationViewModel: ObservableObject {
         switch mode {
         case .create:
             do {
-                try await trackerManager.addCategory(withId: categoryId, toTracker: tracker)
+                try await trackerManager.addSection(withId: categoryId, toTracker: tracker)
                 
                 resultObserver.send(.onCreateTracker)                
             }
@@ -203,8 +203,8 @@ extension TrackerCreationViewModel {
         dataSource.numberOfCollectionSections()
     }
     
-    func addCategory(header: String) {
-        dataSource.addCategoryHeader(header)
+    func addSection(header: String) {
+        dataSource.addSectionHeader(header)
         self.categoryHeader = header
     }
     

@@ -63,7 +63,10 @@ final class CategoriesListViewController: FrameViewController {
         setupLayout()
         
         bind(viewModel: viewModel)
-        viewModel.getAllCategories()
+        
+        Task {
+            await viewModel.getAllCategories()
+        }
     }
     
     func bind(viewModel: CategoriesListViewModel) {
@@ -167,7 +170,9 @@ extension CategoriesListViewController: UIContextMenuInteractionDelegate {
                 return
             }
             alertPresenter.show(message:  "Strings.Localizable.Alert.confirmationCategory") { [weak self] in
-                self?.viewModel.deleteCategoryAt(indexPath: indexPath)
+                Task {
+                    await self?.viewModel.deleteCategoryAt(indexPath: indexPath)
+                }
             }
         }
         

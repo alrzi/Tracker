@@ -80,7 +80,9 @@ final class CategoryCreationViewController: FrameViewController {
     
     // @objc
     override func handleButtonCenterTap() {
-        viewModel.createButtonTapped()
+        Task {
+            await viewModel.createButtonTapped()
+        }
     }
 }
 

@@ -19,7 +19,8 @@ final class CategoryListAssembly: ViewControllerAssembly {
         self.categoryRepository = categoryRepository
     }
     
-    func assemble(_ context: Context) -> UIViewController {        
+    @MainActor
+    func assemble(_ context: Context) -> UIViewController {
         let viewModel = CategoriesListViewModel(
             categoryRepository: categoryRepository,
             onAction: {

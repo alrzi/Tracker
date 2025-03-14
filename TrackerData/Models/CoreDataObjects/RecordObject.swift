@@ -11,7 +11,7 @@ import CoreData
 public class RecordObject: NSManagedObject {
     @NSManaged public var id: UUID
     @NSManaged public var date: Date
-    @NSManaged public var tracker: TrackerObject?
+    @NSManaged public var tracker: TrackerObject
 }
 
 extension RecordObject: Entity {

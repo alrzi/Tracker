@@ -2,7 +2,7 @@ import Foundation
 import TrackerDomain
 
 protocol DataSourceProtocol {
-    mutating func addCategoryHeader(_ header: String)
+    mutating func addSectionHeader(_ header: String)
     mutating func addSchedule(_ schedule: String)
     func numberOfTableViewRows(ofKind kind: Tracker.Kind) -> Int
     func dataForTablView(ofKind kind: Tracker.Kind) -> [TableData]
@@ -102,7 +102,7 @@ extension DataSourceImpl: DataSourceProtocol {
         return nil
     }
     
-    mutating func addCategoryHeader(_ header: String) {
+    mutating func addSectionHeader(_ header: String) {
         self.category.subtitle = header
     }
     

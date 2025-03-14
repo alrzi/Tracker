@@ -7,71 +7,97 @@
 
 import Foundation
 import TrackerDomain
-import CoreData.NSFetchRequest
 
-final class RecordRepository {
+final class RecordRepository: RecordRepositoryProtocol {
     private let persistencyService: PersistencyService
-    private let predicateBuilder: PredicateBuilder
+    private let calendar: Calendar = .autoupdatingCurrent
     
-    init(
-        persistencyService: PersistencyService,
-        predicateBuilder: PredicateBuilder
-    ) {
-        self.persistencyService = persistencyService
-        self.predicateBuilder = predicateBuilder
-    }
-}
-
-extension RecordRepository: RecordRepositoryProtocol {
     var numberOfCompletedTrackers: Int {
-        persistencyService.fetchObjects(RecordObject.self).count
-    }
-    
-    func getTrackedDaysFor(id: UUID) -> Int {
-        guard let objects = persistencyService.fetchObject(RecordObject.self, by: \.id, value: id) else {
-            return .zero
+        get async throws {
+            try await persistencyService.fetchObjects(RecordObject.self).count
         }
-        
-        return objects.count
     }
     
-    func isCompletedFor(selectedDay date: Date, trackerWithId id: UUID) -> Bool {
-        let predicate = predicateBuilder.buildPredicateIsCompletedFor(
-            selectedDate: date,
-            trackerWithId: id
-        )
-                
-        let fetchRequest = NSFetchRequest<RecordObject>(entityName: RecordObject.entityName)
-        fetchRequest.predicate = predicate
-        
-        return persistencyService.fetchObjects(with: fetchRequest).first != nil
+    init(persistencyService: PersistencyService) {
+        self.persistencyService = persistencyService
     }
     
-    func removeOrAddRecordOf(tracker: Tracker, forParticularDay date: Date) {
-        guard let trackerObject = persistencyService.fetchObject(TrackerObject.self, by: \.id, value: tracker.id)?.first else {
+    func createOrDeleteIfPresent(for trackerId: UUID, date: Date) async throws {
+        let request = FetchRequestBuilder<TrackerObject>.by(id: trackerId).build()
+        
+        let trackerObject = try await persistencyService.fetchObject(with: request)
+        
+        guard let trackerObject else {
             return
         }
         
-        trackerObject.copy(from: tracker)
+        let recordRequest = FetchRequestBuilder<RecordObject>.by(id: trackerId).build()
         
-        let predicate = predicateBuilder.buildPredicateIsCompletedFor(
-            selectedDate: date,
-            trackerWithId: tracker.id
-        )
-                
-        let fetchRequest = NSFetchRequest<RecordObject>(entityName: RecordObject.entityName)
-        fetchRequest.predicate = predicate
-        
-        if let object = persistencyService.fetchObjects(with: fetchRequest).first {
-            persistencyService.removeObject(object)
+        if let recordObject = try await persistencyService.fetchObject(with: recordRequest) {
+            await persistencyService.removeObject(recordObject)
+            
+            await persistencyService.saveContext()
         }
         else {
-            let recordObject = persistencyService.createObject(RecordObject.self)
+            let recordObject = await persistencyService.createObject(RecordObject.self)
+            recordObject.id = UUID()
             recordObject.date = date
-            recordObject.id = tracker.id
             recordObject.tracker = trackerObject
+            
+            await persistencyService.saveContext()
         }
+    }
+    
+    func getTrackedDaysFor(id: UUID) async throws -> Int {
+        let request = FetchRequestBuilder<RecordObject>.by(id: id).build()
         
-        persistencyService.saveContext()
+        let recordObjects = try await persistencyService.fetchObjects(with: request)
+        
+        return recordObjects.count
+    }
+    
+    func isCompletedFor(selectedDay date: Date, trackerWithId id: UUID) async throws -> Bool {
+        let startDate = calendar.startOfDay(for: date)
+        let endDate = calendar.date(byAdding: .day, value: 1, to: startDate) ?? date
+        let request = FetchRequestBuilder<RecordObject>.by(id: id, date: startDate, upTo: endDate).build()
+        
+        let recordObject = try await persistencyService.fetchObject(with: request)
+        
+        return recordObject != nil
+    }
+}
+
+// MARK: - Requests
+
+private extension FetchRequestBuilder where T: TrackerObject {
+    static func by(id: UUID) -> FetchRequestBuilder<T> {
+        Self()
+            .setPredicate(
+                StaticPredicateBuilder<T>()
+                    .filter(by: \.id, value: id, comparison: .equal)
+                    .build()
+            )
+    }
+}
+
+private extension FetchRequestBuilder where T: RecordObject {
+    static func by(id: UUID) -> FetchRequestBuilder<T> {
+        Self()
+            .setPredicate(
+                StaticPredicateBuilder<T>()
+                    .filter(by: \.tracker.id, value: id, comparison: .equal)
+                    .build()
+            )
+    }
+    
+    static func by(id: UUID, date: Date, upTo endDate: Date) -> FetchRequestBuilder<T> {
+        Self()
+            .setPredicate(
+                StaticPredicateBuilder<T>()
+                    .filter(by: \.tracker.id, value: id, comparison: .equal)
+                    .filter(by: \.date, value: date, comparison: .greaterThanOrEqual)
+                    .filter(by: \.date, value: endDate, comparison: .lessThan)
+                    .build()
+            )
     }
 }

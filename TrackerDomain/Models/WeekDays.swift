@@ -40,7 +40,7 @@ extension WeekDay: Comparable {
 }
 
 public extension Set<Int> {
-    static func fromString(_ str: String) -> Set<Int>? {
+    static func fromString(_ str: String) -> Set<Int> {
         let maxElement = 6
         let elements = str
             .components(separatedBy: ", ") // turn to array of string numbers

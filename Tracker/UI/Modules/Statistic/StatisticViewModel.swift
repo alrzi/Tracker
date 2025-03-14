@@ -2,6 +2,7 @@ import Foundation
 import Combine
 import TrackerDomain
 
+@MainActor
 final class StatisticViewModel {
     private let recordRepository: RecordRepositoryProtocol
     private let trackerManager: any TrackerManaging
@@ -16,13 +17,15 @@ final class StatisticViewModel {
         self.recordRepository = recordRepository
         self.trackerManager = trackerManager
         
-        let numberOfCompletedTrackers = recordRepository.numberOfCompletedTrackers
-        
-        statisticData = [
-            .bestPeriod(.init()),
-            .idealDays(.init()),
-            .completedTrackers(.init(completedTrackersCount: numberOfCompletedTrackers)),
-            .averageValue(.init())
-        ]
+        Task {
+            let numberOfCompletedTrackers = try await recordRepository.numberOfCompletedTrackers
+            
+            statisticData = [
+                .bestPeriod(.init()),
+                .idealDays(.init()),
+                .completedTrackers(.init(completedTrackersCount: numberOfCompletedTrackers)),
+                .averageValue(.init())
+            ]
+        }
     }
 }

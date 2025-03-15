@@ -31,7 +31,9 @@ final class RecordRepository: RecordRepositoryProtocol {
             .setPredicate(.by(id: trackerId))
             .build()
         
-        if try await persistencyService.fetchObject(with: recordRequest) != nil {
+        let fetchedRecord: TrackerRecord? = try await persistencyService.fetchObject(with: recordRequest)
+        
+        if fetchedRecord != nil {
             try await persistencyService.removeObject(for: recordRequest)
         }
         else {
@@ -57,9 +59,9 @@ final class RecordRepository: RecordRepositoryProtocol {
             .setPredicate(.by(id: id, date: startDate, upTo: endDate))
             .build()
         
-        let recordObject = try await persistencyService.fetchObject(with: request)
+        let record: TrackerRecord? = try await persistencyService.fetchObject(with: request)
         
-        return recordObject != nil
+        return record != nil
     }
 }
 

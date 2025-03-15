@@ -71,11 +71,11 @@ final class TrackerRepository: TrackerRepositoryProtocol {
             .setPredicate(.by(id: id))
             .build()
         
-        guard let object = try await persistencyService.fetchObject(with: request) else {
+        guard let tracker: Tracker = try await persistencyService.fetchObject(with: request) else {
             throw TrackerRepositoryError.noTrackerForId
         }
         
-        return .init(object: object)
+        return tracker
     }
     
     // MARK: - Update

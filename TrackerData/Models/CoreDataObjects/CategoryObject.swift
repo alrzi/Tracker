@@ -32,7 +32,7 @@ extension CategoryObject: CopyableEntity {
     }
 }
 
-extension TrackerSection {
+extension TrackerSection: Initable {
     init(object: CategoryObject) {
         self.init(
             id: object.id,

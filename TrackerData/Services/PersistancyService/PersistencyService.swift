@@ -67,8 +67,7 @@ final class PersistencyService: @unchecked Sendable {
     
     func createObject<T, C>(_ type: T.Type, from domain: C) async throws
     where
-        T: NSManagedObject & CopyableEntity,
-        T.CopyableValue == C
+        T: NSManagedObject & CopyableEntity<C>
     {
         try await managedObjectContext.perform {
             let newObject = T(context: self.managedObjectContext)
@@ -80,11 +79,8 @@ final class PersistencyService: @unchecked Sendable {
     
     func createObjectAddObjectToIt<T, C, E, R>(_ type: T.Type, from domain: C, _ subType: E.Type, entityToAddTo: R) async throws
     where
-        T: NSManagedObject & CopyableEntity & ValueAddable,
-        T.CopyableValue == C,
-        E: NSManagedObject & CopyableEntity,
-        E.CopyableValue == R,
-        T.AddableValue == E
+        T: NSManagedObject & CopyableEntity<C> & ValueAddable<E>,
+        E: NSManagedObject & CopyableEntity<R>
     {
         try await managedObjectContext.perform {
             let newObject = T(context: self.managedObjectContext)
@@ -101,11 +97,8 @@ final class PersistencyService: @unchecked Sendable {
     
     func createObjectAndAddToEntity<T, C, E, R>(_ type: T.Type, from domain: [C], _ subType: E.Type, entityToAddTo: R) async throws
     where
-        T: NSManagedObject & CopyableEntity,
-        T.CopyableValue == C,
-        E: NSManagedObject & CopyableEntity & SetAddable,
-        E.CopyableValue == R,
-        E.ElementType == T
+        T: NSManagedObject & CopyableEntity<C>,
+        E: NSManagedObject & CopyableEntity<R> & SetAddable<T>
     {
         try await managedObjectContext.perform {
             var objects: [T] = []
@@ -125,10 +118,7 @@ final class PersistencyService: @unchecked Sendable {
     
     func createObject<T, C, D>(_ type: T.Type, from domain: C, andAddObjectFor request: NSFetchRequest<D>) async throws
     where
-        T: NSManagedObject & ValueAddable & CopyableEntity,
-        T.CopyableValue == C,
-        D: NSManagedObject,
-        T.AddableValue == D
+        T: NSManagedObject & ValueAddable<D> & CopyableEntity<C>
     {
         try await managedObjectContext.perform {
             guard let objectToAdd = try self.managedObjectContext.fetch(request).first else {
@@ -151,9 +141,12 @@ final class PersistencyService: @unchecked Sendable {
         }
     }
     
-    func fetchObject<T: NSManagedObject>(with fetchRequest: NSFetchRequest<T>) async throws -> T? where T: Entity {
+    func fetchObject<T, R>(with fetchRequest: NSFetchRequest<T>) async throws -> R?
+    where
+        R: Initable<T>
+    {
         try await managedObjectContext.perform {
-            try self.managedObjectContext.fetch(fetchRequest).first
+            try self.managedObjectContext.fetch(fetchRequest).first.map { .init(object: $0) }
         }
     }
     
@@ -173,8 +166,7 @@ final class PersistencyService: @unchecked Sendable {
     
     func updateObject<T, C>(for request: NSFetchRequest<T>, with info: C) async throws
     where
-        T: NSManagedObject & CopyableEntity,
-        T.CopyableValue == C
+        T: CopyableEntity<C>
     {
         try await managedObjectContext.perform {
             guard let object = try self.managedObjectContext.fetch(request).first else {
@@ -189,9 +181,7 @@ final class PersistencyService: @unchecked Sendable {
     
     func updateObject<T, A>(for request: NSFetchRequest<T>, withObjectForRequest anotherRequest: NSFetchRequest<A>) async throws
     where
-        T: NSManagedObject & ValueAddable,
-        A: NSManagedObject,
-        T.AddableValue == A
+        T: ValueAddable<A>
     {
         try await managedObjectContext.perform {
             guard let object = try self.managedObjectContext.fetch(request).first else {

@@ -31,3 +31,12 @@ extension RecordObject: CopyableEntity {
         self.date = record.date
     }
 }
+
+extension TrackerRecord: Initable {
+    init(object: RecordObject) {
+        self.init(
+            id: object.id,
+            date: object.date
+        )
+    }
+}

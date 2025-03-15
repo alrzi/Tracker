@@ -52,11 +52,14 @@ final class CategoryRepository: CategoryRepositoryProtocol {
             .setSortDescriptors([.init(keyPath: \.title)])
             .build()
         
-        guard let object = try await persistencyService.fetchObject(with: request) else {
+        let category: TrackerSection? = try await persistencyService.fetchObject(with: request)
+        
+        if let category {
+            return category
+        }
+        else {
             throw CategoryRepositoryError.noTrackerForId
         }
-        
-        return .init(object: object)
     }
     
     // MARK: - Update

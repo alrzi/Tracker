@@ -43,7 +43,7 @@ extension TrackerObject: CopyableEntity {
     }
 }
 
-extension Tracker {
+extension Tracker: Initable {
     init(object: TrackerObject) {
         self.init(
             id: object.id,

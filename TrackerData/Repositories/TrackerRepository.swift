@@ -99,30 +99,30 @@ final class TrackerRepository: TrackerRepositoryProtocol {
     }
 }
 
-// MARK: - Requests
+// MARK: - Predicates
 
 private extension StaticPredicateBuilder where T: TrackerObject {
-    static func by(id: UUID) -> StaticPredicateBuilder<T> {
-        Self()
-            .filter(by: \.id, value: id, comparison: .equal)
+    static func by(id: UUID) -> Self {
+        .init()
+        .filter(by: \.id, value: id, comparison: .equal)
     }
     
-    static func by(isPinned: Bool) -> StaticPredicateBuilder<T> {
-        Self()
-            .filter(by: \.isPinned, value: isPinned, comparison: .equal)
+    static func by(isPinned: Bool) -> Self {
+        .init()
+        .filter(by: \.isPinned, value: isPinned, comparison: .equal)
     }
     
-    static func by(categoryId: UUID, isPinned: Bool, weekDay: String) -> StaticPredicateBuilder<T> {
-        Self()
-            .filter(by: \.category.id, value: categoryId)
-            .filter(by: \.isPinned, value: isPinned)
-            .filter(by: \.weekDays, value: weekDay, comparison: .contains)
+    static func by(categoryId: UUID, isPinned: Bool, weekDay: String) -> Self {
+        .init()
+        .filter(by: \.category.id, value: categoryId)
+        .filter(by: \.isPinned, value: isPinned)
+        .filter(by: \.weekDays, value: weekDay, comparison: .contains)
     }
 }
 
 private extension StaticPredicateBuilder where T: CategoryObject {
-    static func by(id: UUID) -> StaticPredicateBuilder<T> {
-        Self()
-            .filter(by: \.id, value: id, comparison: .equal)
+    static func by(id: UUID) -> Self {
+        .init()
+        .filter(by: \.id, value: id, comparison: .equal)
     }
 }

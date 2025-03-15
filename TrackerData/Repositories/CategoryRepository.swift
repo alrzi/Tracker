@@ -84,16 +84,16 @@ final class CategoryRepository: CategoryRepositoryProtocol {
     }
 }
 
-// MARK: - Requests
+// MARK: - Predicates
 
 private extension StaticPredicateBuilder where T: CategoryObject {
-    static func by(id: UUID) -> StaticPredicateBuilder<T> {
-        Self()
-            .filter(by: \.id, value: id, comparison: .equal)
+    static func by(id: UUID) -> Self {
+        .init()
+        .filter(by: \.id, value: id, comparison: .equal)
     }
     
-    static func by(weekDay: String) -> StaticPredicateBuilder<T> {
-        Self()
-            .subpredicate(by: \.trackers, subKeyPath: \.weekDays, subValue: weekDay, comparison: .contains)
+    static func by(weekDay: String) -> Self {
+        .init()
+        .subpredicate(by: \.trackers, subKeyPath: \.weekDays, subValue: weekDay, comparison: .contains)
     }
 }

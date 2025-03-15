@@ -63,25 +63,25 @@ final class RecordRepository: RecordRepositoryProtocol {
     }
 }
 
-// MARK: - Requests
+// MARK: - Predicates
 
 private extension StaticPredicateBuilder where T: TrackerObject {
-    static func by(id: UUID) -> StaticPredicateBuilder<T> {
-        Self()
-            .filter(by: \.id, value: id, comparison: .equal)
+    static func by(id: UUID) -> Self {
+        .init()
+        .filter(by: \.id, value: id, comparison: .equal)
     }
 }
 
 private extension StaticPredicateBuilder where T: RecordObject {
-    static func by(id: UUID) -> StaticPredicateBuilder<T> {
-        Self()
-            .filter(by: \.tracker.id, value: id, comparison: .equal)
+    static func by(id: UUID) -> Self {
+        .init()
+        .filter(by: \.tracker.id, value: id, comparison: .equal)
     }
     
-    static func by(id: UUID, date: Date, upTo endDate: Date) -> StaticPredicateBuilder<T> {
-        Self()
-            .filter(by: \.tracker.id, value: id, comparison: .equal)
-            .filter(by: \.date, value: date, comparison: .greaterThanOrEqual)
-            .filter(by: \.date, value: endDate, comparison: .lessThan)
+    static func by(id: UUID, date: Date, upTo endDate: Date) -> Self {
+        .init()
+        .filter(by: \.tracker.id, value: id, comparison: .equal)
+        .filter(by: \.date, value: date, comparison: .greaterThanOrEqual)
+        .filter(by: \.date, value: endDate, comparison: .lessThan)
     }
 }

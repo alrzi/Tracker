@@ -135,9 +135,12 @@ final class PersistencyService: @unchecked Sendable {
     
     // MARK: - Read
     
-    func fetchObjects<T: NSManagedObject>(with fetchRequest: NSFetchRequest<T>) async throws -> [T] {
+    func fetchObjects<T, R>(with fetchRequest: NSFetchRequest<T>) async throws -> [R]
+    where
+        R: Initable<T>
+    {
         try await managedObjectContext.perform {
-            try self.managedObjectContext.fetch(fetchRequest)
+            try self.managedObjectContext.fetch(fetchRequest).map { .init(object: $0) }
         }
     }
     
@@ -150,9 +153,13 @@ final class PersistencyService: @unchecked Sendable {
         }
     }
     
-    func fetchObjects<T: NSManagedObject>(_ type: T.Type) async throws -> [T] where T: Entity {
+    func fetchObjects<T: NSManagedObject, R>(_ type: T.Type) async throws -> [R]
+    where
+        T: Entity,
+        R: Initable<T>
+    {
         try await managedObjectContext.perform {
-            try self.managedObjectContext.fetch(NSFetchRequest<T>(entityName: type.entityName))
+            try self.managedObjectContext.fetch(NSFetchRequest<T>(entityName: type.entityName)).map { .init(object: $0) }
         }
     }
     

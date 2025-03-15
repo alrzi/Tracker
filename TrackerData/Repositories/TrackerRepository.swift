@@ -41,10 +41,7 @@ final class TrackerRepository: TrackerRepositoryProtocol {
             .setSortDescriptors([.init(keyPath: \.name)])
             .build()
         
-        let trackerObjects = try await persistencyService.fetchObjects(with: request)
-        let trackers = trackerObjects.map(Tracker.init)
-        
-        return trackers
+        return try await persistencyService.fetchObjects(with: request)
     }
     
     func getAllTrackers(isPinned: Bool) async throws -> [Tracker] {
@@ -53,17 +50,11 @@ final class TrackerRepository: TrackerRepositoryProtocol {
             .setSortDescriptors([.init(keyPath: \.name)])
             .build()
         
-        let trackerObjects = try await persistencyService.fetchObjects(with: request)
-        let trackers = trackerObjects.map(Tracker.init)
-        
-        return trackers
+        return try await persistencyService.fetchObjects(with: request)
     }
     
     func getAllTrackers() async throws -> [Tracker] {
-        let objects = try await persistencyService.fetchObjects(TrackerObject.self)
-        let trackers = objects.map(Tracker.init)
-        
-        return trackers
+        try await persistencyService.fetchObjects(TrackerObject.self)
     }
     
     func getTracker(by id: UUID) async throws -> Tracker {

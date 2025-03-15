@@ -41,9 +41,7 @@ final class CategoryRepository: CategoryRepositoryProtocol {
             .setSortDescriptors([.init(keyPath: \.title)])
             .build()
         
-        let objects = try await persistencyService.fetchObjects(with: request)
-        let categories = objects.map(TrackerSection.init)
-        return categories
+        return try await persistencyService.fetchObjects(with: request)
     }
     
     func getCategory(by id: UUID) async throws -> TrackerSection {

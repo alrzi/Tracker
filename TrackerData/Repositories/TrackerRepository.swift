@@ -22,12 +22,12 @@ final class TrackerRepository: TrackerRepositoryProtocol {
     }
     
     func addSection(withId id: UUID, toTracker tracker: Tracker) async throws {
-        let requestForTracker = FetchRequestBuilder<TrackerObject>
-            .by(id: id)
+        let requestForTracker = FetchRequestBuilder<TrackerObject>()
+            .setPredicate(.by(id: id))
             .build()
         
-        let requestForCategory = FetchRequestBuilder<CategoryObject>
-            .by(id: id)
+        let requestForCategory = FetchRequestBuilder<CategoryObject>()
+            .setPredicate(.by(id: id))
             .build()
         
         try await persistencyService.updateObject(for: requestForTracker, withObjectForRequest: requestForCategory)
@@ -36,8 +36,9 @@ final class TrackerRepository: TrackerRepositoryProtocol {
     // MARK: - Read
     
     func getAllTrackersForCategory(category: UUID, isPinned: Bool, weekDay: String) async throws -> [Tracker] {
-        let request = FetchRequestBuilder<TrackerObject>
-            .by(categoryId: category, isPinned: isPinned, weekDay: weekDay)
+        let request = FetchRequestBuilder<TrackerObject>()
+            .setPredicate(.by(categoryId: category, isPinned: isPinned, weekDay: weekDay))
+            .setSortDescriptors([.init(keyPath: \.name)])
             .build()
         
         let trackerObjects = try await persistencyService.fetchObjects(with: request)
@@ -47,8 +48,9 @@ final class TrackerRepository: TrackerRepositoryProtocol {
     }
     
     func getAllTrackers(isPinned: Bool) async throws -> [Tracker] {
-        let request = FetchRequestBuilder<TrackerObject>
-            .by(isPinned: isPinned)
+        let request = FetchRequestBuilder<TrackerObject>()
+            .setPredicate(.by(isPinned: isPinned))
+            .setSortDescriptors([.init(keyPath: \.name)])
             .build()
         
         let trackerObjects = try await persistencyService.fetchObjects(with: request)
@@ -65,8 +67,8 @@ final class TrackerRepository: TrackerRepositoryProtocol {
     }
     
     func getTracker(by id: UUID) async throws -> Tracker {
-        let request = FetchRequestBuilder<TrackerObject>
-            .by(id: id)
+        let request = FetchRequestBuilder<TrackerObject>()
+            .setPredicate(.by(id: id))
             .build()
         
         guard let object = try await persistencyService.fetchObject(with: request) else {
@@ -79,65 +81,48 @@ final class TrackerRepository: TrackerRepositoryProtocol {
     // MARK: - Update
     
     func updateTracker(_ tracker: Tracker) async throws {
-        let request = FetchRequestBuilder<TrackerObject>
-            .by(id: tracker.id)
+        let request = FetchRequestBuilder<TrackerObject>()
+            .setPredicate(.by(id: tracker.id))
             .build()
-             
+        
         try await persistencyService.updateObject(for: request, with: tracker)
     }
     
     // MARK: - Delete
     
     func deleteTracker(with id: UUID) async throws {
-        let request = FetchRequestBuilder<TrackerObject>
-            .by(id: id)
+        let request = FetchRequestBuilder<TrackerObject>()
+            .setPredicate(.by(id: id))
             .build()
-       
+        
         try await persistencyService.removeObject(for: request)
     }
 }
 
 // MARK: - Requests
 
-private extension FetchRequestBuilder where T: TrackerObject {
-    static func by(id: UUID) -> FetchRequestBuilder<T> {
+private extension StaticPredicateBuilder where T: TrackerObject {
+    static func by(id: UUID) -> StaticPredicateBuilder<T> {
         Self()
-            .setPredicate(
-                StaticPredicateBuilder<T>()
-                    .filter(by: \.id, value: id, comparison: .equal)
-                    .build()
-            )
+            .filter(by: \.id, value: id, comparison: .equal)
     }
     
-    static func by(isPinned: Bool) -> FetchRequestBuilder<T> {
+    static func by(isPinned: Bool) -> StaticPredicateBuilder<T> {
         Self()
-            .setPredicate(
-                StaticPredicateBuilder<T>()
-                    .filter(by: \.isPinned, value: isPinned, comparison: .equal)
-                    .build()
-            )
+            .filter(by: \.isPinned, value: isPinned, comparison: .equal)
     }
     
-    static func by(categoryId: UUID, isPinned: Bool, weekDay: String) -> FetchRequestBuilder<T> {
+    static func by(categoryId: UUID, isPinned: Bool, weekDay: String) -> StaticPredicateBuilder<T> {
         Self()
-            .setPredicate(
-                StaticPredicateBuilder<T>()
-                    .filter(by: \.category.id, value: categoryId)
-                    .filter(by: \.isPinned, value: isPinned)
-                    .filter(by: \.weekDays, value: weekDay, comparison: .contains)
-                    .build()
-            )
-            .setSortDescriptors([.init(keyPath: \T.name, ascending: false)])
+            .filter(by: \.category.id, value: categoryId)
+            .filter(by: \.isPinned, value: isPinned)
+            .filter(by: \.weekDays, value: weekDay, comparison: .contains)
     }
 }
 
-private extension FetchRequestBuilder where T: CategoryObject {
-    static func by(id: UUID) -> FetchRequestBuilder<T> {
+private extension StaticPredicateBuilder where T: CategoryObject {
+    static func by(id: UUID) -> StaticPredicateBuilder<T> {
         Self()
-            .setPredicate(
-                StaticPredicateBuilder<T>()
-                    .filter(by: \.id, value: id, comparison: .equal)
-                    .build()
-            )
+            .filter(by: \.id, value: id, comparison: .equal)
     }
 }

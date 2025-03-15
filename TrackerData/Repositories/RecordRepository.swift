@@ -23,12 +23,12 @@ final class RecordRepository: RecordRepositoryProtocol {
     }
     
     func createOrDeleteIfPresent(record: TrackerRecord, for trackerId: UUID) async throws {
-        let request = FetchRequestBuilder<TrackerObject>
-            .by(id: trackerId)
+        let request = FetchRequestBuilder<TrackerObject>()
+            .setPredicate(.by(id: trackerId))
             .build()
         
-        let recordRequest = FetchRequestBuilder<RecordObject>
-            .by(id: record.id)
+        let recordRequest = FetchRequestBuilder<RecordObject>()
+            .setPredicate(.by(id: trackerId))
             .build()
         
         if try await persistencyService.fetchObject(with: recordRequest) != nil {
@@ -40,8 +40,8 @@ final class RecordRepository: RecordRepositoryProtocol {
     }
     
     func getTrackedDaysFor(id: UUID) async throws -> Int {
-        let request = FetchRequestBuilder<RecordObject>
-            .by(id: id)
+        let request = FetchRequestBuilder<TrackerObject>()
+            .setPredicate(.by(id: id))
             .build()
         
         let recordObjects = try await persistencyService.fetchObjects(with: request)
@@ -53,8 +53,8 @@ final class RecordRepository: RecordRepositoryProtocol {
         let startDate = calendar.startOfDay(for: date)
         let endDate = calendar.date(byAdding: .day, value: 1, to: startDate) ?? date
         
-        let request = FetchRequestBuilder<RecordObject>
-            .by(id: id, date: startDate, upTo: endDate)
+        let request = FetchRequestBuilder<RecordObject>()
+            .setPredicate(.by(id: id, date: startDate, upTo: endDate))
             .build()
         
         let recordObject = try await persistencyService.fetchObject(with: request)
@@ -65,35 +65,23 @@ final class RecordRepository: RecordRepositoryProtocol {
 
 // MARK: - Requests
 
-private extension FetchRequestBuilder where T: TrackerObject {
-    static func by(id: UUID) -> FetchRequestBuilder<T> {
+private extension StaticPredicateBuilder where T: TrackerObject {
+    static func by(id: UUID) -> StaticPredicateBuilder<T> {
         Self()
-            .setPredicate(
-                StaticPredicateBuilder<T>()
-                    .filter(by: \.id, value: id, comparison: .equal)
-                    .build()
-            )
+            .filter(by: \.id, value: id, comparison: .equal)
     }
 }
 
-private extension FetchRequestBuilder where T: RecordObject {
-    static func by(id: UUID) -> FetchRequestBuilder<T> {
+private extension StaticPredicateBuilder where T: RecordObject {
+    static func by(id: UUID) -> StaticPredicateBuilder<T> {
         Self()
-            .setPredicate(
-                StaticPredicateBuilder<T>()
-                    .filter(by: \.tracker.id, value: id, comparison: .equal)
-                    .build()
-            )
+            .filter(by: \.tracker.id, value: id, comparison: .equal)
     }
     
-    static func by(id: UUID, date: Date, upTo endDate: Date) -> FetchRequestBuilder<T> {
+    static func by(id: UUID, date: Date, upTo endDate: Date) -> StaticPredicateBuilder<T> {
         Self()
-            .setPredicate(
-                StaticPredicateBuilder<T>()
-                    .filter(by: \.tracker.id, value: id, comparison: .equal)
-                    .filter(by: \.date, value: date, comparison: .greaterThanOrEqual)
-                    .filter(by: \.date, value: endDate, comparison: .lessThan)
-                    .build()
-            )
+            .filter(by: \.tracker.id, value: id, comparison: .equal)
+            .filter(by: \.date, value: date, comparison: .greaterThanOrEqual)
+            .filter(by: \.date, value: endDate, comparison: .lessThan)
     }
 }

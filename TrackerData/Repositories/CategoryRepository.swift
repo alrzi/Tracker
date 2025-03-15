@@ -36,8 +36,9 @@ final class CategoryRepository: CategoryRepositoryProtocol {
     // MARK: - Read
     
     func getAllSections(weekDay: String) async throws -> [TrackerSection] {
-        let request = FetchRequestBuilder<CategoryObject>
-            .by(weekDay: weekDay)
+        let request = FetchRequestBuilder<CategoryObject>()
+            .setPredicate(.by(weekDay: weekDay))
+            .setSortDescriptors([.init(keyPath: \.title)])
             .build()
         
         let objects = try await persistencyService.fetchObjects(with: request)
@@ -46,22 +47,23 @@ final class CategoryRepository: CategoryRepositoryProtocol {
     }
     
     func getCategory(by id: UUID) async throws -> TrackerSection {
-        let request = FetchRequestBuilder<CategoryObject>
-            .by(id: id)
+        let request = FetchRequestBuilder<CategoryObject>()
+            .setPredicate(.by(id: id))
+            .setSortDescriptors([.init(keyPath: \.title)])
             .build()
         
         guard let object = try await persistencyService.fetchObject(with: request) else {
             throw CategoryRepositoryError.noTrackerForId
         }
         
-        return .init(id: object.id, title: object.title, trackers: [])
+        return .init(object: object)
     }
     
     // MARK: - Update
     
     func updateCategory(_ category: TrackerSection) async throws {
-        let request = FetchRequestBuilder<CategoryObject>
-            .by(id: category.id)
+        let request = FetchRequestBuilder<CategoryObject>()
+            .setPredicate(.by(id: category.id))
             .build()
         
         try await persistencyService.updateObject(for: request, with: category)
@@ -70,8 +72,8 @@ final class CategoryRepository: CategoryRepositoryProtocol {
     // MARK: - Delete
     
     func deleteCategory(with id: UUID) async throws {
-        let request = FetchRequestBuilder<CategoryObject>
-            .by(id: id)
+        let request = FetchRequestBuilder<CategoryObject>()
+            .setPredicate(.by(id: id))
             .build()
         
         try await persistencyService.removeObject(for: request)
@@ -84,24 +86,14 @@ final class CategoryRepository: CategoryRepositoryProtocol {
 
 // MARK: - Requests
 
-private extension FetchRequestBuilder where T: CategoryObject {
-    static func by(id: UUID) -> FetchRequestBuilder<T> {
+private extension StaticPredicateBuilder where T: CategoryObject {
+    static func by(id: UUID) -> StaticPredicateBuilder<T> {
         Self()
-            .setPredicate(
-                StaticPredicateBuilder<T>()
-                    .filter(by: \.id, value: id, comparison: .equal)
-                    .build()
-            )
-            .setSortDescriptors([.init(keyPath: \T.title, ascending: true)])
+            .filter(by: \.id, value: id, comparison: .equal)
     }
     
-    static func by(weekDay: String) -> FetchRequestBuilder<T> {
+    static func by(weekDay: String) -> StaticPredicateBuilder<T> {
         Self()
-            .setPredicate(
-                StaticPredicateBuilder<T>()
-                    .subpredicate(by: \.trackers, subKeyPath: \.weekDays, subValue: weekDay, comparison: .contains)
-                    .build()
-            )
-            .setSortDescriptors([.init(keyPath: \T.title, ascending: true)])
+            .subpredicate(by: \.trackers, subKeyPath: \.weekDays, subValue: weekDay, comparison: .contains)
     }
 }

@@ -15,15 +15,15 @@ struct FetchRequestBuilder<T: NSManagedObject & Entity> {
         self.fetchRequest = NSFetchRequest<T>(entityName: T.entityName)
     }
     
-    func setPredicate(_ predicate: NSPredicate) -> FetchRequestBuilder {
+    func setPredicate(_ predicate: StaticPredicateBuilder<T>) -> FetchRequestBuilder {
         let newBuilder = self
-        newBuilder.fetchRequest.predicate = predicate
+        newBuilder.fetchRequest.predicate = predicate.build()
         return newBuilder
     }
     
-    func setSortDescriptors(_ sortDescriptors: [NSSortDescriptor]) -> FetchRequestBuilder {
+    func setSortDescriptors<V>(_ sortDescriptors: [SortDescriptor<V>]) -> FetchRequestBuilder {
         let newBuilder = self
-        newBuilder.fetchRequest.sortDescriptors = sortDescriptors
+        newBuilder.fetchRequest.sortDescriptors = sortDescriptors.map { .init(keyPath: $0.keyPath, ascending: $0.ascending) }
         return newBuilder
     }
     
@@ -41,5 +41,12 @@ struct FetchRequestBuilder<T: NSManagedObject & Entity> {
     
     func build() -> NSFetchRequest<T> {
         fetchRequest
+    }
+}
+
+extension FetchRequestBuilder {
+    struct SortDescriptor<Value> {
+        let keyPath: KeyPath<T, Value>
+        var ascending: Bool = true
     }
 }

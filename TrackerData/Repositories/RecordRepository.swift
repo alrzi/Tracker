@@ -22,34 +22,27 @@ final class RecordRepository: RecordRepositoryProtocol {
         self.persistencyService = persistencyService
     }
     
-    func createOrDeleteIfPresent(for trackerId: UUID, date: Date) async throws {
-        let request = FetchRequestBuilder<TrackerObject>.by(id: trackerId).build()
+    func createOrDeleteIfPresent(record: TrackerRecord, for trackerId: UUID) async throws {
+        let request = FetchRequestBuilder<TrackerObject>
+            .by(id: trackerId)
+            .build()
         
-        let trackerObject = try await persistencyService.fetchObject(with: request)
+        let recordRequest = FetchRequestBuilder<RecordObject>
+            .by(id: record.id)
+            .build()
         
-        guard let trackerObject else {
-            return
-        }
-        
-        let recordRequest = FetchRequestBuilder<RecordObject>.by(id: trackerId).build()
-        
-        if let recordObject = try await persistencyService.fetchObject(with: recordRequest) {
-            await persistencyService.removeObject(recordObject)
-            
-            await persistencyService.saveContext()
+        if try await persistencyService.fetchObject(with: recordRequest) != nil {
+            try await persistencyService.removeObject(for: recordRequest)
         }
         else {
-            let recordObject = await persistencyService.createObject(RecordObject.self)
-            recordObject.id = UUID()
-            recordObject.date = date
-            recordObject.tracker = trackerObject
-            
-            await persistencyService.saveContext()
+            try await persistencyService.createObject(RecordObject.self, from: record, andAddObjectFor: request)
         }
     }
     
     func getTrackedDaysFor(id: UUID) async throws -> Int {
-        let request = FetchRequestBuilder<RecordObject>.by(id: id).build()
+        let request = FetchRequestBuilder<RecordObject>
+            .by(id: id)
+            .build()
         
         let recordObjects = try await persistencyService.fetchObjects(with: request)
         
@@ -59,7 +52,10 @@ final class RecordRepository: RecordRepositoryProtocol {
     func isCompletedFor(selectedDay date: Date, trackerWithId id: UUID) async throws -> Bool {
         let startDate = calendar.startOfDay(for: date)
         let endDate = calendar.date(byAdding: .day, value: 1, to: startDate) ?? date
-        let request = FetchRequestBuilder<RecordObject>.by(id: id, date: startDate, upTo: endDate).build()
+        
+        let request = FetchRequestBuilder<RecordObject>
+            .by(id: id, date: startDate, upTo: endDate)
+            .build()
         
         let recordObject = try await persistencyService.fetchObject(with: request)
         

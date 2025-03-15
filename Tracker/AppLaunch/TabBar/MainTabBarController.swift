@@ -1,13 +1,13 @@
 import UIKit
 
 final class TabBarViewController: UITabBarController {
-    private let trackersAssembly: TrackersAssembly
+    private let trackersAssembly: TrackersSwiftUIAssembly
     private let statisticAssembly: StatisticAssembly
     
     private let viewModel: TabBarViewModel
     
     init(
-        trackersAssembly: TrackersAssembly,
+        trackersAssembly: TrackersSwiftUIAssembly,
         statisticAssembly: StatisticAssembly,
         viewModel: TabBarViewModel
     ) {

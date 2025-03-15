@@ -19,7 +19,13 @@ extension CategoryObject: Entity {
     public static let entityName = String(describing: CategoryObject.self)
 }
 
-extension CategoryObject {
+extension CategoryObject: SetAddable {
+    func addElement(_ elements: [TrackerObject]) {
+        addToTrackers(Set(elements))
+    }
+}
+
+extension CategoryObject: CopyableEntity {
     func copy(from category: TrackerSection) {
         self.id = category.id
         self.title = category.title
@@ -44,8 +50,8 @@ extension CategoryObject {
     @NSManaged public func removeFromTrackers(_ value: TrackerObject)
 
     @objc(addTrackers:)
-    @NSManaged public func addToTrackers(_ values: NSSet)
+    @NSManaged public func addToTrackers(_ values: Set<TrackerObject>)
 
     @objc(removeTrackers:)
-    @NSManaged public func removeFromTrackers(_ values: NSSet)
+    @NSManaged public func removeFromTrackers(_ values: Set<TrackerObject>)
 }

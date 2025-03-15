@@ -14,7 +14,7 @@ public enum TrackerRepositoryError: Error {
 
 public protocol TrackerRepositoryProtocol: Sendable {
     // Create
-    func createTracker(_ tracker: Tracker) async
+    func createTracker(_ tracker: Tracker) async throws
     func addSection(withId id: UUID, toTracker tracker: Tracker) async throws
     
     // Read

@@ -30,8 +30,8 @@ final class CreateTrackerCollectionColorCell: UICollectionViewCell, Highilable {
         cellState = .selected
     }
     
-    // MARK: - Cell State
-    private var cellState = State.unselected {
+    // MARK: - Cell ButtonState
+    private var cellState = ButtonState.unselected {
         didSet {
             configureCell()
         }

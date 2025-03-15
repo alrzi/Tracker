@@ -6,11 +6,11 @@ public protocol TrackerManaging: Sendable {
     var sections: StateSectionSequence { get }
         
     func addSection(withId id: UUID, toTracker tracker: Tracker) async throws
-    func togglePin(for tracker: Tracker) async throws    
+    func addSections(_ sections: [TrackerSection]) async throws
+    func togglePin(for tracker: Tracker) async throws
     func delete(tracker: Tracker) async throws    
     func isCompleted(tracker: Tracker, for date: Date) async throws -> Bool
-    func toggleIsCompleted(for trackerId: UUID, for date: Date) async throws
-    func addSections(_ sections: [TrackerSection]) async
+    func toggle(record: TrackerRecord) async throws
     func daysTracked(for tracker: Tracker) async throws -> Int
     func fetchAllSectionedTrackers() async throws
 }
@@ -42,8 +42,8 @@ final class TrackerManager: TrackerManaging {
         try await fetchAllSectionedTrackers()
     }
     
-    func addSections(_ sections: [TrackerSection]) async {
-        await categoryRepository.createSections(sections)
+    func addSections(_ sections: [TrackerSection]) async throws {
+        try await categoryRepository.createSections(sections)
     }
     
     // MARK: - Read
@@ -105,8 +105,8 @@ final class TrackerManager: TrackerManaging {
         try await fetchAllSectionedTrackers()
     }
     
-    func toggleIsCompleted(for trackerId: UUID, for date: Date) async throws {
-        try await recordRepository.createOrDeleteIfPresent(for: trackerId, date: date)
+    func toggle(record: TrackerRecord) async throws {
+        try await recordRepository.createOrDeleteIfPresent(record: record, for: record.id)
         try await fetchAllSectionedTrackers()
     }
     

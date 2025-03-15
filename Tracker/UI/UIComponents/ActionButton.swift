@@ -1,7 +1,7 @@
 import UIKit
 
-// MARK: - State
-enum State {
+// MARK: - ButtonState
+enum ButtonState {
     case selected
     case unselected
     
@@ -31,11 +31,11 @@ final class ActionButton: UIButton {
     }
     
     // MARK: - ButtonState
-    enum State {
+    enum ButtonState {
         case enabled, disabled
     }
     
-    var buttonState: State = .disabled {
+    var buttonState: ButtonState = .disabled {
         didSet {
             configureButton()
         }

@@ -110,7 +110,7 @@ extension TrackersViewModel {
         }
         
         do {
-            try await trackerManager.toggleIsCompleted(for: tracker.id, for: date)
+            try await trackerManager.toggle(record: .init(id: tracker.id, date: .now))
         }
         catch {
             debugPrint(error)

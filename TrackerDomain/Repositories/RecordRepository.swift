@@ -9,7 +9,7 @@ import Foundation
 
 public protocol RecordRepositoryProtocol: Sendable {
     // Create/Delete
-    func createOrDeleteIfPresent(for trackerId: UUID, date: Date) async throws
+    func createOrDeleteIfPresent(record: TrackerRecord, for trackerId: UUID) async throws
     
     // Read
     var numberOfCompletedTrackers: Int { get async throws }

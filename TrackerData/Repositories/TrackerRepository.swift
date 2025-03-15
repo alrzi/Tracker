@@ -17,29 +17,20 @@ final class TrackerRepository: TrackerRepositoryProtocol {
     
     // MARK: - Create
     
-    func createTracker(_ tracker: Tracker) async {
-        let object = await persistencyService.createObject(TrackerObject.self)
-        object.copy(from: tracker)
-        
-        await persistencyService.saveContext()
+    func createTracker(_ tracker: Tracker) async throws {
+        try await persistencyService.createObject(TrackerObject.self, from: tracker)
     }
     
     func addSection(withId id: UUID, toTracker tracker: Tracker) async throws {
-        let requestForCategory = FetchRequestBuilder<CategoryObject>.by(id: id).build()
+        let requestForTracker = FetchRequestBuilder<TrackerObject>
+            .by(id: id)
+            .build()
         
-        guard let categoryObject = try await persistencyService.fetchObject(with: requestForCategory) else {
-            throw TrackerRepositoryError.noCategoryForId
-        }
+        let requestForCategory = FetchRequestBuilder<CategoryObject>
+            .by(id: id)
+            .build()
         
-        let requestForTracker = FetchRequestBuilder<TrackerObject>.by(id: id).build()
-        
-        guard let trackerObject = try await persistencyService.fetchObject(with: requestForTracker) else {
-            throw TrackerRepositoryError.noTrackerForId
-        }
-               
-        trackerObject.category = categoryObject
-        
-        await persistencyService.saveContext()
+        try await persistencyService.updateObject(for: requestForTracker, withObjectForRequest: requestForCategory)
     }
     
     // MARK: - Read
@@ -56,7 +47,10 @@ final class TrackerRepository: TrackerRepositoryProtocol {
     }
     
     func getAllTrackers(isPinned: Bool) async throws -> [Tracker] {
-        let request = FetchRequestBuilder<TrackerObject>.by(isPinned: isPinned).build()
+        let request = FetchRequestBuilder<TrackerObject>
+            .by(isPinned: isPinned)
+            .build()
+        
         let trackerObjects = try await persistencyService.fetchObjects(with: request)
         let trackers = trackerObjects.map(Tracker.init)
         
@@ -66,11 +60,14 @@ final class TrackerRepository: TrackerRepositoryProtocol {
     func getAllTrackers() async throws -> [Tracker] {
         let objects = try await persistencyService.fetchObjects(TrackerObject.self)
         let trackers = objects.map(Tracker.init)
+        
         return trackers
     }
     
     func getTracker(by id: UUID) async throws -> Tracker {
-        let request = FetchRequestBuilder<TrackerObject>.by(id: id).build()
+        let request = FetchRequestBuilder<TrackerObject>
+            .by(id: id)
+            .build()
         
         guard let object = try await persistencyService.fetchObject(with: request) else {
             throw TrackerRepositoryError.noTrackerForId
@@ -82,28 +79,21 @@ final class TrackerRepository: TrackerRepositoryProtocol {
     // MARK: - Update
     
     func updateTracker(_ tracker: Tracker) async throws {
-        let request = FetchRequestBuilder<TrackerObject>.by(id: tracker.id).build()
-        
-        guard let object = try await persistencyService.fetchObject(with: request) else {
-            throw TrackerRepositoryError.noTrackerForId
-        }
-        
-        object.copy(from: tracker)
-        
-        await persistencyService.saveContext()
+        let request = FetchRequestBuilder<TrackerObject>
+            .by(id: tracker.id)
+            .build()
+             
+        try await persistencyService.updateObject(for: request, with: tracker)
     }
     
     // MARK: - Delete
     
     func deleteTracker(with id: UUID) async throws {
-        let request = FetchRequestBuilder<TrackerObject>.by(id: id).build()
-        
-        guard let object = try await persistencyService.fetchObject(with: request) else {
-            throw TrackerRepositoryError.noTrackerForId
-        }
-        
-        await persistencyService.removeObject(object)
-        await persistencyService.saveContext()
+        let request = FetchRequestBuilder<TrackerObject>
+            .by(id: id)
+            .build()
+       
+        try await persistencyService.removeObject(for: request)
     }
 }
 

@@ -35,13 +35,20 @@ extension CategoryCreationViewModel {
         if case .available(let name) = categoryNameStatus {
             switch mode {
             case .create:
-                await categoryRepository.createSection(.init(title: name, trackers: []))
+                do {
+                    try await categoryRepository.createSection(.init(title: name, trackers: []))
+                }
+                catch {
+                    debugPrint(error)
+                    preconditionFailure()
+                }
                 
             case .update(let id):
                 do {
                     try await categoryRepository.updateCategory(.init(id: id, title: name, trackers: []))
                 }
                 catch {
+                    debugPrint(error)
                     preconditionFailure()
                 }
             }

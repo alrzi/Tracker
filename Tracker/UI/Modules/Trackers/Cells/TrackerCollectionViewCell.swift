@@ -85,8 +85,8 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
         static let buttonSize: CGFloat = 34
     }
     
-    // MARK: - Button State
-    private var buttonState = State.unselected {
+    // MARK: - Button ButtonState
+    private var buttonState = ButtonState.unselected {
         didSet {
             configureButton()
         }

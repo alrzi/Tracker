@@ -17,18 +17,18 @@ public struct TrackerSection: Hashable, Identifiable, Sendable {
 }
 
 public extension TrackerSection {
-    func insertingTracker(_ tracker: Tracker, at index: Int) -> TrackerSection {
-        var updatedTrackers = trackers
-        updatedTrackers.insert(tracker, at: index)
-        return TrackerSection(id: id, title: title, trackers: updatedTrackers)
+    func updatingTrackers(with newTrackers: [Tracker]) -> TrackerSection {
+        return TrackerSection(id: self.id, title: self.title, trackers: newTrackers)
     }
-        
-    func removingTracker(at index: Int) -> TrackerSection {
-        guard index >= 0 && index < trackers.count else {
-            return self
-        }
-        var updatedTrackers = trackers
-        updatedTrackers.remove(at: index)
-        return TrackerSection(id: id, title: title, trackers: updatedTrackers)
+    
+    func addingTracker(_ tracker: Tracker) -> TrackerSection {
+        var updatedTrackers = self.trackers
+        updatedTrackers.append(tracker)
+        return TrackerSection(id: self.id, title: self.title, trackers: updatedTrackers)
+    }
+    
+    func removingTracker(withId id: UUID) -> TrackerSection {
+        let updatedTrackers = self.trackers.filter { $0.id != id }
+        return TrackerSection(id: self.id, title: self.title, trackers: updatedTrackers)
     }
 }

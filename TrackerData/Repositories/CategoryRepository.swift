@@ -18,33 +18,27 @@ final class CategoryRepository: CategoryRepositoryProtocol {
     
     // MARK: - Create
     
-    func createSection(_ sections: TrackerSection) async {
-        let object = await persistencyService.createObject(CategoryObject.self)
-        object.copy(from: sections)
-        
-        await persistencyService.saveContext()
+    func createSection(_ section: TrackerSection) async throws {
+        try await persistencyService.createObject(CategoryObject.self, from: section)
     }
     
-    func createSections(_ sections: [TrackerSection]) async {
+    func createSections(_ sections: [TrackerSection]) async throws {
         for section in sections {
-            let sectionObject = await persistencyService.createObject(CategoryObject.self)
-            sectionObject.copy(from: section)
-            
-            for tracker in section.trackers {
-                let trackerObject = await persistencyService.createObject(TrackerObject.self)
-                trackerObject.copy(from: tracker)
-                
-                sectionObject.addToTrackers(trackerObject)
-            }
+            try await persistencyService.createObjectAndAddToEntity(
+                TrackerObject.self,
+                from: section.trackers,
+                CategoryObject.self,
+                entityToAddTo: section
+            )
         }
-        
-        await persistencyService.saveContext()
     }
-        
+    
     // MARK: - Read
     
     func getAllSections(weekDay: String) async throws -> [TrackerSection] {
-        let request = FetchRequestBuilder<CategoryObject>.by(weekDay: weekDay).build()
+        let request = FetchRequestBuilder<CategoryObject>
+            .by(weekDay: weekDay)
+            .build()
         
         let objects = try await persistencyService.fetchObjects(with: request)
         let categories = objects.map(TrackerSection.init)
@@ -52,7 +46,9 @@ final class CategoryRepository: CategoryRepositoryProtocol {
     }
     
     func getCategory(by id: UUID) async throws -> TrackerSection {
-        let request = FetchRequestBuilder<CategoryObject>.by(id: id).build()
+        let request = FetchRequestBuilder<CategoryObject>
+            .by(id: id)
+            .build()
         
         guard let object = try await persistencyService.fetchObject(with: request) else {
             throw CategoryRepositoryError.noTrackerForId
@@ -64,35 +60,25 @@ final class CategoryRepository: CategoryRepositoryProtocol {
     // MARK: - Update
     
     func updateCategory(_ category: TrackerSection) async throws {
-        let request = FetchRequestBuilder<CategoryObject>.by(id: category.id).build()
+        let request = FetchRequestBuilder<CategoryObject>
+            .by(id: category.id)
+            .build()
         
-        guard let object = try await persistencyService.fetchObject(with: request) else {
-            throw CategoryRepositoryError.noTrackerForId
-        }
-        
-        object.copy(from: category)
-        
-        await persistencyService.saveContext()
+        try await persistencyService.updateObject(for: request, with: category)
     }
     
     // MARK: - Delete
     
     func deleteCategory(with id: UUID) async throws {
-        let request = FetchRequestBuilder<CategoryObject>.by(id: id).build()
+        let request = FetchRequestBuilder<CategoryObject>
+            .by(id: id)
+            .build()
         
-        guard let object = try await persistencyService.fetchObject(with: request) else {
-            throw CategoryRepositoryError.noTrackerForId
-        }
-        
-        await persistencyService.removeObject(object)
-        
-        await persistencyService.saveContext()
+        try await persistencyService.removeObject(for: request)
     }
     
     func deleteAll() async throws {
         try await persistencyService.deleteAllObjects(CategoryObject.self)
-        
-        await persistencyService.saveContext()
     }
 }
 
@@ -119,4 +105,3 @@ private extension FetchRequestBuilder where T: CategoryObject {
             .setSortDescriptors([.init(keyPath: \T.title, ascending: true)])
     }
 }
-

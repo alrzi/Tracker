@@ -13,8 +13,8 @@ public enum CategoryRepositoryError: Error {
 
 public protocol CategoryRepositoryProtocol: Sendable {
     // Create
-    func createSection(_ section: TrackerSection) async
-    func createSections(_ sections: [TrackerSection]) async
+    func createSection(_ section: TrackerSection) async throws
+    func createSections(_ sections: [TrackerSection]) async throws
     
     // Read
     func getAllSections(weekDay: String) async throws -> [TrackerSection]

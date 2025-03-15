@@ -48,46 +48,60 @@ final class TrackerManager: TrackerManaging {
     
     // MARK: - Read
     
+//    func fetchAllSectionedTrackers() async throws {
+//        let weekDay: String = "0, 1, 2, 3, 4, 5, 6"
+//        
+//        let sections = try await categoryRepository.getAllSections(weekDay: weekDay)
+//        
+//        async let pinned = trackerRepository.getAllTrackers(isPinned: true)
+//        
+//        async let regular = withThrowingTaskGroup(of: TrackerSection?.self, returning: [TrackerSection].self) { [trackerRepository] group in
+//            for section in sections {
+//                group.addTask {
+//                    let trackers = try await trackerRepository.getAllTrackersForCategory(category: section.id, isPinned: false, weekDay: weekDay)
+//                    
+//                    if trackers.isEmpty {
+//                        return nil
+//                    }
+//                    else {
+//                        return TrackerSection(
+//                            id: section.id,
+//                            title: section.title,
+//                            trackers: trackers
+//                        )
+//                    }
+//                }
+//            }
+//            
+//            return try await group.reduce(into: []) { accumulatedSections, section in
+//                if let validSection = section {
+//                    accumulatedSections.append(validSection)
+//                }
+//            }
+//        }
+//        
+//        let tempPinned = try await pinned
+//        var tempSections = try await regular
+//        
+//        if !tempPinned.isEmpty {
+//            tempSections.insert(.init(title: "Pinned", trackers: tempPinned), at: 0)
+//        }
+//        
+//        await mutableSections.setIfNeeded(value: tempSections)
+//    }
+    
     func fetchAllSectionedTrackers() async throws {
         let weekDay: String = "0, 1, 2, 3, 4, 5, 6"
         
-        let sections = try await categoryRepository.getAllSections(weekDay: weekDay)
+        var sections = try await categoryRepository.getAllSections(weekDay: weekDay)
         
-        async let pinned = trackerRepository.getAllTrackers(isPinned: true)
+        let isPinnedExist = try await trackerRepository.isPinnedTrackersExist()
         
-        async let regular = withThrowingTaskGroup(of: TrackerSection?.self, returning: [TrackerSection].self) { [trackerRepository] group in
-            for section in sections {
-                group.addTask {
-                    let trackers = try await trackerRepository.getAllTrackersForCategory(category: section.id, isPinned: false, weekDay: weekDay)
-                    
-                    if trackers.isEmpty {
-                        return nil
-                    }
-                    else {
-                        return TrackerSection(
-                            id: section.id,
-                            title: section.title,
-                            trackers: trackers
-                        )
-                    }
-                }
-            }
-            
-            return try await group.reduce(into: []) { accumulatedSections, section in
-                if let validSection = section {
-                    accumulatedSections.append(validSection)
-                }
-            }
+        if isPinnedExist {
+            sections.insert(.init(title: "Pinned", trackers: []), at: 0)
         }
         
-        let tempPinned = try await pinned
-        var tempSections = try await regular
-        
-        if !tempPinned.isEmpty {
-            tempSections.insert(.init(title: "Pinned", trackers: tempPinned), at: 0)
-        }
-        
-        await mutableSections.setIfNeeded(value: tempSections)
+        await mutableSections.setIfNeeded(value: sections)
     }
     
     func daysTracked(for tracker: Tracker) async throws -> Int {
@@ -107,7 +121,7 @@ final class TrackerManager: TrackerManaging {
     
     func toggle(record: TrackerRecord) async throws {
         try await recordRepository.createOrDeleteIfPresent(record: record, for: record.id)
-        try await fetchAllSectionedTrackers()
+//        try await fetchAllSectionedTrackers()
     }
     
     // MARK: - Delete

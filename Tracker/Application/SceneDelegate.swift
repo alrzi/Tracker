@@ -90,7 +90,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             filtersAssembly: filtersAssembly
         )
         
-        let trackersAssembly1 = TrackersSwiftUIAssembly(trackerManager: trackerManager)
+        let trackersAssembly1 = TrackersSwiftUIAssembly(trackerManager: trackerManager, trackerRepository: trackerRepository)
         
         let tabBarAssembly = TabBarAssembly(
             trackersAssembly: trackersAssembly1,

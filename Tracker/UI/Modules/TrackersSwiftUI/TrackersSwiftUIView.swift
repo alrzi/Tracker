@@ -32,9 +32,7 @@ extension TrackersSwiftUIView: View {
                         VideoCollectionView(viewModel: collection)
                     }
                 }
-                .searchable(text: $queryString, placement: .navigationBarDrawer(displayMode: .always)) {
-                    
-                }                
+                .searchable(text: $queryString, placement: .navigationBarDrawer(displayMode: .always)) { }
                 .navigationTitle("Trackers")
             }
         }

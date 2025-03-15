@@ -7,7 +7,6 @@
 
 import Foundation
 import TrackerDomain
-import CoreData.NSFetchRequest
 
 final class CategoryRepository: CategoryRepositoryProtocol {
     private let persistencyService: PersistencyService
@@ -96,5 +95,6 @@ private extension StaticPredicateBuilder where T: CategoryObject {
     static func by(weekDay: String) -> Self {
         .init()
         .subpredicate(by: \.trackers, subKeyPath: \.weekDays, subValue: weekDay, comparison: .contains)
+        .subpredicate(by: \.trackers, subKeyPath: \.isPinned, subValue: false, comparison: .equal)
     }
 }

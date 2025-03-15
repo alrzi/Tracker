@@ -59,7 +59,7 @@ extension Tracker: Initable {
     }
 }
 
-extension Tracker.Kind {
+private extension Tracker.Kind {
     func toKind() -> TrackerKind {
         switch self {
         case .habit: .habit
@@ -69,7 +69,7 @@ extension Tracker.Kind {
     }
 }
 
-extension TrackerKind {
+private extension TrackerKind {
     func toKind() -> Tracker.Kind {
         switch self {
         case .habit: .habit

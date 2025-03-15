@@ -20,8 +20,8 @@ extension CategoryObject: Entity {
 }
 
 extension CategoryObject: SetAddable {
-    func addElement(_ elements: [TrackerObject]) {
-        addToTrackers(Set(elements))
+    func addElement(_ elements: Set<TrackerObject>) {
+        addToTrackers(elements)
     }
 }
 

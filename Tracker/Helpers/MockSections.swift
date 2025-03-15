@@ -25,7 +25,7 @@ func createSectionsWithTrackers(sectionCount: Int, trackerCount: Int) -> ([Track
                 emoji: RandomEmojiService.emoji,
                 color: RandomHexColorService.randomHexString,
                 schedule: WeekDay.allDaysOfWeek,
-                isPinned: false,
+                isPinned: sectionIndex == 1 || sectionIndex == 2,
                 kind: .habit,
                 trackedDays: 0,
                 categoryId: sectionID

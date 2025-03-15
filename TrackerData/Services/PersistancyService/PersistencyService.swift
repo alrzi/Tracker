@@ -5,10 +5,10 @@ enum PersistencyError: Error {
     case failedToSave
 }
 
-final class PersistencyService: @unchecked Sendable {
+final class PersistencyService: Sendable {
     private let modelName: String = "Tracker"
     private let persistentContainer: NSPersistentContainer
-    private let managedObjectContext: NSManagedObjectContext
+    nonisolated(unsafe) private let managedObjectContext: NSManagedObjectContext
 
     init() {
         let bundle = Bundle(for: type(of: self))
@@ -101,11 +101,11 @@ final class PersistencyService: @unchecked Sendable {
         E: NSManagedObject & CopyableEntity<R> & SetAddable<T>
     {
         try await managedObjectContext.perform {
-            var objects: [T] = []
+            var objects: Set<T> = []
             for i in domain {
                 let newObject = T(context: self.managedObjectContext)
                 newObject.copy(from: i)
-                objects.append(newObject)
+                objects.insert(newObject)
             }
             
             let parentObject = E(context: self.managedObjectContext)

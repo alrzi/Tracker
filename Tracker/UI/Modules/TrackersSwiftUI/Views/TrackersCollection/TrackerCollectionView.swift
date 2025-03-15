@@ -25,7 +25,7 @@ struct VideoCollectionView<ViewModel: VideoCollectionViewModelProtocol>: View {
     }
     
     var body: some View {
-        VStack(alignment: .leading) {
+        LazyVStack(alignment: .leading) {
             Text(viewModel.collection.title)
                 .font(.system(size: 24, weight: .bold))
                 .padding(.leading)
@@ -37,8 +37,7 @@ struct VideoCollectionView<ViewModel: VideoCollectionViewModelProtocol>: View {
                             TrackerItemView(tracker: tracker)
                                 .frame(width: 200, height: 170)
                         }
-                    }
-                    .background(.blue)
+                    }                    
                     .padding(.horizontal, 5)
                 }
                 else {
@@ -48,13 +47,10 @@ struct VideoCollectionView<ViewModel: VideoCollectionViewModelProtocol>: View {
                                 .frame(width: 200, height: 170)
                         }
                     }
-                    .background(.blue)
                     .padding(.horizontal, 5)
                 }
             }
-            .background(.orange)
         }
-        .background(.green)
     }
 }
 

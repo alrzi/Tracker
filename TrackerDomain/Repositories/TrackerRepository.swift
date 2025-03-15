@@ -22,6 +22,7 @@ public protocol TrackerRepositoryProtocol: Sendable {
     func getAllTrackers() async throws -> [Tracker]
     func getAllTrackers(isPinned: Bool) async throws -> [Tracker]
     func getTracker(by id: UUID) async throws -> Tracker
+    func isPinnedTrackersExist() async throws -> Bool
     
     // Update
     func updateTracker(_ tracker: Tracker) async throws

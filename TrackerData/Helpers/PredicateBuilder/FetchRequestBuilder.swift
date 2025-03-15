@@ -47,6 +47,6 @@ struct FetchRequestBuilder<T: NSManagedObject & Entity> {
 extension FetchRequestBuilder {
     struct SortDescriptor<Value> {
         let keyPath: KeyPath<T, Value>
-        var ascending: Bool = true
+        var ascending = true
     }
 }

@@ -13,7 +13,7 @@ protocol CopyableEntity<CopyableValue> {
 protocol SetAddable<ElementType> {
     associatedtype ElementType: NSManagedObject
     
-    func addElement(_ elements: [ElementType])
+    func addElement(_ elements: Set<ElementType>)
 }
 
 protocol ValueAddable<AddableValue> {

@@ -14,18 +14,35 @@ struct TrackerItemView: View {
 
     var body: some View {
         VStack(spacing: 12) {
-            Text(tracker.emoji)
-            
-            Text(tracker.name)
-                .foregroundColor(.white)
+            HStack {
+                VStack(alignment: .leading) {
+                    Text(tracker.emoji)
+                        .foregroundStyle(.black)
+                    
+                    Text(tracker.name)
+                        .foregroundStyle(.black)
+                }
+                
+                Spacer()
+                
+                if tracker.isPinned {
+                    Image(systemName: "pin")
+                        .resizable()
+                        .symbolVariant(.circle.fill)
+                        .symbolRenderingMode(.palette)
+                        .foregroundStyle(.white, .orange)
+                        .frame(width: 24, height: 24)
+                }
+            }
+            .multilineTextAlignment(.leading)
             
             Spacer()
             
             HStack {
                 Text("Tracked days \(tracker.trackedDays.formatted(.number))")
-                    .font(.title)
-                    .foregroundColor(.white)
+                    .font(.title)                    
                     .multilineTextAlignment(.center)
+                    .foregroundStyle(.black)
                 
                 Spacer()
                 
@@ -49,7 +66,7 @@ struct TrackerItemView: View {
             }
         }
         .padding(8)
-        .background(.gray)
+        .background(Color(uiColor: UIColor(hexString: tracker.color)!))
         .cornerRadius(8)
     }
 }

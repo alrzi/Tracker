@@ -16,34 +16,35 @@ protocol TrackersSwiftUIViewModelProtocol: ObservableObject {
 
 final class TrackersSwiftUIViewModel: TrackersSwiftUIViewModelProtocol {
     private let trackerManager: any TrackerManaging
+    private let trackerRepository: any TrackerRepositoryProtocol
     
     private var stateUpdateTask: Task<Void, Error>?
     
     @Published private(set) var collectionViewModel: [TrackerCollectionViewModel] = []
     
     init(
-        trackerManager: some TrackerManaging
+        trackerManager: some TrackerManaging,
+        trackerRepository: some TrackerRepositoryProtocol
     ) {
+        self.trackerRepository = trackerRepository
         self.trackerManager = trackerManager
         
-//        let (sections, records) = createSectionsWithTrackers(sectionCount: 4, trackerCount: 30)
+        let (sections, records) = createSectionsWithTrackers(sectionCount: 40, trackerCount: 10)
         
         stateUpdateTask = Task { @MainActor in
-            try await trackerManager.fetchAllSectionedTrackers()
-            
-            for try await sections in trackerManager.sections {
-                let models = sections.map { TrackerCollectionViewModel(trackerManager: trackerManager, collection: $0) }
-                collectionViewModel = models
-            }
-        }
-        
-//        Task {
 //            try await trackerManager.addSections(sections)
 //            
 //            for record in records {
 //                try await trackerManager.toggle(record: record)
 //            }
-//        }
+            
+            try await trackerManager.fetchAllSectionedTrackers()
+            
+            for try await sections in trackerManager.sections {
+                let models = sections.map { TrackerCollectionViewModel(trackerRepository: trackerRepository, collection: $0) }
+                collectionViewModel = models
+            }
+        }
     }
     
     deinit {

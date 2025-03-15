@@ -69,6 +69,16 @@ final class TrackerRepository: TrackerRepositoryProtocol {
         return tracker
     }
     
+    func isPinnedTrackersExist() async throws -> Bool {
+        let request = FetchRequestBuilder<TrackerObject>()
+            .setPredicate(.by(isPinned: true))
+            .setFetchLimit(1)
+            .build()
+        
+        let trackers: [Tracker] = try await persistencyService.fetchObjects(with: request)
+        return trackers.first != nil
+    }
+    
     // MARK: - Update
     
     func updateTracker(_ tracker: Tracker) async throws {

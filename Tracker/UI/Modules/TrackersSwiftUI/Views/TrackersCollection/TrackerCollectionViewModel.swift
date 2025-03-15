@@ -13,12 +13,30 @@ protocol VideoCollectionViewModelProtocol: ObservableObject, Identifiable {
 }
 
 final class TrackerCollectionViewModel: VideoCollectionViewModelProtocol {
+    private let trackerRepository: TrackerRepositoryProtocol
+    
     @Published private(set) var collection: TrackerSection
     
     init(
-        trackerManager: some TrackerManaging,
+        trackerRepository: some TrackerRepositoryProtocol,
         collection: TrackerSection
     ) {
+        self.trackerRepository = trackerRepository
         self.collection = collection
+        
+        let weekDay: String = "0, 1, 2, 3, 4, 5, 6"
+        
+        Task { @MainActor in
+            let trackers: [Tracker]
+            
+            if collection.title == "Pinned" {
+                trackers = try await trackerRepository.getAllTrackers(isPinned: true)
+            }
+            else {
+                trackers = try await trackerRepository.getAllTrackersForCategory(category: collection.id, isPinned: false, weekDay: weekDay)
+            }
+            
+            self.collection = collection.updatingTrackers(with: trackers)
+        }
     }
 }

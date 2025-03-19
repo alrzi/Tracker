@@ -8,9 +8,8 @@
 import Foundation
 import TrackerDomain
 
-func createSectionsWithTrackers(sectionCount: Int, trackerCount: Int) -> ([TrackerSection], [TrackerRecord]) {
+func createSectionsWithTrackers(sectionCount: Int, trackerCount: Int) -> [TrackerSection] {
     var sections: [TrackerSection] = []
-    var records: [TrackerRecord] = []
         
     for sectionIndex in 0..<sectionCount {
         var trackers: [Tracker] = []
@@ -24,17 +23,14 @@ func createSectionsWithTrackers(sectionCount: Int, trackerCount: Int) -> ([Track
                 name: "Section \(sectionIndex) - Item \(trackerIndex)",
                 emoji: RandomEmojiService.emoji,
                 color: RandomHexColorService.randomHexString,
-                schedule: WeekDay.allDaysOfWeek,
-                isPinned: sectionIndex == 1 || sectionIndex == 2,
+                schedule: [0,1,2,3,4,5,6],
+                isPinned: false,
                 kind: .habit,
                 trackedDays: 0,
                 categoryId: sectionID
             )
             trackers.append(tracker)
-            
-            if trackerIndex.isMultiple(of: 2) {
-                records.append(.init(id: id, date: .now))
-            }
+            print("trackerID", id)
         }
         
         let section = TrackerSection(
@@ -43,7 +39,8 @@ func createSectionsWithTrackers(sectionCount: Int, trackerCount: Int) -> ([Track
             trackers: trackers
         )
         sections.append(section)
+        print("sectionID", sectionID)
     }
     
-    return (sections, records)
+    return sections
 }

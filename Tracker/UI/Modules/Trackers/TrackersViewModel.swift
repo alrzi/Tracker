@@ -44,7 +44,7 @@ final class TrackersViewModel {
             .store(in: &cancellable)
         
         stateUpdateTask = Task {
-            try await trackerManager.fetchAllSectionedTrackers()
+//            try await trackerManager.fetchAllSectionedTrackers(for: date.weekDayString)
             
             for try await section in trackerManager.sections {
                 state.trackerSections = section
@@ -82,7 +82,7 @@ extension TrackersViewModel {
         analyticsTracker.track(event: TrackType.trackers(event: .action(.onTrackerPin)))
         
         do {
-            try await trackerManager.togglePin(for: tracker)
+//            try await trackerManager.togglePin(for: tracker)
         }
         catch {
             preconditionFailure("\(String(describing: self)) onPinTracker(at indexPath: \(indexPath)")
@@ -97,7 +97,7 @@ extension TrackersViewModel {
         analyticsTracker.track(event: TrackType.trackers(event: .action(.onTrackerPin)))
         
         do {
-            try await trackerManager.togglePin(for: tracker)
+//            try await trackerManager.togglePin(for: tracker)
         }
         catch {
             preconditionFailure("\(String(describing: self)) onUnPinTracker(at indexPath: \(indexPath)")

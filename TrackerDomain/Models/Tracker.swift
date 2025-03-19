@@ -59,7 +59,7 @@ public extension Tracker {
         )
     }
     
-    func updated(trackedDays: Int) -> Self {
+    func with(isCompleted: Bool) -> Self {
         Tracker(
             id: id,
             name: name,
@@ -69,11 +69,12 @@ public extension Tracker {
             isPinned: isPinned,
             kind: kind,
             trackedDays: trackedDays,
-            categoryId: categoryId
+            categoryId: categoryId,
+            isCompleted: isCompleted
         )
     }
-    
-    func with(isCompleted: Bool) -> Self {
+        
+    func with(isCompleted: Bool, trackedDays: Int) -> Self {
         Tracker(
             id: id,
             name: name,

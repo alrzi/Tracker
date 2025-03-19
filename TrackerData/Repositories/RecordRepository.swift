@@ -23,21 +23,19 @@ final class RecordRepository: RecordRepositoryProtocol {
         self.persistencyService = persistencyService
     }
     
-    func createOrDeleteIfPresent(record: TrackerRecord, for trackerId: UUID) async throws {
-        let request = FetchRequestBuilder<TrackerObject>()
-            .setPredicate(.by(id: trackerId))
-            .build()
-        
-        let recordRequest = FetchRequestBuilder<RecordObject>()
-            .setPredicate(.by(id: trackerId))
-            .build()
-        
-        let fetchedRecord: TrackerRecord? = try await persistencyService.fetchObject(with: recordRequest)
-        
-        if fetchedRecord != nil {
-            try await persistencyService.removeObject(for: recordRequest)
+    func createOrDeleteIfPresent(record: TrackerRecord) async throws {
+        if try await isCompletedFor(selectedDay: record.date, trackerWithId: record.id) {
+            let request = FetchRequestBuilder<RecordObject>()
+                .setPredicate(.by(id: record.id, dateInterval: record.date.fullDayInterval()))
+                .build()
+            
+            try await persistencyService.removeObject(for: request)
         }
         else {
+            let request = FetchRequestBuilder<TrackerObject>()
+                .setPredicate(.by(id: record.id))
+                .build()
+            
             try await persistencyService.createObject(RecordObject.self, from: record, andAddObjectFor: request)
         }
     }
@@ -53,11 +51,8 @@ final class RecordRepository: RecordRepositoryProtocol {
     }
     
     func isCompletedFor(selectedDay date: Date, trackerWithId id: UUID) async throws -> Bool {
-        let startDate = calendar.startOfDay(for: date)
-        let endDate = calendar.date(byAdding: .day, value: 1, to: startDate) ?? date
-        
         let request = FetchRequestBuilder<RecordObject>()
-            .setPredicate(.by(id: id, date: startDate, upTo: endDate))
+            .setPredicate(.by(id: id, dateInterval: date.fullDayInterval()))
             .build()
         
         let record: TrackerRecord? = try await persistencyService.fetchObject(with: request)
@@ -81,10 +76,18 @@ private extension StaticPredicateBuilder where T: RecordObject {
         .filter(by: \.tracker.id, value: id, comparison: .equal)
     }
     
-    static func by(id: UUID, date: Date, upTo endDate: Date) -> Self {
-        .init()
-        .filter(by: \.tracker.id, value: id, comparison: .equal)
-        .filter(by: \.date, value: date, comparison: .greaterThanOrEqual)
-        .filter(by: \.date, value: endDate, comparison: .lessThan)
+    static func by(id: UUID, dateInterval: DateInterval) -> Self {
+        .by(id: id)
+        .filter(by: \.date, value: dateInterval.start, comparison: .greaterThanOrEqual)
+        .filter(by: \.date, value: dateInterval.end, comparison: .lessThan)
+    }
+}
+
+private extension Date {
+    func fullDayInterval(calendar: Calendar = .autoupdatingCurrent) -> DateInterval {
+        let startDate = calendar.startOfDay(for: self)
+        let endDate = calendar.date(byAdding: .day, value: 1, to: startDate) ?? self
+        
+        return DateInterval(start: startDate, end: endDate)
     }
 }

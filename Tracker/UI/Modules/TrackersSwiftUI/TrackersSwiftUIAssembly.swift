@@ -14,15 +14,27 @@ final class TrackersSwiftUIAssembly: ViewControllerAssembly {
     typealias Context = ()
     
     private let trackerManager: any TrackerManaging
-    private let trackerRepository: TrackerRepositoryProtocol
-    
-    init(trackerManager: any TrackerManaging, trackerRepository: TrackerRepositoryProtocol) {
+    private let trackerRepository: any TrackerRepositoryProtocol
+    private let recordRepository: any RecordRepositoryProtocol
+   
+    init(
+        trackerManager: any TrackerManaging,
+        trackerRepository: any TrackerRepositoryProtocol,
+        recordRepository: any RecordRepositoryProtocol
+    ) {
         self.trackerManager = trackerManager
         self.trackerRepository = trackerRepository
+        self.recordRepository = recordRepository
     }
     
+    @MainActor
     func assemble(_ context: Context) -> UIViewController {
-        let viewModel = TrackersSwiftUIViewModel(trackerManager: trackerManager, trackerRepository: trackerRepository)
+        let viewModel = TrackersSwiftUIViewModel(
+            trackerManager: trackerManager,
+            trackerRepository: trackerRepository,
+            recordRepository: recordRepository
+        )
+        
         let view = TrackersSwiftUIView(viewModel: viewModel)
         let viewController = UIHostingController(rootView: view)
         return viewController

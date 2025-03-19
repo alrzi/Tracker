@@ -54,7 +54,7 @@ extension Tracker: Initable {
             isPinned: object.isPinned,
             kind: object.kind.toKind(),
             trackedDays: object.trackerRecord.count,
-            categoryId: object.category.id
+            categoryId: object.category.id            
         )
     }
 }

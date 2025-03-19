@@ -34,9 +34,20 @@ final class CategoryRepository: CategoryRepositoryProtocol {
     
     // MARK: - Read
     
-    func getAllSections(weekDay: String) async throws -> [TrackerSection] {
+    func getSections(with query: String, for weekDay: String, fetchLimit: Int, fetchOffset: Int) async throws -> [TrackerSection] {
         let request = FetchRequestBuilder<CategoryObject>()
-            .setPredicate(.by(weekDay: weekDay))
+            .setPredicate(query.isEmpty ? .by(weekDay: weekDay) : .by(query: query, weekDay: weekDay))
+            .setSortDescriptors([.init(keyPath: \.title)])
+            .setFetchLimit(fetchLimit)
+            .setFetchOffset(fetchOffset)
+            .build()
+        
+        return try await persistencyService.fetchObjects(with: request)
+    }
+    
+    func getAllTrackers(with query: String) async throws -> [TrackerSection] {
+        let request = FetchRequestBuilder<CategoryObject>()
+            .setPredicate(.by(query: query))
             .setSortDescriptors([.init(keyPath: \.title)])
             .build()
         
@@ -46,17 +57,13 @@ final class CategoryRepository: CategoryRepositoryProtocol {
     func getCategory(by id: UUID) async throws -> TrackerSection {
         let request = FetchRequestBuilder<CategoryObject>()
             .setPredicate(.by(id: id))
-            .setSortDescriptors([.init(keyPath: \.title)])
             .build()
         
-        let category: TrackerSection? = try await persistencyService.fetchObject(with: request)
-        
-        if let category {
-            return category
-        }
-        else {
+        guard let category: TrackerSection = try await persistencyService.fetchObject(with: request) else {
             throw CategoryRepositoryError.noTrackerForId
         }
+        
+        return category
     }
     
     // MARK: - Update
@@ -95,6 +102,18 @@ private extension StaticPredicateBuilder where T: CategoryObject {
     static func by(weekDay: String) -> Self {
         .init()
         .subpredicate(by: \.trackers, subKeyPath: \.weekDays, subValue: weekDay, comparison: .contains)
+        .subpredicate(by: \.trackers, subKeyPath: \.isPinned, subValue: false, comparison: .equal)
+    }
+    
+    static func by(query: String) -> Self {
+        .init()
+        .subpredicate(by: \.trackers, subKeyPath: \.name, subValue: query, comparison: .contains)
+        .subpredicate(by: \.trackers, subKeyPath: \.isPinned, subValue: false, comparison: .equal)
+    }
+    
+    static func by(query: String, weekDay: String) -> Self {
+        .by(weekDay: weekDay)
+        .subpredicate(by: \.trackers, subKeyPath: \.name, subValue: query, comparison: .contains)
         .subpredicate(by: \.trackers, subKeyPath: \.isPinned, subValue: false, comparison: .equal)
     }
 }

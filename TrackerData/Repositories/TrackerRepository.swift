@@ -35,9 +35,13 @@ final class TrackerRepository: TrackerRepositoryProtocol {
     
     // MARK: - Read
     
-    func getAllTrackersForCategory(category: UUID, isPinned: Bool, weekDay: String) async throws -> [Tracker] {
+    func getTrackers(for category: UUID, isPinned: Bool, weekDay: String, query: String) async throws -> [Tracker] {
         let request = FetchRequestBuilder<TrackerObject>()
-            .setPredicate(.by(categoryId: category, isPinned: isPinned, weekDay: weekDay))
+            .setPredicate(
+                query.isEmpty
+                    ? .by(isPinned: isPinned, categoryId: category, weekDay: weekDay)
+                    : .by(isPinned: isPinned, query: query, categoryId: category, weekDay: weekDay)
+            )
             .setSortDescriptors([.init(keyPath: \.name)])
             .build()
         
@@ -47,6 +51,15 @@ final class TrackerRepository: TrackerRepositoryProtocol {
     func getAllTrackers(isPinned: Bool) async throws -> [Tracker] {
         let request = FetchRequestBuilder<TrackerObject>()
             .setPredicate(.by(isPinned: isPinned))
+            .setSortDescriptors([.init(keyPath: \.name)])
+            .build()
+        
+        return try await persistencyService.fetchObjects(with: request)
+    }
+    
+    func getAllTrackers(isPinned: Bool, name: String) async throws -> [Tracker] {
+        let request = FetchRequestBuilder<TrackerObject>()
+            .setPredicate(.by(isPinned: isPinned, query: name))
             .setSortDescriptors([.init(keyPath: \.name)])
             .build()
         
@@ -75,8 +88,16 @@ final class TrackerRepository: TrackerRepositoryProtocol {
             .setFetchLimit(1)
             .build()
         
-        let trackers: [Tracker] = try await persistencyService.fetchObjects(with: request)
-        return trackers.first != nil
+        return try await persistencyService.fetchCount(with: request) > 0
+    }
+    
+    func isPinnedTrackersExist(with name: String) async throws -> Bool {
+        let request = FetchRequestBuilder<TrackerObject>()
+            .setPredicate(.by(isPinned: true, query: name))
+            .setFetchLimit(1)
+            .build()
+                
+        return try await persistencyService.fetchCount(with: request) > 0
     }
     
     // MARK: - Update
@@ -113,10 +134,20 @@ private extension StaticPredicateBuilder where T: TrackerObject {
         .filter(by: \.isPinned, value: isPinned, comparison: .equal)
     }
     
-    static func by(categoryId: UUID, isPinned: Bool, weekDay: String) -> Self {
-        .init()
+    static func by(isPinned: Bool, query: String) -> Self {
+        .by(isPinned: isPinned)
+        .filter(by: \.name, value: query, comparison: .contains)
+    }
+    
+    static func by(isPinned: Bool, query: String, categoryId: UUID, weekDay: String) -> Self {
+        .by(isPinned: isPinned, query: query)
         .filter(by: \.category.id, value: categoryId)
-        .filter(by: \.isPinned, value: isPinned)
+        .filter(by: \.weekDays, value: weekDay, comparison: .contains)
+    }
+    
+    static func by(isPinned: Bool, categoryId: UUID, weekDay: String) -> Self {
+        .by(isPinned: isPinned)
+        .filter(by: \.category.id, value: categoryId)
         .filter(by: \.weekDays, value: weekDay, comparison: .contains)
     }
 }

@@ -11,13 +11,9 @@ import TrackerDomain
 struct VideoCollectionView<ViewModel: VideoCollectionViewModelProtocol>: View {
     @ObservedObject private var viewModel: ViewModel
     
-    private let row = [
-        GridItem(.adaptive(minimum: 170, maximum: 180), spacing: 5)
-    ]
-    
-    private let rows = [
-        GridItem(.adaptive(minimum: 170, maximum: 180), spacing: 5),
-        GridItem(.adaptive(minimum: 170, maximum: 180), spacing: 5)
+    private let columns = [
+        GridItem(.adaptive(minimum: 170, maximum: 220), spacing: 5),
+        GridItem(.adaptive(minimum: 170, maximum: 220), spacing: 5)
     ]
     
     init(viewModel: ViewModel) {
@@ -25,29 +21,24 @@ struct VideoCollectionView<ViewModel: VideoCollectionViewModelProtocol>: View {
     }
     
     var body: some View {
-        LazyVStack(alignment: .leading) {
-            Text(viewModel.collection.title)
-                .font(.system(size: 24, weight: .bold))
-                .padding(.leading)
+        LazyVStack {
+            HStack {
+                Text(viewModel.title)
+                    .font(.system(size: 19, weight: .bold))
+                    .padding(.leading)
+                
+                Spacer()
+            }
             
-            ScrollView(.horizontal, showsIndicators: false) {
-                if viewModel.collection.trackers.count >= 3 {
-                    LazyHGrid(rows: rows, spacing: 5) {
-                        ForEach(viewModel.collection.trackers) { tracker in
-                            TrackerItemView(tracker: tracker)
-                                .frame(width: 200, height: 170)
-                        }
-                    }                    
-                    .padding(.horizontal, 5)
-                }
-                else {
-                    LazyHGrid(rows: row, spacing: 5) {
-                        ForEach(viewModel.collection.trackers) { tracker in
-                            TrackerItemView(tracker: tracker)
-                                .frame(width: 200, height: 170)
-                        }
-                    }
-                    .padding(.horizontal, 5)
+            LazyVGrid(columns: columns, spacing: 10) {
+                ForEach(Array(viewModel.trackers.enumerated()), id: \.element.id) { index, tracker in
+                    TrackerItemView(
+                        tracker: tracker,
+                        onToggleCompletion: { viewModel.onToggleCompletion(at: index) },
+                        onTogglePin: { viewModel.onTogglePin(at: index) },
+                        onEdit: { viewModel.onEdit(at: index) },
+                        onDelete: { viewModel.onDelete(at: index) }
+                    )
                 }
             }
         }
@@ -60,6 +51,13 @@ struct VideoCollectionView<ViewModel: VideoCollectionViewModelProtocol>: View {
 }
 
 final class CollectionViewModel: VideoCollectionViewModelProtocol {
-    let collection: TrackerSection = .init(title: "Pinned", trackers: [])
+    let id: UUID = .init()
+    let title: String = "Pinned"
+    let trackers: [Tracker] = []    
+    
+    func onToggleCompletion(at index: Int) { }
+    func onTogglePin(at index: Int) { }
+    func onEdit(at index: Int) { }
+    func onDelete(at index: Int) { }    
 }
 #endif

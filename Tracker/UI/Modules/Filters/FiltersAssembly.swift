@@ -10,7 +10,7 @@ import Presentation
 import TrackerDomain
 
 final class FiltersAssembly: ViewControllerAssembly {
-    typealias Context = LifecycleManagingContext<TrackerFilters, Never, TrackerFilters>
+    typealias Context = LifecycleManagingContext<TrackerFilter, Never, TrackerFilter>
     
     func assemble(_ context: Context) -> UIViewController {
         FiltersViewController(

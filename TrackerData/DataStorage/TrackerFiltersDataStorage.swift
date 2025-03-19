@@ -10,7 +10,7 @@ import TrackerDomain
 internal import DataStorage
 
 extension TrackerFiltersDataStorage where Self: DataStorageProtocol {
-    var trackerFilters: TrackerFilters {
+    var trackerFilters: TrackerFilter {
         get {
             getCodableValue(
                 key: TrackerFiltersDataStorageKey.trackerFilter,

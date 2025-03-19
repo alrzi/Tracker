@@ -7,6 +7,7 @@
 
 import SwiftUI
 import Foundation
+import TrackerDomain
 
 struct TrackersSwiftUIView<ViewModel: TrackersSwiftUIViewModelProtocol> {
     @ObservedObject private var viewModel: ViewModel       
@@ -20,6 +21,7 @@ struct TrackersSwiftUIView<ViewModel: TrackersSwiftUIViewModelProtocol> {
 
 extension TrackersSwiftUIView: View {
     var body: some View {
+        // swiftlint:disable closure_body_length
         NavigationStack {
             Group {
                 switch viewModel.state {
@@ -72,12 +74,25 @@ extension TrackersSwiftUIView: View {
                 
                 ToolbarItem(placement: .topBarTrailing) {
                     Menu {
-                        Button(action: {}) {
-                            Label("Create a file", systemImage: "doc")
-                        }
-                        
-                        Button(action: {}) {
-                            Label("Create a folder", systemImage: "folder")
+                        Picker(selection: $viewModel.filter, label: Text("Filters")) {
+//                            Button(action: {}) {
+//                                Text("All")
+//                            }
+//                            .tag(TrackerFilter.forCurrentWeekDay)
+//                            
+//                            Button(action: {}) {
+//                                Label("Completed", systemImage: "checklist.checked")
+//                            }
+//                            .tag(TrackerFilter.completedForDate)
+//                            
+//                            Button(action: {}) {
+//                                Label("In progress", systemImage: "checklist.unchecked")
+//                            }
+//                            .tag(TrackerFilter.uncompletedForDate)
+                            
+                            ForEach(TrackerFilter.allCases, id: \.self) { option in
+                                Text(option.name).tag(option)
+                            }
                         }
                     }
                     label: {
@@ -86,7 +101,7 @@ extension TrackersSwiftUIView: View {
                 }
             }
         }
-//        .searchable(text: $viewModel.queryString) { }
+        .searchable(text: $viewModel.queryString, placement: .navigationBarDrawer(displayMode: .always)) { }
     }
 }
 
@@ -96,6 +111,7 @@ extension TrackersSwiftUIView: View {
 }
 
 private final class ViewModel: TrackersSwiftUIViewModelProtocol {
+    var filter: TrackerFilter = .completedForDate
     var queryString: String = ""
     var currentDate: Date = .now
     let isPaginating = false

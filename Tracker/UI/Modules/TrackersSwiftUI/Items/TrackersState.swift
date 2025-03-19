@@ -44,4 +44,13 @@ enum TrackersState<Collection> {
             0
         }
     }
+    
+    var models: [Collection] {
+        if case .loaded(let collection) = self {
+            collection
+        }
+        else {
+            []
+        }
+    }
 }

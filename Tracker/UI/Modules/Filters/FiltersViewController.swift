@@ -3,14 +3,14 @@ import UIKit
 import TrackerDomain
 
 final class FiltersViewController: FrameViewController {
-    typealias Snapshot = NSDiffableDataSourceSnapshot<Int, TrackerFilters>
+    typealias Snapshot = NSDiffableDataSourceSnapshot<Int, TrackerFilter>
     
-    private lazy var dataSource = UITableViewDiffableDataSource<Int, TrackerFilters>(tableView: tableView) { [weak self] collectionView, indexPath, filter in
+    private lazy var dataSource = UITableViewDiffableDataSource<Int, TrackerFilter>(tableView: tableView) { [weak self] collectionView, indexPath, filter in
         let cell = collectionView.dequeueReusableCell(for: indexPath)
-        cell.textLabel?.text = filter.description
+//        cell.textLabel?.text = filter.description
         cell.backgroundColor = .systemBackground
         cell.selectionStyle = .none
-        if TrackerFilters.allCases[indexPath.row] == self?.currentFilter {
+        if TrackerFilter.allCases[indexPath.row] == self?.currentFilter {
             cell.accessoryType = .checkmark
         } 
         else if self?.currentFilter == nil && indexPath.row == 1 {
@@ -41,13 +41,13 @@ final class FiltersViewController: FrameViewController {
         static let bottomInset: CGFloat = -16
     }
     
-    let onFilterSelected: (TrackerFilters) -> Void
+    let onFilterSelected: (TrackerFilter) -> Void
     
-    private var currentFilter: TrackerFilters
+    private var currentFilter: TrackerFilter
     
     init(
-        filter: TrackerFilters,
-        onFilterSelected: @escaping (TrackerFilters) -> Void
+        filter: TrackerFilter,
+        onFilterSelected: @escaping (TrackerFilter) -> Void
     ) {
         self.currentFilter = filter
         self.onFilterSelected = onFilterSelected
@@ -85,14 +85,14 @@ private extension FiltersViewController {
     func makeSnapshot() {
         var snapshot = Snapshot()
         snapshot.appendSections([.zero])
-        snapshot.appendItems(TrackerFilters.allCases)
+        snapshot.appendItems(TrackerFilter.allCases)
         dataSource.apply(snapshot)
     }
 }
 
 extension FiltersViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        onFilterSelected(TrackerFilters.allCases[indexPath.row])
+        onFilterSelected(TrackerFilter.allCases[indexPath.row])
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {

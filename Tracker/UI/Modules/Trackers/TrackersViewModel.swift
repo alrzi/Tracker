@@ -18,7 +18,7 @@ final class TrackersViewModel {
     
     private var cancellable: Set<AnyCancellable> = []
     
-    private var currentFilter: CurrentValueSubject<TrackerFilters, Never>
+    private var currentFilter: CurrentValueSubject<TrackerFilter, Never>
     private var date: Date = .now
     private var weekDay: String { date.weekDayString }
     
@@ -193,7 +193,7 @@ extension TrackersViewModel {
             .store(in: &cancellable)
     }
     
-    private func updateCurrentFilter(_ filter: TrackerFilters) {
+    private func updateCurrentFilter(_ filter: TrackerFilter) {
         currentFilter.value = filter
         trackerFiltersDataStorage.trackerFilters = filter
     }

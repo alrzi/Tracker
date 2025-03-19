@@ -58,7 +58,7 @@ final class TrackersViewRouter {
             .route()
     }
     
-    func showFiltersAssembly(filter: TrackerFilters) -> AnyPublisher<TrackerFilters, Never> {
+    func showFiltersAssembly(filter: TrackerFilter) -> AnyPublisher<TrackerFilter, Never> {
         ModalModuleRouter(
             assembly: filtersAssembly,
             presentationContext: presentationContext

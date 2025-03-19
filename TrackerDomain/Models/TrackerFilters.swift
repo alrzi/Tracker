@@ -7,8 +7,9 @@
 
 import Foundation
 
-public enum TrackerFilters: CaseIterable, Codable {
+public enum TrackerFilter: CaseIterable, Codable {
     case forCurrentWeekDay
     case completedForDate
     case uncompletedForDate
+    case forToday
 }

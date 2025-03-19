@@ -39,8 +39,8 @@ final class TrackerRepository: TrackerRepositoryProtocol {
         let request = FetchRequestBuilder<TrackerObject>()
             .setPredicate(
                 query.isEmpty
-                    ? .by(isPinned: isPinned, categoryId: category, weekDay: weekDay)
-                    : .by(isPinned: isPinned, query: query, categoryId: category, weekDay: weekDay)
+                    ? .by(isPinned: isPinned, weekDay: weekDay, sectionID: category)
+                    : .by(isPinned: isPinned, weekDay: weekDay, sectionID: category, query: query)
             )
             .setSortDescriptors([.init(keyPath: \.name)])
             .build()
@@ -48,9 +48,9 @@ final class TrackerRepository: TrackerRepositoryProtocol {
         return try await persistencyService.fetchObjects(with: request)
     }
     
-    func getAllTrackers(isPinned: Bool) async throws -> [Tracker] {
+    func getTrackers(isPinned: Bool, weekDay: String) async throws -> [Tracker] {
         let request = FetchRequestBuilder<TrackerObject>()
-            .setPredicate(.by(isPinned: isPinned))
+            .setPredicate(.by(isPinned: isPinned, weekDay: weekDay))
             .setSortDescriptors([.init(keyPath: \.name)])
             .build()
         
@@ -139,16 +139,20 @@ private extension StaticPredicateBuilder where T: TrackerObject {
         .filter(by: \.name, value: query, comparison: .contains)
     }
     
-    static func by(isPinned: Bool, query: String, categoryId: UUID, weekDay: String) -> Self {
-        .by(isPinned: isPinned, query: query)
-        .filter(by: \.category.id, value: categoryId)
+    static func by(isPinned: Bool, weekDay: String) -> Self {
+        .init()
+        .filter(by: \.isPinned, value: isPinned, comparison: .equal)
         .filter(by: \.weekDays, value: weekDay, comparison: .contains)
     }
     
-    static func by(isPinned: Bool, categoryId: UUID, weekDay: String) -> Self {
-        .by(isPinned: isPinned)
-        .filter(by: \.category.id, value: categoryId)
-        .filter(by: \.weekDays, value: weekDay, comparison: .contains)
+    static func by(isPinned: Bool, weekDay: String, sectionID: UUID) -> Self {
+        .by(isPinned: isPinned, weekDay: weekDay)
+        .filter(by: \.category.id, value: sectionID)
+    }
+    
+    static func by(isPinned: Bool, weekDay: String, sectionID: UUID, query: String) -> Self {
+        .by(isPinned: isPinned, weekDay: weekDay, sectionID: sectionID)
+        .filter(by: \.name, value: query, comparison: .contains)
     }
 }
 

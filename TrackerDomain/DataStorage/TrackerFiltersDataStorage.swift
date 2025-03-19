@@ -8,5 +8,5 @@
 import Foundation
 
 public protocol TrackerFiltersDataStorage: AnyObject {
-    var trackerFilters: TrackerFilters { get set }
+    var trackerFilters: TrackerFilter { get set }
 }

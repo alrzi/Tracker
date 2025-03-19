@@ -90,7 +90,7 @@ final class TrackerManager: TrackerManaging {
             fetchOffset: fetchOffset
         )
         
-        async let pinned = trackerRepository.getAllTrackers(isPinned: true)
+        async let pinned = trackerRepository.getTrackers(isPinned: true, weekDay: weekDay)
         async let regular = fetchTrackers(for: sections, weekDay: weekDay, query: query, currentDate: currentDate)
         
         let tempPinned = try await pinned

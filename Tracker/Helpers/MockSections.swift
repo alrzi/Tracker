@@ -15,6 +15,7 @@ func createSectionsWithTrackers(sectionCount: Int, trackerCount: Int) -> [Tracke
         var trackers: [Tracker] = []
         
         let sectionID: UUID = .init()
+        let schedule: Set<Int> = [sectionIndex % 6]
         
         for trackerIndex in 0..<trackerCount {
             let id = UUID()
@@ -23,7 +24,7 @@ func createSectionsWithTrackers(sectionCount: Int, trackerCount: Int) -> [Tracke
                 name: "Section \(sectionIndex) - Item \(trackerIndex)",
                 emoji: RandomEmojiService.emoji,
                 color: RandomHexColorService.randomHexString,
-                schedule: [0,1,2,3,4,5,6],
+                schedule: schedule,
                 isPinned: false,
                 kind: .habit,
                 trackedDays: 0,

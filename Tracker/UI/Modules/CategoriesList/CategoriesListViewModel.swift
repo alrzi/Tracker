@@ -24,8 +24,8 @@ final class CategoriesListViewModel: ObservableObject {
 extension CategoriesListViewModel {
     func getAllCategories() async {
         do {
-            let categories = try await categoryRepository.getSections(with: "", for: Date.now.weekDayString, fetchLimit: 10, fetchOffset: 0)
-            categoryViewModels = categories.map(CategoryViewModel.init)
+//            let categories = try await categoryRepository.getSections(with: "", for: Date.now.weekDayString, fetchLimit: 10, fetchOffset: 0)
+//            categoryViewModels = categories.map(CategoryViewModel.init)
         }
         catch {
             debugPrint(error)

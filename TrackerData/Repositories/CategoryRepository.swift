@@ -34,21 +34,16 @@ final class CategoryRepository: CategoryRepositoryProtocol {
     
     // MARK: - Read
     
-    func getSections(with query: String, for weekDay: String, fetchLimit: Int, fetchOffset: Int) async throws -> [TrackerSection] {
+    func getSections(params: RequestParameters) async throws -> [TrackerSection] {
         let request = FetchRequestBuilder<CategoryObject>()
-            .setPredicate(query.isEmpty ? .by(weekDay: weekDay) : .by(query: query, weekDay: weekDay))
+            .setPredicate(
+                params.query.isEmpty
+                    ? .by(weekDay: params.weekDay)
+                    : .by(query: params.query, weekDay: params.weekDay)
+            )
             .setSortDescriptors([.init(keyPath: \.title)])
-            .setFetchLimit(fetchLimit)
-            .setFetchOffset(fetchOffset)
-            .build()
-        
-        return try await persistencyService.fetchObjects(with: request)
-    }
-    
-    func getAllTrackers(with query: String) async throws -> [TrackerSection] {
-        let request = FetchRequestBuilder<CategoryObject>()
-            .setPredicate(.by(query: query))
-            .setSortDescriptors([.init(keyPath: \.title)])
+            .setFetchLimit(params.fetchLimit)
+            .setFetchOffset(params.fetchOffset)
             .build()
         
         return try await persistencyService.fetchObjects(with: request)

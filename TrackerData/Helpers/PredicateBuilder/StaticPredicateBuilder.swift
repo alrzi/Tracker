@@ -10,7 +10,7 @@ import Foundation
 struct StaticPredicateBuilder<T> {
     private var predicates: [NSPredicate] = []
     
-    func filter<V>(by keyPath: KeyPath<T, V>, value: V, comparison: ComparisonType = .equal) -> StaticPredicateBuilder {
+    func filter<V>(by keyPath: KeyPath<T, V>, value: V, comparison: ComparisonType) -> StaticPredicateBuilder {
         let key = NSExpression(forKeyPath: keyPath).keyPath
         let predicate = NSPredicate(format: comparison.format, argumentArray: [key, value])
                 

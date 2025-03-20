@@ -49,24 +49,17 @@ final class TrackersSwiftUIViewModel: TrackersSwiftUIViewModelProtocol {
         self.trackerManager = trackerManager
         self.recordRepository = recordRepository
         
-        $queryString
+        $queryString            
             .dropFirst()
-            .combineLatest($currentDate)
-            .sink { [weak self, fetchParameters] query, date in
-                Task {
-                    await self?.fetchSection(with: query, for: date.weekDayString, params: fetchParameters)
-                }
-            }
+            .handleEvents(receiveOutput: { _ in self.fetchParameters.reset() })
+            .sink { [weak self] _ in self?.onQueryTrigger() }
             .store(in: &cancellables)
         
         $filter
-            .combineLatest($currentDate.map(\.weekDayString))
+            .removeDuplicates()
+            .combineLatest($currentDate)
             .handleEvents(receiveOutput: { _ in self.fetchParameters.reset() })
-            .sink { [weak self, fetchParameters] filter, weekDay in
-                Task {
-                    await self?.fetchSection(with: "", for: weekDay, params: fetchParameters)
-                }
-            }
+            .sink { [weak self] _, _ in self?.onFilterOrDateTrigger() }
             .store(in: &cancellables)
         
         $updateState
@@ -93,60 +86,42 @@ final class TrackersSwiftUIViewModel: TrackersSwiftUIViewModelProtocol {
 // MARK: - Private
 
 private extension TrackersSwiftUIViewModel {
-    func createModel(from sections: [TrackerSection]) -> [TrackerCollectionViewModel] {
-        sections.map {
-            TrackerCollectionViewModel(
-                trackerRepository: trackerRepository,
-                recordRepository: recordRepository,
-                trackerManager: trackerManager,
-                collection: $0,
-                currentDate: currentDate,
-                eventsHandler: { [weak self] tracker in
-                    Task {
-                        await self?.togglePin(for: tracker)
-                    }
-                }
-            )
+    // MARK: - Triggers
+    
+    func onQueryTrigger() {
+        Task {
+            await fetchSection()
         }
     }
     
-    func createPinnedModel(from trackers: [Tracker]) -> TrackerSection? {
-        if !trackers.isEmpty {
-            .init(id: .init(), title: "Pinned", trackers: trackers)
-        }
-        else {
-            nil
+    func onFilterOrDateTrigger() {
+        Task {
+            await fetchSection()
         }
     }
+    
+    func onTogglePinTrigger(_ tracker: Tracker) {
+        Task {
+            await togglePin(for: tracker)
+        }
+    }
+    
+    // MARK: - Async
     
     func togglePin(for tracker: Tracker) async {
         do {
             try await trackerManager.update(tracker: tracker.toggleIsPinned())
             
-            await fetchSection(
-                with: "",
-                for: currentDate.weekDayString,
-                params: .init(fetchLimit: state.lastElementIndex, fetchOffset: .zero)
-            )
+            await fetchSection()
         }
         catch {
             debugPrint(error)
         }
     }
     
-    func fetchSection(with query: String, for weekDay: String, params: FetchParameters) async {
+    func fetchSection() async {
         do {
-            var (sections, pinnedTrackers) = try await trackerManager.fetchSections(
-                with: query,
-                for: weekDay,
-                fetchLimit: params.fetchLimit,
-                fetchOffset: params.fetchOffset,
-                currentDate: currentDate
-            )
-            
-            if let pinned = createPinnedModel(from: pinnedTrackers) {
-                sections.insert(pinned, at: 0)
-            }
+            let sections = try await fetchSections(isPaginating: false)
             
             state = .loaded(createModel(from: sections))
             
@@ -169,20 +144,8 @@ private extension TrackersSwiftUIViewModel {
         updateState = .loading
         
         do {
-            let sections = try await trackerManager.fetchSectionsNextPage(
-                for: queryString,
-                for: currentDate.weekDayString,
-                fetchLimit: fetchParameters.fetchLimit,
-                fetchOffset: fetchParameters.fetchOffset,
-                currentDate: currentDate
-            )
-            
-            if sections.isEmpty {
-                updateState = .idle
-                
-                return
-            }
-            
+            let sections = try await fetchSections(isPaginating: true)
+                        
             fetchParameters.nextPage()
             
             updateState = .idle
@@ -191,6 +154,64 @@ private extension TrackersSwiftUIViewModel {
         catch {
             updateState = .error(.paginationError)
             debugPrint(error)
+        }
+    }
+    
+    func fetchSections(isPaginating: Bool) async throws -> [TrackerSection] {
+        var (sections, pinnedTrackers): ([TrackerSection], [Tracker]) = ([], [])
+        
+        let params: RequestParameters = .init(
+            currentDate: currentDate,
+            weekDay: currentDate.weekDayString,
+            fetchLimit: fetchParameters.fetchLimit,
+            fetchOffset: fetchParameters.fetchOffset,
+            query: queryString
+        )
+        
+        switch filter {
+        case .forCurrentWeekDay:
+            (sections, pinnedTrackers) = try await trackerManager.fetchSections(params: params, isPaginating: isPaginating)
+            
+        case .completedForDate:
+            (sections, pinnedTrackers) = try await trackerManager.fetchCompletedSections(params: params, isPaginating: isPaginating)
+        
+        case .uncompletedForDate:
+            break
+        
+        case .forToday:
+            break
+        }
+        
+        if !isPaginating {
+            if let pinned = createPinnedModel(from: pinnedTrackers) {
+                sections.insert(pinned, at: 0)
+            }
+        }
+        
+        return sections
+    }
+    
+    // MARK: - Sync
+    
+    func createModel(from sections: [TrackerSection]) -> [TrackerCollectionViewModel] {
+        sections.map {
+            TrackerCollectionViewModel(
+                trackerRepository: trackerRepository,
+                recordRepository: recordRepository,
+                trackerManager: trackerManager,
+                collection: $0,
+                currentDate: currentDate,
+                eventsHandler: { [weak self] in self?.onTogglePinTrigger($0) }
+            )
+        }
+    }
+    
+    func createPinnedModel(from trackers: [Tracker]) -> TrackerSection? {
+        if !trackers.isEmpty {
+            .init(id: .init(), title: "Pinned", trackers: trackers)
+        }
+        else {
+            nil
         }
     }
 }
@@ -219,15 +240,4 @@ private extension TrackerFilter {
             true
         }
     }
-}
-
-struct RequestParameters {
-    let weekDay: String
-    let filter: TrackerFilter
-    let params: FetchParameters
-}
-
-enum FetchType {
-    case basic(RequestParameters)
-    case withQuery(RequestParameters, query: String)
 }

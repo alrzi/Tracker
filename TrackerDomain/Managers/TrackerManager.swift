@@ -10,15 +10,8 @@ public protocol TrackerManaging: Sendable {
     func addSections(_ sections: [TrackerSection]) async throws
     
     // Read
-    func fetchSections(
-        with query: String,
-        for weekDay: String,
-        fetchLimit: Int,
-        fetchOffset: Int,
-        currentDate: Date
-    ) async throws -> ([TrackerSection], [Tracker])
-    
-    func fetchSectionsNextPage(for query: String, for weekDay: String, fetchLimit: Int, fetchOffset: Int, currentDate: Date) async throws -> [TrackerSection]
+    func fetchCompletedSections(params: RequestParameters, isPaginating: Bool) async throws -> ([TrackerSection], [Tracker])
+    func fetchSections(params: RequestParameters, isPaginating: Bool) async throws -> ([TrackerSection], [Tracker])
     func fetchSection(by id: UUID) async throws -> TrackerSection
     func daysTracked(for tracker: Tracker) async throws -> Int
     func isCompleted(tracker: Tracker, for date: Date) async throws -> Bool
@@ -63,40 +56,38 @@ final class TrackerManager: TrackerManaging {
     
     // MARK: - Read
     
-    func fetchSectionsNextPage(for query: String, for weekDay: String, fetchLimit: Int, fetchOffset: Int, currentDate: Date) async throws -> [TrackerSection] {
-        let sections = try await categoryRepository.getSections(
-            with: query,
-            for: weekDay,
-            fetchLimit: fetchLimit,
-            fetchOffset: fetchOffset
-        )
+    func fetchSections(params: RequestParameters, isPaginating: Bool) async throws -> ([TrackerSection], [Tracker]) {
+        let sections = try await categoryRepository.getSections(params: params)
         
-        let regular = try await fetchTrackers(for: sections, weekDay: weekDay, query: query, currentDate: currentDate).sorted { $0.title < $1.title }
+        var tempPinned: [Tracker] = []
         
-        return regular
+        if !isPaginating {
+            async let pinned = trackerRepository.getTrackers(isPinned: true, weekDay: params.weekDay, query: params.query)
+            tempPinned = try await pinned
+        }
+        
+        async let regular = fetchTrackers(for: sections, params: params).sorted { $0.title < $1.title }
+                       
+        return (try await regular, tempPinned)
     }
     
-    func fetchSections(
-        with query: String,
-        for weekDay: String,
-        fetchLimit: Int,
-        fetchOffset: Int,
-        currentDate: Date
-    ) async throws -> ([TrackerSection], [Tracker]) {
-        let sections = try await categoryRepository.getSections(
-            with: query,
-            for: weekDay,
-            fetchLimit: fetchLimit,
-            fetchOffset: fetchOffset
-        )
+    func fetchCompletedSections(params: RequestParameters, isPaginating: Bool) async throws -> ([TrackerSection], [Tracker]) {
+        let sections = try await categoryRepository.getSections(params: params)
         
-        async let pinned = trackerRepository.getTrackers(isPinned: true, weekDay: weekDay)
-        async let regular = fetchTrackers(for: sections, weekDay: weekDay, query: query, currentDate: currentDate)
+        var tempPinned: [Tracker] = []
         
-        let tempPinned = try await pinned
-        let tempSections = try await regular.sorted { $0.title < $1.title }
+        if !isPaginating {
+            async let pinnedRecords = recordRepository.fetchRecords(for: params.currentDate, weekDay: params.weekDay, query: params.query, isPinned: true)
+            
+            for pinnedRecord in try await pinnedRecords {
+                let trackers = try await trackerRepository.getTrackers(id: pinnedRecord.id)
+                tempPinned.append(contentsOf: trackers.map { $0.with(isCompleted: true) })
+            }
+        }
+        
+        async let regular = fetchCompletedTrackers(for: sections, params: params).sorted { $0.title < $1.title }
                        
-        return (tempSections, tempPinned)
+        return (try await regular, tempPinned)
     }
     
     func fetchSection(by id: UUID) async throws -> TrackerSection {
@@ -129,30 +120,65 @@ final class TrackerManager: TrackerManaging {
 }
 
 private extension TrackerManager {
-    func fetchTrackers(for sections: [TrackerSection], weekDay: String, query: String, currentDate: Date) async throws -> [TrackerSection] {
-        try await withThrowingTaskGroup(of: TrackerSection?.self, returning: [TrackerSection].self) { [trackerRepository, recordRepository] group in
+    func fetchTrackers(for sections: [TrackerSection], params: RequestParameters) async throws -> [TrackerSection] {
+        try await fetchTrackers(
+            for: sections,
+            fetchTask: { [trackerRepository] section in
+                try await trackerRepository.getTrackers(for: section.id, isPinned: false, weekDay: params.weekDay, query: params.query)
+            },
+            mapToTrackerSection: { [recordRepository] section, trackers in
+                var updatedTrackers: [Tracker] = []
+                
+                for tracker in trackers {
+                    let isCompleted = try await recordRepository.isCompletedFor(selectedDay: params.currentDate, trackerWithId: tracker.id)
+                    updatedTrackers.append(tracker.with(isCompleted: isCompleted))
+                }
+                
+                return TrackerSection(id: section.id, title: section.title, trackers: updatedTrackers)
+            }
+        )
+    }
+    
+    func fetchCompletedTrackers(for sections: [TrackerSection], params: RequestParameters) async throws -> [TrackerSection] {
+        try await fetchTrackers(
+            for: sections,
+            fetchTask: { [recordRepository] section in
+                try await recordRepository.fetchRecords(
+                    for: section.id,
+                    for: params.currentDate,
+                    weekDay: params.weekDay,
+                    query: params.query,
+                    isPinned: false
+                )
+            },
+            mapToTrackerSection: { [trackerRepository] section, records in
+                var updatedTrackers: [Tracker] = []
+                
+                for record in records {
+                    let trackers = try await trackerRepository.getTrackers(id: record.id)
+                    updatedTrackers.append(contentsOf: trackers.map { $0.with(isCompleted: true) })
+                }
+                
+                return TrackerSection(id: section.id, title: section.title, trackers: updatedTrackers)
+            }
+        )
+    }
+    
+    func fetchTrackers<T>(
+        for sections: [TrackerSection],
+        fetchTask: @escaping (TrackerSection) async throws -> [T],
+        mapToTrackerSection: @escaping (TrackerSection, [T]) async throws -> TrackerSection?
+    ) async throws -> [TrackerSection] {
+        try await withThrowingTaskGroup(of: TrackerSection?.self, returning: [TrackerSection].self) { group in
             for section in sections {
                 group.addTask {
-                    let trackers = try await trackerRepository.getTrackers(for: section.id, isPinned: false, weekDay: weekDay, query: query)
+                    let items = try await fetchTask(section)
                     
-                    if trackers.isEmpty {
+                    guard !items.isEmpty else {
                         return nil
                     }
-                    else {
-                        var updatedTrackers: [Tracker] = []
-                        
-                        for tracker in trackers {
-                            let isCompleted = try await recordRepository.isCompletedFor(selectedDay: currentDate, trackerWithId: tracker.id)
-                            
-                            updatedTrackers.append(tracker.with(isCompleted: isCompleted))
-                        }
-                                                
-                        return TrackerSection(
-                            id: section.id,
-                            title: section.title,
-                            trackers: updatedTrackers
-                        )
-                    }
+                    
+                    return try await mapToTrackerSection(section, items)
                 }
             }
             

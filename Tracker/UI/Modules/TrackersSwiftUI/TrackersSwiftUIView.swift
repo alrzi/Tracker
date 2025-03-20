@@ -101,7 +101,7 @@ extension TrackersSwiftUIView: View {
                 }
             }
         }
-        .searchable(text: $viewModel.queryString, placement: .navigationBarDrawer(displayMode: .always)) { }
+        .searchable(text: $viewModel.queryString) { }
     }
 }
 

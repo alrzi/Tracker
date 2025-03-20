@@ -48,38 +48,39 @@ final class TrackerRepository: TrackerRepositoryProtocol {
         return try await persistencyService.fetchObjects(with: request)
     }
     
-    func getTrackers(isPinned: Bool, weekDay: String) async throws -> [Tracker] {
+    func getTrackers(for category: UUID, isPinned: Bool, weekDay: String, query: String, isCompleted: Bool) async throws -> [Tracker] {
         let request = FetchRequestBuilder<TrackerObject>()
-            .setPredicate(.by(isPinned: isPinned, weekDay: weekDay))
+            .setPredicate(
+                query.isEmpty
+                    ? .by(isPinned: isPinned, weekDay: weekDay, sectionID: category)
+                    : .by(isPinned: isPinned, weekDay: weekDay, sectionID: category, query: query)
+            )
             .setSortDescriptors([.init(keyPath: \.name)])
             .build()
         
         return try await persistencyService.fetchObjects(with: request)
     }
     
-    func getAllTrackers(isPinned: Bool, name: String) async throws -> [Tracker] {
+    func getTrackers(isPinned: Bool, weekDay: String, query: String) async throws -> [Tracker] {
         let request = FetchRequestBuilder<TrackerObject>()
-            .setPredicate(.by(isPinned: isPinned, query: name))
+            .setPredicate(
+                query.isEmpty
+                    ? .by(isPinned: isPinned, weekDay: weekDay)
+                    : .by(isPinned: isPinned, weekDay: weekDay, query: query)
+            )
             .setSortDescriptors([.init(keyPath: \.name)])
             .build()
         
         return try await persistencyService.fetchObjects(with: request)
     }
     
-    func getAllTrackers() async throws -> [Tracker] {
-        try await persistencyService.fetchObjects(TrackerObject.self)
-    }
-    
-    func getTracker(by id: UUID) async throws -> Tracker {
+    func getTrackers(id: UUID) async throws -> [Tracker] {
         let request = FetchRequestBuilder<TrackerObject>()
             .setPredicate(.by(id: id))
+            .setSortDescriptors([.init(keyPath: \.name)])
             .build()
         
-        guard let tracker: Tracker = try await persistencyService.fetchObject(with: request) else {
-            throw TrackerRepositoryError.noTrackerForId
-        }
-        
-        return tracker
+        return try await persistencyService.fetchObjects(with: request)
     }
     
     func isPinnedTrackersExist() async throws -> Bool {
@@ -129,6 +130,12 @@ private extension StaticPredicateBuilder where T: TrackerObject {
         .filter(by: \.id, value: id, comparison: .equal)
     }
     
+    static func by(id: UUID, isPinned: Bool) -> Self {
+        .init()
+        .filter(by: \.id, value: id, comparison: .equal)
+        .filter(by: \.isPinned, value: isPinned, comparison: .equal)
+    }
+    
     static func by(isPinned: Bool) -> Self {
         .init()
         .filter(by: \.isPinned, value: isPinned, comparison: .equal)
@@ -145,9 +152,14 @@ private extension StaticPredicateBuilder where T: TrackerObject {
         .filter(by: \.weekDays, value: weekDay, comparison: .contains)
     }
     
+    static func by(isPinned: Bool, weekDay: String, query: String) -> Self {
+        .by(isPinned: isPinned, weekDay: weekDay)
+        .filter(by: \.name, value: query, comparison: .contains)
+    }
+    
     static func by(isPinned: Bool, weekDay: String, sectionID: UUID) -> Self {
         .by(isPinned: isPinned, weekDay: weekDay)
-        .filter(by: \.category.id, value: sectionID)
+        .filter(by: \.category.id, value: sectionID, comparison: .equal)
     }
     
     static func by(isPinned: Bool, weekDay: String, sectionID: UUID, query: String) -> Self {

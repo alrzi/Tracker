@@ -14,29 +14,26 @@ final class TrackersAssembly: ViewControllerAssembly {
     typealias Context = ()
     
     private let trackerManager: any TrackerManaging
-    private let trackerRepository: any TrackerRepositoryProtocol
-    private let recordRepository: any RecordRepositoryProtocol
     private let hapticManager: any VibrationFeedbackManaging
+    
+    private let trackersViewModelsFactory: TrackersViewModelsFactory
    
     init(
         trackerManager: some TrackerManaging,
-        trackerRepository: some TrackerRepositoryProtocol,
-        recordRepository: some RecordRepositoryProtocol,
-        hapticManager: some VibrationFeedbackManaging
+        hapticManager: some VibrationFeedbackManaging,
+        trackersViewModelsFactory: TrackersViewModelsFactory
     ) {
         self.trackerManager = trackerManager
-        self.trackerRepository = trackerRepository
-        self.recordRepository = recordRepository
         self.hapticManager = hapticManager
+        self.trackersViewModelsFactory = trackersViewModelsFactory
     }
     
     @MainActor
     func assemble(_ context: Context) -> UIViewController {
         let viewModel = TrackersViewModel(
             trackerManager: trackerManager,
-            trackerRepository: trackerRepository,
-            recordRepository: recordRepository,
-            hapticManager: hapticManager
+            hapticManager: hapticManager,
+            trackersViewModelsFactory: trackersViewModelsFactory
         )
         
         let view = TrackersView(viewModel: viewModel)

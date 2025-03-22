@@ -26,8 +26,7 @@ protocol TrackersViewModelProtocol: ObservableObject {
 
 final class TrackersViewModel: TrackersViewModelProtocol {
     private let trackerManager: any TrackerManaging
-    private let trackerRepository: any TrackerRepositoryProtocol
-    private let recordRepository: any RecordRepositoryProtocol
+    private let trackersViewModelsFactory: TrackersViewModelsFactory
     private let hapticManager: any VibrationFeedbackManaging
     private let calendar: Calendar = .autoupdatingCurrent
     
@@ -46,14 +45,12 @@ final class TrackersViewModel: TrackersViewModelProtocol {
     
     init(
         trackerManager: some TrackerManaging,
-        trackerRepository: some TrackerRepositoryProtocol,
-        recordRepository: some RecordRepositoryProtocol,
-        hapticManager: some VibrationFeedbackManaging
+        hapticManager: some VibrationFeedbackManaging,
+        trackersViewModelsFactory: TrackersViewModelsFactory
     ) {
-        self.trackerRepository = trackerRepository
         self.trackerManager = trackerManager
-        self.recordRepository = recordRepository
         self.hapticManager = hapticManager
+        self.trackersViewModelsFactory = trackersViewModelsFactory
         
         $queryString
             .dropFirst()
@@ -195,8 +192,8 @@ private extension TrackersViewModel {
             paginationState = .idle
         }
         catch {
-            paginationState = .error(.paginationError)
             debugPrint(error)
+            paginationState = .error(.paginationError)
         }
     }
     
@@ -227,11 +224,7 @@ private extension TrackersViewModel {
     
     func createModels(from sections: [TrackerSection]) -> [TrackersCollectionViewModel] {
         sections.map {
-            TrackersCollectionViewModel(
-                trackerRepository: trackerRepository,
-                recordRepository: recordRepository,
-                trackerManager: trackerManager,
-                hapticManager: hapticManager,
+            trackersViewModelsFactory.createTrackersCollectionViewModel(
                 collection: $0,
                 currentDate: currentDate,
                 eventsHandler: { [weak self] in self?.handleTrackerItem(events: $0) }

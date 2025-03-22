@@ -115,7 +115,7 @@ private struct RecordView: View {
                         .resizable()
                         .symbolVariant(.circle.fill)
                         .symbolRenderingMode(.palette)
-                        .foregroundStyle(.white, color)
+                        .foregroundStyle(.white, color.opacity(0.3))
                 }
                 else {
                     Image(systemName: "plus")

@@ -264,7 +264,7 @@ private extension TrackersViewModel {
         .init(
             currentDate: currentDate,
             weekDay: currentDate.weekDayString,
-            fetchLimit: state.lastElementIndex,
+            fetchLimit: state.count,
             fetchOffset: .zero,
             query: queryString
         )

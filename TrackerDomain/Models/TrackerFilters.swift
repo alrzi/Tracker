@@ -8,8 +8,10 @@
 import Foundation
 
 @frozen
-public enum TrackerFilter: CaseIterable, Codable {
+public enum TrackerFilter: CaseIterable, Codable, Identifiable {
     case forCurrentWeekDay
     case completedForDate
-    case uncompletedForDate   
+    case uncompletedForDate
+    
+    public var id: Self { self }
 }

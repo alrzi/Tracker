@@ -22,7 +22,7 @@ struct TrackersCollectionView<ViewModel: TrackersCollectionViewModelProtocol> {
 }
 
 // MARK: - View
- 
+
 extension TrackersCollectionView: View {
     var body: some View {
         LazyVStack {
@@ -46,6 +46,21 @@ extension TrackersCollectionView: View {
                 }
             }
         }
+        .confirmationDialog(
+            "Уверены что хотите удалить?",
+            isPresented: $viewModel.isDeleteTrackerConfirmationAlertPresented,
+            presenting: viewModel.deleteTrackerConfirmationAlert,
+            actions: { detail in
+                Button("Cancel", role: .cancel) { }
+                
+                Button("Delete", role: .destructive) {
+                    detail.onConfirm()
+                }
+            },
+            message: { detail in
+                Text(detail.message)
+            }
+        )
     }
 }
 
@@ -57,11 +72,14 @@ extension TrackersCollectionView: View {
 final class CollectionViewModel: TrackersCollectionViewModelProtocol {
     let id: UUID = .init()
     let title: String = "Pinned"
-    let trackers: [Tracker] = []    
+    let trackers: [Tracker] = []
+    let deleteTrackerConfirmationAlert: ErrorInfo? = nil
+    
+    var isDeleteTrackerConfirmationAlertPresented = false
     
     func onToggleCompletion(at index: Int) { }
     func onTogglePin(at index: Int) { }
     func onEdit(at index: Int) { }
-    func onDelete(at index: Int) { }    
+    func onDelete(at index: Int) { }
 }
 #endif

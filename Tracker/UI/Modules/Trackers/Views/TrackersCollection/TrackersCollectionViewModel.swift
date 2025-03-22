@@ -12,7 +12,10 @@ import TrackerDomain
 protocol TrackersCollectionViewModelProtocol: ObservableObject, Identifiable {
     var id: UUID { get }
     var title: String { get }
-    var trackers: [Tracker] { get }    
+    var trackers: [Tracker] { get }
+    
+    var deleteTrackerConfirmationAlert: ErrorInfo? { get }
+    var isDeleteTrackerConfirmationAlertPresented: Bool { get set }
     
     func onToggleCompletion(at index: Int)
     func onTogglePin(at index: Int)
@@ -30,6 +33,9 @@ final class TrackersCollectionViewModel: TrackersCollectionViewModelProtocol {
         
     @Published private(set) var trackers: [Tracker]
     @Published private(set) var completionState: LoadingState = .idle
+    
+    @Published private(set) var deleteTrackerConfirmationAlert: ErrorInfo?
+    @Published var isDeleteTrackerConfirmationAlertPresented = false
         
     let id: UUID
     let title: String
@@ -50,6 +56,10 @@ final class TrackersCollectionViewModel: TrackersCollectionViewModelProtocol {
         self.title = collection.title
         self.trackers = collection.trackers
         self.eventsHandler = eventsHandler
+        
+        $deleteTrackerConfirmationAlert
+            .map { $0 != nil }
+            .assign(to: &$isDeleteTrackerConfirmationAlertPresented)
     }
     
     func onToggleCompletion(at index: Int) {
@@ -79,7 +89,7 @@ final class TrackersCollectionViewModel: TrackersCollectionViewModelProtocol {
             return
         }
         
-        eventsHandler(.delete(tracker))
+        deleteTrackerConfirmationAlert = .deleteTrackerConfirmationAlert { [eventsHandler] in eventsHandler(.delete(tracker)) }
     }
 }
 
@@ -123,6 +133,15 @@ private extension ErrorInfo {
             cancelButtonText: "",
             confirmationButtonText: "Ок",
             onConfirm: { }
+        )
+    }
+    
+    static func deleteTrackerConfirmationAlert(onConfirm: @escaping () -> Void) -> Self {
+        .init(
+            message: "Уверены что хотите удалить трекер?",
+            cancelButtonText: "Нет",
+            confirmationButtonText: "Да",
+            onConfirm: onConfirm
         )
     }
 }

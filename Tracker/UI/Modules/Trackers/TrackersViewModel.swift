@@ -63,7 +63,7 @@ final class TrackersViewModel: TrackersViewModelProtocol {
             .combineLatest($currentDate.removeDuplicates())
             .handleEvents(receiveOutput: { [weak self] _ in self?.fetchParameters.reset() })
             .sink { [weak self] _, _ in self?.onFilterOrDateTrigger() }
-            .store(in: &cancellables)
+            .store(in: &cancellables)            
         
         $paginationState
             .map { $0.isLoading }
@@ -174,9 +174,10 @@ private extension TrackersViewModel {
             let sections = try await fetchSections(isPaginating: true, params: commonParams)
             
             fetchParameters.nextPage()
+                        
+            state = .loaded(currentModels + createModels(from: sections))
             
             paginationState = .idle
-            state = .loaded(currentModels + createModels(from: sections))
         }
         catch {
             paginationState = .error(.paginationError)

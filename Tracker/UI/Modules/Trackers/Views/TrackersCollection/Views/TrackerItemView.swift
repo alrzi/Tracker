@@ -15,19 +15,24 @@ struct TrackerItemView: View {
     let onTogglePin: () -> Void
     let onEdit: () -> Void
     let onDelete: () -> Void
-
+    
     var body: some View {
         VStack(spacing: 0) {
             TrackerView(tracker: tracker, onTogglePin: onTogglePin)
                 .contentShape(.contextMenuPreview, RoundedRectangle(cornerRadius: 16))
                 .contextMenu {
-                    Button(action: onTogglePin) {
-                        Label(tracker.isPinned ? "Unpin" : "Pin", systemImage: "pin")
+                    Section("Modifications") {
+                        Button(action: onTogglePin) {
+                            Label(tracker.isPinned ? "Unpin" : "Pin", systemImage: tracker.isPinned ? "pin.slash" : "pin")
+                        }
+                        Button(action: onEdit) {
+                            Label("Update", systemImage: "repeat.circle")
+                        }
                     }
-                    Button(action: onEdit) {
-                        Label("Update", systemImage: "repeat.circle")
-                    }
-                    Button(action: onDelete) {
+                    
+                    Divider()
+                    
+                    Button(role: .destructive, action: onDelete) {
                         Label("Delete", systemImage: "xmark.bin")
                     }
                 }
@@ -103,7 +108,7 @@ private struct RecordView: View {
                 .lineLimit(1)
             
             Spacer()
-                           
+            
             Button(action: onToggleCompletion) {
                 if isCompleted {
                     Image(systemName: "checkmark")

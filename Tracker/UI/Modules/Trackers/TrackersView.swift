@@ -106,15 +106,22 @@ extension TrackersView: View {
                     
                     ToolbarItem(placement: .topBarTrailing) {
                         Menu {
-                            Picker(selection: $viewModel.filter, label: Text("Filters")) {
-                                ForEach(TrackerFilter.allCases, id: \.self) { option in
+                            Picker("Filters", selection: $viewModel.filter) {
+                                ForEach(TrackerFilter.allCases) { option in
                                     Label(option.name, systemImage: option.systemImageName)
                                         .tag(option)
                                 }
                             }
+                            .backDeployedLabelsVisibility(.visible)
                         }
                         label: {
                             Image(systemName: "line.3.horizontal.decrease")
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 24, height: 24)
+                                .padding(16)
+                                .background(Color.clear)
+                                .contentShape(Rectangle())
                         }
                     }
                 }

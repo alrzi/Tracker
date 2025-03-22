@@ -11,19 +11,13 @@ enum TrackersState<Collection> {
     case idle
     case loading
     case loaded([Collection])
+    case empty(Placeholder)
     case error
-    
-    var isLoaded: Bool {
-        switch self {
-        case .loading, .error, .idle: false
-        case .loaded: true
-        }
-    }
     
     var isLoading: Bool {
         switch self {
         case .loading: true
-        case .loaded, .error, .idle: false
+        case .loaded, .error, .idle, .empty: false
         }
     }
     

@@ -46,6 +46,19 @@ extension TrackersCollectionView: View {
                 }
             }
         }
+        .alert(
+            "Не удалось актуализировать профайл, количество лайком может быть неверно!",
+            isPresented: $viewModel.isCompletionConfirmationAlertPresented,
+            presenting: viewModel.deleteTrackerConfirmationAlert,
+            actions: { error in
+                Button(action: { }) {
+                    Text(error.confirmationButtonText)
+                }
+            },
+            message: { error in
+                Text(error.message)
+            }
+        )
         .confirmationDialog(
             "Уверены что хотите удалить?",
             isPresented: $viewModel.isDeleteTrackerConfirmationAlertPresented,
@@ -76,6 +89,7 @@ final class CollectionViewModel: TrackersCollectionViewModelProtocol {
     let deleteTrackerConfirmationAlert: ErrorInfo? = nil
     
     var isDeleteTrackerConfirmationAlertPresented = false
+    var isCompletionConfirmationAlertPresented = false
     
     func onToggleCompletion(at index: Int) { }
     func onTogglePin(at index: Int) { }

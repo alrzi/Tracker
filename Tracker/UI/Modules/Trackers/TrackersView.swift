@@ -14,6 +14,7 @@ struct TrackersView<ViewModel: TrackersViewModelProtocol> {
     @ObservedObject private var viewModel: ViewModel
     
     @Namespace private var topID
+    @State private var keyboardShown = false
     
     init(viewModel: ViewModel) {
         self.viewModel = viewModel
@@ -22,7 +23,7 @@ struct TrackersView<ViewModel: TrackersViewModelProtocol> {
 
 // MARK: - View
 
-extension TrackersView: View {
+extension TrackersView: View, KeyboardReadable {
     var body: some View {
         // swiftlint:disable closure_body_length
         NavigationStack {
@@ -47,29 +48,18 @@ extension TrackersView: View {
                                     .onAppear { viewModel.onSectionAppear(at: index) }
                             }
                             .id(topID)
-                            
-                            if viewModel.isPaginating {
-                                ProgressView()
-                                    .scaleEffect(2)
-                                    .tint(.white)
-                                    .padding(.vertical, 16)
-                            }
                         }
                         
+                    case .empty(let placeholder):
+                        PlaceholderSwiftUIView(placeholder: placeholder)
+                        
                     case .error:
-                        VStack {
-                            HStack {
-                                Spacer()
-                            }
-                            Spacer()
-                            Text("Erorr")
-                            Spacer()
-                        }
+                        ErrorView(onRetry: { })
                     }
                 }
                 .safeAreaInset(edge: .bottom, alignment: .trailing) {
                     HStack(spacing: 20) {
-                        if !viewModel.isToday {
+                        if !viewModel.isToday && !keyboardShown {
                             Button(action: {
                                 viewModel.onToday()
                                 
@@ -128,6 +118,9 @@ extension TrackersView: View {
             }
         }
         .searchable(text: $viewModel.queryString) { }
+        .onReceive(keyboardPublisher) { newIsKeyboardVisible in
+            keyboardShown = newIsKeyboardVisible
+        }
     }
 }
 

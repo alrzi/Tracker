@@ -16,6 +16,7 @@ protocol TrackersCollectionViewModelProtocol: ObservableObject, Identifiable {
     
     var deleteTrackerConfirmationAlert: ErrorInfo? { get }
     var isDeleteTrackerConfirmationAlertPresented: Bool { get set }
+    var isCompletionConfirmationAlertPresented: Bool { get set }
     
     func onToggleCompletion(at index: Int)
     func onTogglePin(at index: Int)
@@ -36,6 +37,7 @@ final class TrackersCollectionViewModel: TrackersCollectionViewModelProtocol {
     
     @Published private(set) var deleteTrackerConfirmationAlert: ErrorInfo?
     @Published var isDeleteTrackerConfirmationAlertPresented = false
+    @Published var isCompletionConfirmationAlertPresented = false
         
     let id: UUID
     let title: String
@@ -60,6 +62,10 @@ final class TrackersCollectionViewModel: TrackersCollectionViewModelProtocol {
         $deleteTrackerConfirmationAlert
             .map { $0 != nil }
             .assign(to: &$isDeleteTrackerConfirmationAlertPresented)
+        
+        $completionState
+            .map { $0.isError }
+            .assign(to: &$isCompletionConfirmationAlertPresented)
     }
     
     func onToggleCompletion(at index: Int) {

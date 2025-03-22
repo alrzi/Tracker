@@ -93,13 +93,13 @@ private extension TrackersViewModel {
     
     func onQueryTrigger() {
         Task {
-            await fetchSection()
+            await fetchSection(isSearch: true)
         }
     }
     
     func onFilterOrDateTrigger() {
         Task {
-            await fetchSection()
+            await fetchSection(isSearch: false)
         }
     }
     
@@ -139,20 +139,29 @@ private extension TrackersViewModel {
             
             let sections = try await fetchSections(isPaginating: false, params: amountSensitiveParams)
             
-            state = .loaded(createModels(from: sections))
+            if !sections.isEmpty {
+                state = .loaded(createModels(from: sections))
+            }
+            else {
+                state = .empty(.empty)
+            }
         }
         catch {
             debugPrint(error)
         }
     }
     
-    func fetchSection() async {
+    func fetchSection(isSearch: Bool) async {
         do {
             let sections = try await fetchSections(isPaginating: false, params: commonParams)
             
-            state = .loaded(createModels(from: sections))
-            
-            fetchParameters.nextPage()
+            if !sections.isEmpty {
+                state = .loaded(createModels(from: sections))
+                fetchParameters.nextPage()
+            }
+            else {
+                state = .empty(isSearch ? .emptySearch : .empty)
+            }
         }
         catch {
             debugPrint(error)

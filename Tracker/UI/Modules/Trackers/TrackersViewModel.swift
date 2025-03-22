@@ -12,7 +12,7 @@ import Combine
 @MainActor
 protocol TrackersViewModelProtocol: ObservableObject {
     associatedtype TrackersCollectionModel: TrackersCollectionViewModelProtocol
-       
+    
     var state: TrackersState<TrackersCollectionModel> { get }
     var queryString: String { get set }
     var currentDate: Date { get set }
@@ -52,7 +52,7 @@ final class TrackersViewModel: TrackersViewModelProtocol {
         self.trackerManager = trackerManager
         self.recordRepository = recordRepository
         
-        $queryString            
+        $queryString
             .dropFirst()
             .handleEvents(receiveOutput: { [weak self] _ in self?.fetchParameters.reset() })
             .sink { [weak self] _ in self?.onQueryTrigger() }
@@ -62,20 +62,17 @@ final class TrackersViewModel: TrackersViewModelProtocol {
             .removeDuplicates()
             .combineLatest($currentDate.removeDuplicates())
             .handleEvents(receiveOutput: { [weak self] _ in self?.fetchParameters.reset() })
-            .sink { [weak self] _, _ in
-                self?.onFilterOrDateTrigger()
-                print("Called")
-            }
+            .sink { [weak self] _, _ in self?.onFilterOrDateTrigger() }
             .store(in: &cancellables)
         
         $paginationState
             .map { $0.isLoading }
             .assign(to: &$isPaginating)
         
-//        Task { @MainActor in
-//            let sections = createSectionsWithTrackers(sectionCount: 80, trackerCount: 4)
-//            try await trackerManager.addSections(sections)
-//        }
+        //        Task { @MainActor in
+        //            let sections = createSectionsWithTrackers(sectionCount: 80, trackerCount: 4)
+        //            try await trackerManager.addSections(sections)
+        //        }
     }
     
     func onToday() {
@@ -111,10 +108,10 @@ private extension TrackersViewModel {
             switch events {
             case .togglePin(let tracker):
                 await togglePin(for: tracker)
-            
+                
             case .delete(let tracker):
                 await delete(tracker: tracker)
-            
+                
             case .edit(let tracker):
                 break
             }
@@ -175,7 +172,7 @@ private extension TrackersViewModel {
         
         do {
             let sections = try await fetchSections(isPaginating: true, params: commonParams)
-                        
+            
             fetchParameters.nextPage()
             
             paginationState = .idle
@@ -196,7 +193,7 @@ private extension TrackersViewModel {
             
         case .completedForDate:
             (sections, pinnedTrackers) = try await trackerManager.fetchCompletedSections(params: params, isPaginating: isPaginating)
-        
+            
         case .uncompletedForDate:
             (sections, pinnedTrackers) = try await trackerManager.fetchUnCompletedSections(params: params, isPaginating: isPaginating)
         }

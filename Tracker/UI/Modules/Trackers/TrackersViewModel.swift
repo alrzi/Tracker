@@ -160,7 +160,7 @@ private extension TrackersViewModel {
                 fetchParameters.nextPage()
             }
             else {
-                state = .empty(isSearch ? .emptySearch : .empty)
+                state = .empty(isSearch || !queryString.isEmpty ? .emptySearch : .empty)
             }
         }
         catch {

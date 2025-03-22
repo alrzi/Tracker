@@ -8,7 +8,7 @@
 import SwiftUI
 import TrackerDomain
 
-struct TrackersCollectionView<ViewModel: TrackersCollectionViewModelProtocol>: View {
+struct TrackersCollectionView<ViewModel: TrackersCollectionViewModelProtocol> {
     @ObservedObject private var viewModel: ViewModel
     
     private let columns = [
@@ -19,7 +19,11 @@ struct TrackersCollectionView<ViewModel: TrackersCollectionViewModelProtocol>: V
     init(viewModel: ViewModel) {
         self.viewModel = viewModel
     }
-    
+}
+
+// MARK: - View
+ 
+extension TrackersCollectionView: View {
     var body: some View {
         LazyVStack {
             HStack {

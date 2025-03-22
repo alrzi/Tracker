@@ -31,12 +31,10 @@ final class TrackersViewModel: TrackersViewModelProtocol {
     private let calendar: Calendar = .autoupdatingCurrent
     
     private var cancellables: Set<AnyCancellable> = []
-    private var stateUpdateTask: Task<Void, Error>?
-    
     private var fetchParameters: FetchParameters = .init(fetchLimit: 4, fetchOffset: 0)
     
     @Published private(set) var state: TrackersState<TrackersCollectionViewModel> = .idle
-    @Published private(set) var updateState: LoadingState = .idle
+    @Published private(set) var paginationState: LoadingState = .idle
     @Published private(set) var isPaginating = false
     
     @Published var filter: TrackerFilter = .forCurrentWeekDay
@@ -70,11 +68,11 @@ final class TrackersViewModel: TrackersViewModelProtocol {
             }
             .store(in: &cancellables)
         
-        $updateState
+        $paginationState
             .map { $0.isLoading }
             .assign(to: &$isPaginating)
         
-//        stateUpdateTask = Task { @MainActor in
+//        Task { @MainActor in
 //            let sections = createSectionsWithTrackers(sectionCount: 80, trackerCount: 4)
 //            try await trackerManager.addSections(sections)
 //        }
@@ -88,10 +86,6 @@ final class TrackersViewModel: TrackersViewModelProtocol {
         Task {
             await paginateMoreSectionsIfNeeded(index: index)
         }
-    }
-    
-    deinit {
-        stateUpdateTask?.cancel()
     }
 }
 
@@ -112,9 +106,18 @@ private extension TrackersViewModel {
         }
     }
     
-    func onTogglePinTrigger(_ tracker: Tracker) {
+    func handleTrackerItem(events: TrackersCollectionOutput) {
         Task {
-            await togglePin(for: tracker)
+            switch events {
+            case .togglePin(let tracker):
+                await togglePin(for: tracker)
+            
+            case .delete(let tracker):
+                await delete(tracker: tracker)
+            
+            case .edit(let tracker):
+                break
+            }
         }
     }
     
@@ -124,9 +127,22 @@ private extension TrackersViewModel {
         do {
             try await trackerManager.update(tracker: tracker.toggleIsPinned())
             
-            let sections = try await fetchSections(isPaginating: false, params: togglePinParams)
+            let sections = try await fetchSections(isPaginating: false, params: amountSensitiveParams)
             
-            state = .loaded(createModel(from: sections))
+            state = .loaded(createModels(from: sections))
+        }
+        catch {
+            debugPrint(error)
+        }
+    }
+    
+    func delete(tracker: Tracker) async {
+        do {
+            try await trackerManager.delete(tracker: tracker)
+            
+            let sections = try await fetchSections(isPaginating: false, params: amountSensitiveParams)
+            
+            state = .loaded(createModels(from: sections))
         }
         catch {
             debugPrint(error)
@@ -137,7 +153,7 @@ private extension TrackersViewModel {
         do {
             let sections = try await fetchSections(isPaginating: false, params: commonParams)
             
-            state = .loaded(createModel(from: sections))
+            state = .loaded(createModels(from: sections))
             
             fetchParameters.nextPage()
         }
@@ -151,22 +167,22 @@ private extension TrackersViewModel {
             return
         }
         
-        guard case .loaded(let currentModels) = state, !updateState.isLoading else {
+        guard case .loaded(let currentModels) = state, !paginationState.isLoading else {
             return
         }
         
-        updateState = .loading
+        paginationState = .loading
         
         do {
             let sections = try await fetchSections(isPaginating: true, params: commonParams)
                         
             fetchParameters.nextPage()
             
-            updateState = .idle
-            state = .loaded(currentModels + createModel(from: sections))
+            paginationState = .idle
+            state = .loaded(currentModels + createModels(from: sections))
         }
         catch {
-            updateState = .error(.paginationError)
+            paginationState = .error(.paginationError)
             debugPrint(error)
         }
     }
@@ -196,7 +212,7 @@ private extension TrackersViewModel {
     
     // MARK: - Sync
     
-    func createModel(from sections: [TrackerSection]) -> [TrackersCollectionViewModel] {
+    func createModels(from sections: [TrackerSection]) -> [TrackersCollectionViewModel] {
         sections.map {
             TrackersCollectionViewModel(
                 trackerRepository: trackerRepository,
@@ -204,7 +220,7 @@ private extension TrackersViewModel {
                 trackerManager: trackerManager,
                 collection: $0,
                 currentDate: currentDate,
-                eventsHandler: { [weak self] in self?.onTogglePinTrigger($0) }
+                eventsHandler: { [weak self] in self?.handleTrackerItem(events: $0) }
             )
         }
     }
@@ -230,7 +246,7 @@ private extension TrackersViewModel {
         )
     }
     
-    var togglePinParams: RequestParameters {
+    var amountSensitiveParams: RequestParameters {
         .init(
             currentDate: currentDate,
             weekDay: currentDate.weekDayString,

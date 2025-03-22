@@ -26,7 +26,7 @@ final class TrackersCollectionViewModel: TrackersCollectionViewModelProtocol {
     private let trackerManager: any TrackerManaging
     private let currentDate: Date
     
-    private let eventsHandler: (Tracker) -> Void
+    private let eventsHandler: (TrackersCollectionOutput) -> Void
         
     @Published private(set) var trackers: [Tracker]
     @Published private(set) var completionState: LoadingState = .idle
@@ -40,7 +40,7 @@ final class TrackersCollectionViewModel: TrackersCollectionViewModelProtocol {
         trackerManager: some TrackerManaging,
         collection: TrackerSection,
         currentDate: Date,
-        eventsHandler: @escaping (Tracker) -> Void
+        eventsHandler: @escaping (TrackersCollectionOutput) -> Void
     ) {
         self.trackerRepository = trackerRepository
         self.recordRepository = recordRepository
@@ -63,19 +63,23 @@ final class TrackersCollectionViewModel: TrackersCollectionViewModelProtocol {
             return
         }
         
-        eventsHandler(tracker)
+        eventsHandler(.togglePin(tracker))
     }
     
     func onEdit(at index: Int) {
+        guard let tracker = trackers.elementOrNil(at: index) else {
+            return
+        }
         
+        eventsHandler(.edit(tracker))
     }
     
     func onDelete(at index: Int) {
+        guard let tracker = trackers.elementOrNil(at: index) else {
+            return
+        }
         
-    }
-    
-    deinit {
-        print("deinit")
+        eventsHandler(.delete(tracker))
     }
 }
 

@@ -18,6 +18,7 @@ enum ComparisonType {
     case beginsWith
     case endsWith
     case contains
+    case between
     
     var format: String {
         switch self {
@@ -31,6 +32,7 @@ enum ComparisonType {
         case .beginsWith: "%K BEGINSWITH %@"
         case .endsWith: "%K ENDSWITH %@"
         case .contains: "%K CONTAINS[cd] %@"
+        case .between: "%K BETWEEN {%@, %@}"
         }
     }
 }

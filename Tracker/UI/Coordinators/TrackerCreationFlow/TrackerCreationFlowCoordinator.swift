@@ -17,8 +17,7 @@ struct TrackerCreationFlowCoordinator: ReactiveFlowCoordinator {
     }
     
     func makeFlow() -> AnyPublisher<(), Never> {
-        router.showTrackerTypeSelection()
-            .flatMap { router.showTrackerCreation(kind: $0) }
+        router.showTrackerCreation(kind: .habit)
             .prefix(1)
             .eraseToAnyPublisher()
     }

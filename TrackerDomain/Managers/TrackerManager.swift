@@ -11,6 +11,7 @@ public protocol TrackerManaging: Sendable {
     
     // Read
     func fetchCompletedSections(params: RequestParameters, isPaginating: Bool) async throws -> ([TrackerSection], [Tracker])
+    func fetchUnCompletedSections(params: RequestParameters, isPaginating: Bool) async throws -> ([TrackerSection], [Tracker])
     func fetchSections(params: RequestParameters, isPaginating: Bool) async throws -> ([TrackerSection], [Tracker])
     func fetchSection(by id: UUID) async throws -> TrackerSection
     func daysTracked(for tracker: Tracker) async throws -> Int
@@ -63,7 +64,15 @@ final class TrackerManager: TrackerManaging {
         
         if !isPaginating {
             async let pinned = trackerRepository.getTrackers(isPinned: true, weekDay: params.weekDay, query: params.query)
-            tempPinned = try await pinned
+            
+            var updatedTrackers: [Tracker] = []
+            
+            for tracker in try await pinned {
+                let isCompleted = try await recordRepository.isCompletedFor(selectedDay: params.currentDate, trackerWithId: tracker.id)
+                updatedTrackers.append(tracker.with(isCompleted: isCompleted))
+            }
+            
+            tempPinned = updatedTrackers
         }
         
         async let regular = fetchTrackers(for: sections, params: params).sorted { $0.title < $1.title }
@@ -86,6 +95,21 @@ final class TrackerManager: TrackerManaging {
         }
         
         async let regular = fetchCompletedTrackers(for: sections, params: params).sorted { $0.title < $1.title }
+                       
+        return (try await regular, tempPinned)
+    }
+    
+    func fetchUnCompletedSections(params: RequestParameters, isPaginating: Bool) async throws -> ([TrackerSection], [Tracker]) {
+        let sections = try await categoryRepository.getSections(params: params)
+        
+        var tempPinned: [Tracker] = []
+        
+        if !isPaginating {
+            async let pinnedRecords = trackerRepository.getTrackers(isPinned: true, weekDay: params.weekDay, query: params.query, date: params.currentDate)
+            tempPinned = try await pinnedRecords
+        }
+        
+        async let regular = fetchUnCompletedTrackers(for: sections, params: params).sorted { $0.title < $1.title }
                        
         return (try await regular, tempPinned)
     }
@@ -160,6 +184,18 @@ private extension TrackerManager {
                 }
                 
                 return TrackerSection(id: section.id, title: section.title, trackers: updatedTrackers)
+            }
+        )
+    }
+    
+    func fetchUnCompletedTrackers(for sections: [TrackerSection], params: RequestParameters) async throws -> [TrackerSection] {
+        try await fetchTrackers(
+            for: sections,
+            fetchTask: { [trackerRepository] section in
+                try await trackerRepository.getTrackers(for: section.id, isPinned: false, weekDay: params.weekDay, query: params.query, date: params.currentDate)
+            },
+            mapToTrackerSection: { section, trackers in
+                TrackerSection(id: section.id, title: section.title, trackers: trackers)
             }
         )
     }

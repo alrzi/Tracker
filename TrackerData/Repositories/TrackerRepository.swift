@@ -7,8 +7,9 @@
 
 import Foundation
 import TrackerDomain
+import CoreData
 
-final class TrackerRepository: TrackerRepositoryProtocol {
+final class TrackerRepository: TrackerRepositoryProtocol {    
     private let persistencyService: PersistencyService
     
     init(persistencyService: PersistencyService) {
@@ -48,12 +49,12 @@ final class TrackerRepository: TrackerRepositoryProtocol {
         return try await persistencyService.fetchObjects(with: request)
     }
     
-    func getTrackers(for category: UUID, isPinned: Bool, weekDay: String, query: String, isCompleted: Bool) async throws -> [Tracker] {
+    func getTrackers(for category: UUID, isPinned: Bool, weekDay: String, query: String, date: Date) async throws -> [Tracker] {
         let request = FetchRequestBuilder<TrackerObject>()
             .setPredicate(
                 query.isEmpty
-                    ? .by(isPinned: isPinned, weekDay: weekDay, sectionID: category)
-                    : .by(isPinned: isPinned, weekDay: weekDay, sectionID: category, query: query)
+                    ? .by(isPinned: isPinned, weekDay: weekDay, sectionID: category, interval: date.fullDayInterval())
+                    : .by(isPinned: isPinned, weekDay: weekDay, sectionID: category, query: query, interval: date.fullDayInterval())
             )
             .setSortDescriptors([.init(keyPath: \.name)])
             .build()
@@ -67,6 +68,19 @@ final class TrackerRepository: TrackerRepositoryProtocol {
                 query.isEmpty
                     ? .by(isPinned: isPinned, weekDay: weekDay)
                     : .by(isPinned: isPinned, weekDay: weekDay, query: query)
+            )
+            .setSortDescriptors([.init(keyPath: \.name)])
+            .build()
+        
+        return try await persistencyService.fetchObjects(with: request)
+    }
+    
+    func getTrackers(isPinned: Bool, weekDay: String, query: String, date: Date) async throws -> [Tracker] {
+        let request = FetchRequestBuilder<TrackerObject>()
+            .setPredicate(
+                query.isEmpty
+                    ? .by(isPinned: isPinned, weekDay: weekDay, interval: date.fullDayInterval())
+                    : .by(isPinned: isPinned, weekDay: weekDay, query: query, interval: date.fullDayInterval())
             )
             .setSortDescriptors([.init(keyPath: \.name)])
             .build()
@@ -165,6 +179,28 @@ private extension StaticPredicateBuilder where T: TrackerObject {
     static func by(isPinned: Bool, weekDay: String, sectionID: UUID, query: String) -> Self {
         .by(isPinned: isPinned, weekDay: weekDay, sectionID: sectionID)
         .filter(by: \.name, value: query, comparison: .contains)
+    }
+    
+    static func by(isPinned: Bool, weekDay: String, sectionID: UUID, query: String, interval: DateInterval) -> Self {
+        .by(isPinned: isPinned, weekDay: weekDay, sectionID: sectionID)
+        .filter(by: \.name, value: query, comparison: .contains)
+        .subpredicateBetween(by: \.trackerRecord, subKeyPath: \.date, subValue1: interval.start, subValue2: interval.end)
+    }
+    
+    static func by(isPinned: Bool, weekDay: String, sectionID: UUID, interval: DateInterval) -> Self {
+        .by(isPinned: isPinned, weekDay: weekDay, sectionID: sectionID)
+        .subpredicateBetween(by: \.trackerRecord, subKeyPath: \.date, subValue1: interval.start, subValue2: interval.end)
+    }
+    
+    static func by(isPinned: Bool, weekDay: String, query: String, interval: DateInterval) -> Self {
+        .by(isPinned: isPinned, weekDay: weekDay, query: query)
+        .filter(by: \.name, value: query, comparison: .contains)
+        .subpredicateBetween(by: \.trackerRecord, subKeyPath: \.date, subValue1: interval.start, subValue2: interval.end)
+    }
+    
+    static func by(isPinned: Bool, weekDay: String, interval: DateInterval) -> Self {
+        .by(isPinned: isPinned, weekDay: weekDay)
+        .subpredicateBetween(by: \.trackerRecord, subKeyPath: \.date, subValue1: interval.start, subValue2: interval.end)
     }
 }
 

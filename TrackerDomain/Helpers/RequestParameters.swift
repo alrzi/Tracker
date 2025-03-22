@@ -7,7 +7,7 @@
 
 import Foundation
 
-public struct RequestParameters {
+public struct RequestParameters: Sendable {
     public let currentDate: Date
     public let weekDay: String
     public let query: String

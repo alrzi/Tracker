@@ -11,11 +11,11 @@ import Presentation
 final class TabBarAssembly: ViewControllerAssembly {
     typealias Context = ()
     
-    private let trackersAssembly: TrackersSwiftUIAssembly
+    private let trackersAssembly: TrackersAssembly
     private let statisticAssembly: StatisticAssembly
     
     init(
-        trackersAssembly: TrackersSwiftUIAssembly,
+        trackersAssembly: TrackersAssembly,
         statisticAssembly: StatisticAssembly
     ) {
         self.trackersAssembly = trackersAssembly

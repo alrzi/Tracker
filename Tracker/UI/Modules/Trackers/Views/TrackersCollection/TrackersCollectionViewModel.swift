@@ -1,5 +1,5 @@
 //
-//  TrackerCollectionViewModel.swift
+//  TrackersCollectionViewModel.swift
 //  Tracker
 //
 //  Created by Александр Зиновьев on 14.03.2025.
@@ -9,7 +9,7 @@ import Foundation
 import TrackerDomain
 
 @MainActor
-protocol VideoCollectionViewModelProtocol: ObservableObject, Identifiable {
+protocol TrackersCollectionViewModelProtocol: ObservableObject, Identifiable {
     var id: UUID { get }
     var title: String { get }
     var trackers: [Tracker] { get }    
@@ -20,14 +20,16 @@ protocol VideoCollectionViewModelProtocol: ObservableObject, Identifiable {
     func onDelete(at index: Int)    
 }
 
-final class TrackerCollectionViewModel: VideoCollectionViewModelProtocol {
+final class TrackersCollectionViewModel: TrackersCollectionViewModelProtocol {
     private let trackerRepository: any TrackerRepositoryProtocol
     private let recordRepository: any RecordRepositoryProtocol
     private let trackerManager: any TrackerManaging
+    private let currentDate: Date
     
     private let eventsHandler: (Tracker) -> Void
         
-    @Published var trackers: [Tracker]
+    @Published private(set) var trackers: [Tracker]
+    @Published private(set) var completionState: LoadingState = .idle
         
     let id: UUID
     let title: String
@@ -43,6 +45,7 @@ final class TrackerCollectionViewModel: VideoCollectionViewModelProtocol {
         self.trackerRepository = trackerRepository
         self.recordRepository = recordRepository
         self.trackerManager = trackerManager
+        self.currentDate = currentDate
         self.id = collection.id
         self.title = collection.title
         self.trackers = collection.trackers
@@ -76,26 +79,46 @@ final class TrackerCollectionViewModel: VideoCollectionViewModelProtocol {
     }
 }
 
-private extension TrackerCollectionViewModel {
+private extension TrackersCollectionViewModel {
     func updateTrackerCompletion(at index: Int) async {
         guard let tracker = trackers.elementOrNil(at: index) else {
             return
         }
         
+        guard !completionState.isLoading else {
+            return
+        }
+        
+        completionState = .loading
+        
         do {
-            try await recordRepository.createOrDeleteIfPresent(record: .init(id: tracker.id, date: .now))
+            try await recordRepository.createOrDeleteIfPresent(record: .init(id: tracker.id, date: currentDate))
             
             let trackedDays = try await recordRepository.getTrackedDaysFor(id: tracker.id)
-            let isCompleted = try await recordRepository.isCompletedFor(selectedDay: .now, trackerWithId: tracker.id)
+            let isCompleted = try await recordRepository.isCompletedFor(selectedDay: currentDate, trackerWithId: tracker.id)
             
             let updated = tracker.with(isCompleted: isCompleted, trackedDays: trackedDays)
             
             try await trackerRepository.updateTracker(updated)
             
             trackers[index] = updated
+            
+            completionState = .idle
         }
         catch {
             debugPrint(error)
+            completionState = .error(.completionError)
         }
+    }
+}
+
+private extension ErrorInfo {
+    static var completionError: Self {
+        .init(
+            message: "Мы проверим что случилось, отдохните чуть-чуть и попробуйте еще раз",
+            cancelButtonText: "",
+            confirmationButtonText: "Ок",
+            onConfirm: { }
+        )
     }
 }

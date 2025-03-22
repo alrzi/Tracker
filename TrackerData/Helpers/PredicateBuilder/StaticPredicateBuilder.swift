@@ -20,11 +20,34 @@ struct StaticPredicateBuilder<T> {
         return builder
     }
     
-    func subpredicate<M, V>(by keyPath: KeyPath<T, Set<M>>, subKeyPath: KeyPath<M, V>, subValue: V, comparison: ComparisonType) -> StaticPredicateBuilder {
+    func subpredicate<M, V>(
+        by keyPath: KeyPath<T, Set<M>>,
+        subKeyPath: KeyPath<M, V>,
+        subValue: V,
+        comparison: ComparisonType,
+        isMore: Bool = true
+    ) -> StaticPredicateBuilder {
         let key = NSExpression(forKeyPath: keyPath).keyPath
         let subKey = NSExpression(forKeyPath: subKeyPath).keyPath
-        let formatString = "SUBQUERY(%K, $g, $g.\(comparison.format)).@count > 0"
+        let formatString = "SUBQUERY(%K, $g, $g.\(comparison.format)).@count \(isMore ? ">" : "==") 0"
         let predicate = NSPredicate(format: formatString, argumentArray: [key, subKey, subValue])
+        
+        var builder = self
+        builder.predicates.append(predicate)
+        
+        return builder
+    }
+    
+    func subpredicateBetween<M, V>(
+        by keyPath: KeyPath<T, Set<M>>,
+        subKeyPath: KeyPath<M, V>,
+        subValue1: V,
+        subValue2: V
+    ) -> StaticPredicateBuilder {
+        let key = NSExpression(forKeyPath: keyPath).keyPath
+        let subKey = NSExpression(forKeyPath: subKeyPath).keyPath
+        let formatString = "SUBQUERY(%K, $g, $g.%K BETWEEN {%@, %@}).@count == 0"
+        let predicate = NSPredicate(format: formatString, argumentArray: [key, subKey, subValue1, subValue2])
         
         var builder = self
         builder.predicates.append(predicate)

@@ -1,5 +1,5 @@
 //
-//  TrackerCollectionView.swift
+//  TrackersCollectionView.swift
 //  Tracker
 //
 //  Created by Александр Зиновьев on 14.03.2025.
@@ -8,7 +8,7 @@
 import SwiftUI
 import TrackerDomain
 
-struct VideoCollectionView<ViewModel: VideoCollectionViewModelProtocol>: View {
+struct TrackersCollectionView<ViewModel: TrackersCollectionViewModelProtocol>: View {
     @ObservedObject private var viewModel: ViewModel
     
     private let columns = [
@@ -47,10 +47,10 @@ struct VideoCollectionView<ViewModel: VideoCollectionViewModelProtocol>: View {
 
 #if DEBUG
 #Preview {
-    VideoCollectionView(viewModel: CollectionViewModel())
+    TrackersCollectionView(viewModel: CollectionViewModel())
 }
 
-final class CollectionViewModel: VideoCollectionViewModelProtocol {
+final class CollectionViewModel: TrackersCollectionViewModelProtocol {
     let id: UUID = .init()
     let title: String = "Pinned"
     let trackers: [Tracker] = []    

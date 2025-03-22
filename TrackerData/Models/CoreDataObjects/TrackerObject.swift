@@ -27,7 +27,7 @@ extension TrackerObject: Entity {
 
 extension TrackerObject: ValueAddable {
     func addValue(_ value: CategoryObject) {
-        category = value
+        category = value        
     }
 }
 

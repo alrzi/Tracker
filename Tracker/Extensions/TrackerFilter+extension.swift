@@ -1,5 +1,5 @@
 //
-//  File.swift
+//  TrackerFilter+extension.swift
 //  Tracker
 //
 //  Created by Александр Зиновьев on 19.03.2025.
@@ -14,7 +14,14 @@ extension TrackerFilter {
         case .completedForDate: "Completed"
         case .forCurrentWeekDay: "All"
         case .uncompletedForDate: "In progress"
-        case .forToday: "For today"            
+        }
+    }
+    
+    var systemImageName: String {
+        switch self {
+        case .completedForDate: "checklist.checked"
+        case .forCurrentWeekDay: "xmark.triangle.circle.square"
+        case .uncompletedForDate: "checklist.unchecked"        
         }
     }
 }

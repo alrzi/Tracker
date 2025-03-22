@@ -8,9 +8,9 @@
 import Foundation
 
 final class TabBarViewRouter {
-    private let trackersAssembly: TrackersSwiftUIAssembly
+    private let trackersAssembly: TrackersAssembly
     
-    init(trackersAssembly: TrackersSwiftUIAssembly) {
+    init(trackersAssembly: TrackersAssembly) {
         self.trackersAssembly = trackersAssembly
     }
 }

@@ -21,6 +21,12 @@ struct FetchRequestBuilder<T: NSManagedObject & Entity> {
         return newBuilder
     }
     
+    func setPredicateAny<A>(_ predicate: StaticPredicateBuilder<A>) -> FetchRequestBuilder {
+        let newBuilder = self
+        newBuilder.fetchRequest.predicate = predicate.build()
+        return newBuilder
+    }
+    
     func setSortDescriptors<V>(_ sortDescriptors: [SortDescriptor<V>]) -> FetchRequestBuilder {
         let newBuilder = self
         newBuilder.fetchRequest.sortDescriptors = sortDescriptors.map { .init(keyPath: $0.keyPath, ascending: $0.ascending) }

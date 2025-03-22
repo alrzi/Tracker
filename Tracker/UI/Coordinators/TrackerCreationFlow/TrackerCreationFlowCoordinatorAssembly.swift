@@ -9,15 +9,12 @@ import Foundation
 import Combine
 import Presentation
 
-final class TrackerCreationFlowCoordinatorAssembly {
-    private let trackerTypeSelectionAssembly: TrackerTypeSelectionAssembly
+final class TrackerCreationFlowCoordinatorAssembly {    
     private let trackerUpdatingFlowCoordinatorAssembly: TrackerUpdatingFlowCoordinatorAssembly
  
     init(
-        trackerTypeSelectionAssembly: TrackerTypeSelectionAssembly,
         trackerUpdatingFlowCoordinatorAssembly: TrackerUpdatingFlowCoordinatorAssembly
     ) {
-        self.trackerTypeSelectionAssembly = trackerTypeSelectionAssembly
         self.trackerUpdatingFlowCoordinatorAssembly = trackerUpdatingFlowCoordinatorAssembly
     }
     
@@ -25,7 +22,6 @@ final class TrackerCreationFlowCoordinatorAssembly {
         presentationContext: PresentationContextProtocol
     ) -> AnyPublisher<(), Never> {
         let router = TrackerCreationFlowCoordinatorRouter(
-            trackerTypeSelectionAssembly: trackerTypeSelectionAssembly,
             trackerUpdatingFlowCoordinatorAssembly: trackerUpdatingFlowCoordinatorAssembly,
             presentationContext: presentationContext
         )

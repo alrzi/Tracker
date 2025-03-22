@@ -47,8 +47,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             recordRepository: recordRepository,
             trackerManager: trackerManager
         )
-        
-        let filtersAssembly = FiltersAssembly()
+                
         let chooseScheduleAssembly = WeekDaysSelectionAssembly()
         let createNewCategoryAssembly = CategoryCreationAssembly(categoryRepository: categoryRepository)
         let categoryListAssembly = CategoryListAssembly(categoryRepository: categoryRepository)
@@ -65,10 +64,6 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             chooseScheduleAssembly: chooseScheduleAssembly
         )
         
-        let trackerTypeSelectionAssembly = TrackerTypeSelectionAssembly(
-            createTrackerAssembly: createTrackerAssembly
-        )
-        
         let trackerUpdatingFlowCoordinatorAssembly = TrackerUpdatingFlowCoordinatorAssembly(
             userInputCollector: userInputCollector,
             createTrackerAssembly: createTrackerAssembly,
@@ -77,27 +72,17 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         )
         
         let trackerCreationFlowCoordinatorAssembly = TrackerCreationFlowCoordinatorAssembly(
-            trackerTypeSelectionAssembly: trackerTypeSelectionAssembly,
             trackerUpdatingFlowCoordinatorAssembly: trackerUpdatingFlowCoordinatorAssembly
         )
         
         let trackersAssembly = TrackersAssembly(
-            trackerFiltersDataStorage: trackerFiltersDataStorage,
-            analyticsTracker: analyticsTracker,            
-            trackerManager: trackerManager, 
-            trackerCreationFlowCoordinatorAssembly: trackerCreationFlowCoordinatorAssembly,
-            trackerUpdatingFlowCoordinatorAssembly: trackerUpdatingFlowCoordinatorAssembly,
-            filtersAssembly: filtersAssembly
-        )
-        
-        let trackersAssembly1 = TrackersSwiftUIAssembly(
             trackerManager: trackerManager,
             trackerRepository: trackerRepository,
             recordRepository: recordRepository
         )
         
         let tabBarAssembly = TabBarAssembly(
-            trackersAssembly: trackersAssembly1,
+            trackersAssembly: trackersAssembly,
             statisticAssembly: statisticAssembly
         )
         

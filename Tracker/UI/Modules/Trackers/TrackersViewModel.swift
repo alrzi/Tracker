@@ -233,12 +233,7 @@ private extension TrackersViewModel {
     }
     
     func createPinnedModel(from trackers: [Tracker]) -> TrackerSection? {
-        if !trackers.isEmpty {
-            .init(id: .init(), title: "Pinned", trackers: trackers)
-        }
-        else {
-            nil
-        }
+        trackers.isEmpty ? nil : .init(title: R.string.localizable.mainPinned(), trackers: trackers)
     }
 }
 

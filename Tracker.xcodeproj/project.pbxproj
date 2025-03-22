@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		F93E19482CAC37840006F56E /* Presentation in Frameworks */ = {isa = PBXBuildFile; productRef = F93E19472CAC37840006F56E /* Presentation */; };
+		F956F0852D8F299B00175338 /* RswiftLibrary in Frameworks */ = {isa = PBXBuildFile; productRef = F956F0842D8F299B00175338 /* RswiftLibrary */; };
 		F957BC372C7BBD9A0047559E /* Presentation in Frameworks */ = {isa = PBXBuildFile; productRef = F957BC362C7BBD9A0047559E /* Presentation */; };
 		F957BC3A2C7BBF630047559E /* Presentation in Frameworks */ = {isa = PBXBuildFile; productRef = F957BC392C7BBF630047559E /* Presentation */; };
 		F96D33262D7F6D82009208B9 /* TrackerDomain.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F96D331E2D7F6D82009208B9 /* TrackerDomain.framework */; };
@@ -131,6 +132,7 @@
 				F96D33642D7F6F56009208B9 /* TrackerData.framework in Frameworks */,
 				F93E19482CAC37840006F56E /* Presentation in Frameworks */,
 				F96D33312D7F6D82009208B9 /* TrackerDomain.framework in Frameworks */,
+				F956F0852D8F299B00175338 /* RswiftLibrary in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -236,6 +238,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				F956F0872D8F29C200175338 /* PBXTargetDependency */,
 				F96D33302D7F6D82009208B9 /* PBXTargetDependency */,
 				F96D33632D7F6F56009208B9 /* PBXTargetDependency */,
 			);
@@ -248,6 +251,7 @@
 				F957BC362C7BBD9A0047559E /* Presentation */,
 				F957BC392C7BBF630047559E /* Presentation */,
 				F93E19472CAC37840006F56E /* Presentation */,
+				F956F0842D8F299B00175338 /* RswiftLibrary */,
 			);
 			productName = Tracker;
 			productReference = F918018229CEECCB00767F16 /* Tracker.app */;
@@ -396,6 +400,7 @@
 				F9C512172D7CB3B80093D201 /* XCLocalSwiftPackageReference "../../../../../../Volumes/KINGSTON/MyPackages/Presentation" */,
 				F9C512182D7CB3C80093D201 /* XCLocalSwiftPackageReference "../../../../../../Volumes/KINGSTON/MyPackages/DataStorage" */,
 				F97A0F8A2D80D2D600AC67A4 /* XCRemoteSwiftPackageReference "appmetrica-sdk-ios" */,
+				F956F0832D8F299B00175338 /* XCRemoteSwiftPackageReference "R" */,
 			);
 			productRefGroup = F918018329CEECCB00767F16 /* Products */;
 			projectDirPath = "";
@@ -526,6 +531,10 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		F956F0872D8F29C200175338 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			productRef = F956F0862D8F29C200175338 /* RswiftGenerateInternalResources */;
+		};
 		F96D33282D7F6D82009208B9 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = F96D331D2D7F6D82009208B9 /* TrackerDomain */;
@@ -1074,6 +1083,14 @@
 				minimumVersion = 1.0.0;
 			};
 		};
+		F956F0832D8F299B00175338 /* XCRemoteSwiftPackageReference "R" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/mac-cain13/R.swift";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 7.8.0;
+			};
+		};
 		F97A0F8A2D80D2D600AC67A4 /* XCRemoteSwiftPackageReference "appmetrica-sdk-ios" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/appmetrica/appmetrica-sdk-ios.git";
@@ -1088,6 +1105,16 @@
 		F93E19472CAC37840006F56E /* Presentation */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = Presentation;
+		};
+		F956F0842D8F299B00175338 /* RswiftLibrary */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = F956F0832D8F299B00175338 /* XCRemoteSwiftPackageReference "R" */;
+			productName = RswiftLibrary;
+		};
+		F956F0862D8F29C200175338 /* RswiftGenerateInternalResources */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = F956F0832D8F299B00175338 /* XCRemoteSwiftPackageReference "R" */;
+			productName = "plugin:RswiftGenerateInternalResources";
 		};
 		F957BC362C7BBD9A0047559E /* Presentation */ = {
 			isa = XCSwiftPackageProductDependency;

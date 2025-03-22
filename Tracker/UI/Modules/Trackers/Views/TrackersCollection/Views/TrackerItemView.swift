@@ -16,6 +16,14 @@ struct TrackerItemView: View {
     let onEdit: () -> Void
     let onDelete: () -> Void
     
+    var pinLabel: String {
+        tracker.isPinned ? R.string.localizable.contextPin() : R.string.localizable.contextUnpin()
+    }
+    
+    var pinImageName: String {
+        tracker.isPinned ? "pin.slash" : "pin"
+    }
+    
     var body: some View {
         VStack(spacing: 0) {
             TrackerView(tracker: tracker, onTogglePin: onTogglePin)
@@ -23,17 +31,17 @@ struct TrackerItemView: View {
                 .contextMenu {
                     Section("Modifications") {
                         Button(action: onTogglePin) {
-                            Label(tracker.isPinned ? "Unpin" : "Pin", systemImage: tracker.isPinned ? "pin.slash" : "pin")
+                            Label(pinLabel, systemImage: pinImageName)
                         }
                         Button(action: onEdit) {
-                            Label("Update", systemImage: "repeat.circle")
+                            Label(R.string.localizable.contextUpdate(), systemImage: "repeat.circle")
                         }
                     }
                     
                     Divider()
                     
                     Button(role: .destructive, action: onDelete) {
-                        Label("Delete", systemImage: "xmark.bin")
+                        Label(R.string.localizable.contextDelete(), systemImage: "xmark.bin")
                     }
                 }
             
@@ -71,10 +79,10 @@ private struct TrackerView: View {
         }
         .padding(12)
         .background(Color(UIColor(hexString: tracker.color)!), in: .rect(cornerRadius: 16))
-        .overlay(content: {
+        .overlay {
             RoundedRectangle(cornerRadius: 16)
                 .stroke(.opacity(0.3), lineWidth: 1)
-        })
+        }
         .overlay(alignment: .topTrailing) {
             Button(action: onTogglePin) {
                 if tracker.isPinned {
@@ -101,10 +109,9 @@ private struct RecordView: View {
     
     var body: some View {
         HStack {
-            Text(String(format: NSLocalizedString("days", comment: ""), trackedDays))
+            Text(R.string.localizable.days(number: trackedDays))
                 .font(.system(size: 12))
                 .multilineTextAlignment(.leading)
-                .foregroundStyle(.black)
                 .lineLimit(1)
             
             Spacer()

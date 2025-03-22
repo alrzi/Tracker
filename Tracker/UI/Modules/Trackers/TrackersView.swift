@@ -96,7 +96,7 @@ extension TrackersView: View, KeyboardReadable {
                     
                     ToolbarItem(placement: .topBarTrailing) {
                         Menu {
-                            Picker("Filters", selection: $viewModel.filter) {
+                            Picker(R.string.localizable.filtersTitle(), selection: $viewModel.filter) {
                                 ForEach(TrackerFilter.allCases) { option in
                                     Label(option.name, systemImage: option.systemImageName)
                                         .tag(option)

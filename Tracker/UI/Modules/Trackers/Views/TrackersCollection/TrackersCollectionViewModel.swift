@@ -149,9 +149,9 @@ private extension ErrorInfo {
     
     static func deleteTrackerConfirmationAlert(onConfirm: @escaping () -> Void) -> Self {
         .init(
-            message: "Уверены что хотите удалить трекер?",
-            cancelButtonText: "Нет",
-            confirmationButtonText: "Да",
+            message: R.string.localizable.alertConfirmationTracker(),
+            cancelButtonText: R.string.localizable.alertCancel(),
+            confirmationButtonText: R.string.localizable.alertDelete(),
             onConfirm: onConfirm
         )
     }

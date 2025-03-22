@@ -47,26 +47,24 @@ extension TrackersCollectionView: View {
             }
         }
         .alert(
-            "Не удалось актуализировать профайл, количество лайком может быть неверно!",
+            "Ошибка пометки трекера завершенным",
             isPresented: $viewModel.isCompletionConfirmationAlertPresented,
             presenting: viewModel.deleteTrackerConfirmationAlert,
             actions: { error in
-                Button(action: { }) {
-                    Text(error.confirmationButtonText)
-                }
+                Button(error.confirmationButtonText) { }
             },
             message: { error in
                 Text(error.message)
             }
         )
         .confirmationDialog(
-            "Уверены что хотите удалить?",
+            "Подтверждение удаления",
             isPresented: $viewModel.isDeleteTrackerConfirmationAlertPresented,
             presenting: viewModel.deleteTrackerConfirmationAlert,
             actions: { detail in
-                Button("Cancel", role: .cancel) { }
+                Button(detail.cancelButtonText, role: .cancel) { }
                 
-                Button("Delete", role: .destructive) {
+                Button(detail.confirmationButtonText, role: .destructive) {
                     detail.onConfirm()
                 }
             },

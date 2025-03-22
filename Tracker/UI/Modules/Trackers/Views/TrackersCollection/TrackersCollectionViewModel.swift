@@ -28,6 +28,7 @@ final class TrackersCollectionViewModel: TrackersCollectionViewModelProtocol {
     private let trackerRepository: any TrackerRepositoryProtocol
     private let recordRepository: any RecordRepositoryProtocol
     private let trackerManager: any TrackerManaging
+    private let hapticManager: any VibrationFeedbackManaging
     private let currentDate: Date
     
     private let eventsHandler: (TrackersCollectionOutput) -> Void
@@ -46,6 +47,7 @@ final class TrackersCollectionViewModel: TrackersCollectionViewModelProtocol {
         trackerRepository: some TrackerRepositoryProtocol,
         recordRepository: some RecordRepositoryProtocol,
         trackerManager: some TrackerManaging,
+        hapticManager: some VibrationFeedbackManaging,
         collection: TrackerSection,
         currentDate: Date,
         eventsHandler: @escaping (TrackersCollectionOutput) -> Void
@@ -53,6 +55,7 @@ final class TrackersCollectionViewModel: TrackersCollectionViewModelProtocol {
         self.trackerRepository = trackerRepository
         self.recordRepository = recordRepository
         self.trackerManager = trackerManager
+        self.hapticManager = hapticManager
         self.currentDate = currentDate
         self.id = collection.id
         self.title = collection.title
@@ -122,6 +125,8 @@ private extension TrackersCollectionViewModel {
             try await trackerRepository.updateTracker(updated)
             
             trackers[index] = updated
+            
+            hapticManager.makeVibration(for: .selection)
             
             completionState = .idle
         }

@@ -28,6 +28,7 @@ final class TrackersViewModel: TrackersViewModelProtocol {
     private let trackerManager: any TrackerManaging
     private let trackerRepository: any TrackerRepositoryProtocol
     private let recordRepository: any RecordRepositoryProtocol
+    private let hapticManager: any VibrationFeedbackManaging
     private let calendar: Calendar = .autoupdatingCurrent
     
     private var cancellables: Set<AnyCancellable> = []
@@ -46,11 +47,13 @@ final class TrackersViewModel: TrackersViewModelProtocol {
     init(
         trackerManager: some TrackerManaging,
         trackerRepository: some TrackerRepositoryProtocol,
-        recordRepository: some RecordRepositoryProtocol
+        recordRepository: some RecordRepositoryProtocol,
+        hapticManager: some VibrationFeedbackManaging
     ) {
         self.trackerRepository = trackerRepository
         self.trackerManager = trackerManager
         self.recordRepository = recordRepository
+        self.hapticManager = hapticManager
         
         $queryString
             .dropFirst()
@@ -61,6 +64,7 @@ final class TrackersViewModel: TrackersViewModelProtocol {
         $filter
             .removeDuplicates()
             .combineLatest($currentDate.removeDuplicates())
+            .handleEvents(receiveOutput: { [hapticManager] _ in hapticManager.makeVibration(for: .selection) })
             .handleEvents(receiveOutput: { [weak self] _ in self?.fetchParameters.reset() })
             .sink { [weak self] _, _ in self?.onFilterOrDateTrigger() }
             .store(in: &cancellables)            
@@ -127,6 +131,8 @@ private extension TrackersViewModel {
             let sections = try await fetchSections(isPaginating: false, params: amountSensitiveParams)
             
             state = .loaded(createModels(from: sections))
+            
+            hapticManager.makeVibration(for: .success)
         }
         catch {
             debugPrint(error)
@@ -225,6 +231,7 @@ private extension TrackersViewModel {
                 trackerRepository: trackerRepository,
                 recordRepository: recordRepository,
                 trackerManager: trackerManager,
+                hapticManager: hapticManager,
                 collection: $0,
                 currentDate: currentDate,
                 eventsHandler: { [weak self] in self?.handleTrackerItem(events: $0) }

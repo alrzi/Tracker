@@ -75,10 +75,13 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             trackerUpdatingFlowCoordinatorAssembly: trackerUpdatingFlowCoordinatorAssembly
         )
         
+        let hapticManager = VibrationFeedbackManager()
+        
         let trackersAssembly = TrackersAssembly(
             trackerManager: trackerManager,
             trackerRepository: trackerRepository,
-            recordRepository: recordRepository
+            recordRepository: recordRepository,
+            hapticManager: hapticManager
         )
         
         let tabBarAssembly = TabBarAssembly(

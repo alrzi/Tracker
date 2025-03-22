@@ -16,15 +16,18 @@ final class TrackersAssembly: ViewControllerAssembly {
     private let trackerManager: any TrackerManaging
     private let trackerRepository: any TrackerRepositoryProtocol
     private let recordRepository: any RecordRepositoryProtocol
+    private let hapticManager: any VibrationFeedbackManaging
    
     init(
-        trackerManager: any TrackerManaging,
-        trackerRepository: any TrackerRepositoryProtocol,
-        recordRepository: any RecordRepositoryProtocol
+        trackerManager: some TrackerManaging,
+        trackerRepository: some TrackerRepositoryProtocol,
+        recordRepository: some RecordRepositoryProtocol,
+        hapticManager: some VibrationFeedbackManaging
     ) {
         self.trackerManager = trackerManager
         self.trackerRepository = trackerRepository
         self.recordRepository = recordRepository
+        self.hapticManager = hapticManager
     }
     
     @MainActor
@@ -32,7 +35,8 @@ final class TrackersAssembly: ViewControllerAssembly {
         let viewModel = TrackersViewModel(
             trackerManager: trackerManager,
             trackerRepository: trackerRepository,
-            recordRepository: recordRepository
+            recordRepository: recordRepository,
+            hapticManager: hapticManager
         )
         
         let view = TrackersView(viewModel: viewModel)

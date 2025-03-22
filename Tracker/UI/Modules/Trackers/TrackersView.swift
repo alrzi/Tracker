@@ -11,7 +11,7 @@ import TrackerDomain
 
 @MainActor
 struct TrackersView<ViewModel: TrackersViewModelProtocol> {
-    @ObservedObject private var viewModel: ViewModel       
+    @ObservedObject private var viewModel: ViewModel
     
     @Namespace private var topID
     
@@ -55,7 +55,7 @@ extension TrackersView: View {
                                     .padding(.vertical, 16)
                             }
                         }
-                    
+                        
                     case .error:
                         VStack {
                             HStack {
@@ -136,7 +136,7 @@ private final class ViewModel: TrackersViewModelProtocol {
     let isToday = false
     let isPaginating = false
     let state: TrackersState<CollectionViewModel> = .idle
-        
+    
     func onSectionAppear(at index: Int) { }
     func onToday() { }
 }

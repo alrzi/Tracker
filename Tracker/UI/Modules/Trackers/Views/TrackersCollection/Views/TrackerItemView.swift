@@ -17,7 +17,7 @@ struct TrackerItemView: View {
     let onDelete: () -> Void
     
     var pinLabel: String {
-        tracker.isPinned ? R.string.localizable.contextPin() : R.string.localizable.contextUnpin()
+        tracker.isPinned ? R.string.localizable.contextUnpin() : R.string.localizable.contextPin()
     }
     
     var pinImageName: String {

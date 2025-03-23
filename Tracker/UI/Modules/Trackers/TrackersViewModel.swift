@@ -94,13 +94,13 @@ private extension TrackersViewModel {
     
     func onQueryTrigger() {
         Task {
-            await fetchSection(isSearch: true)
+            await fetchSections(isSearch: true)
         }
     }
     
     func onFilterOrDateTrigger() {
         Task {
-            await fetchSection(isSearch: false)
+            await fetchSections(isSearch: false)
         }
     }
     
@@ -154,7 +154,7 @@ private extension TrackersViewModel {
         }
     }
     
-    func fetchSection(isSearch: Bool) async {
+    func fetchSections(isSearch: Bool) async {
         do {
             let sections = try await fetchSections(isPaginating: false, params: commonParams)
             

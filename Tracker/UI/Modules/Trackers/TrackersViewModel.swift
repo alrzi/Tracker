@@ -31,7 +31,8 @@ final class TrackersViewModel: TrackersViewModelProtocol {
     private let calendar: Calendar = .autoupdatingCurrent
     
     private var cancellables: Set<AnyCancellable> = []
-    private var fetchParameters: FetchParameters = .init(fetchLimit: 4, fetchOffset: 0)
+    private var fetchParameters: FetchParameters = .init(fetchLimit: 5, fetchOffset: 0)
+    private var pinnedSectionID: UUID?
     
     @Published private(set) var state: TrackersState<TrackersCollectionViewModel> = .idle
     @Published private(set) var paginationState: LoadingState = .idle
@@ -64,7 +65,7 @@ final class TrackersViewModel: TrackersViewModelProtocol {
             .handleEvents(receiveOutput: { [hapticManager] _ in hapticManager.makeVibration(for: .selection) })
             .handleEvents(receiveOutput: { [weak self] _ in self?.fetchParameters.reset() })
             .sink { [weak self] _, _ in self?.onFilterOrDateTrigger() }
-            .store(in: &cancellables)            
+            .store(in: &cancellables)
         
         $paginationState
             .map { $0.isLoading }
@@ -125,7 +126,7 @@ private extension TrackersViewModel {
         do {
             try await trackerManager.update(tracker: tracker.toggleIsPinned())
             
-            let sections = try await fetchSections(isPaginating: false, params: amountSensitiveParams)
+            let sections = try await fetchSections(isPaginating: false, params: tracker.isPinned ? amountSensitiveParamsUnPin : amountSensitiveParamsPin)
             
             state = .loaded(createModels(from: sections))
             
@@ -140,7 +141,7 @@ private extension TrackersViewModel {
         do {
             try await trackerManager.delete(tracker: tracker)
             
-            let sections = try await fetchSections(isPaginating: false, params: amountSensitiveParams)
+            let sections = try await fetchSections(isPaginating: false, params: amountSensitiveParamsPin)
             
             if !sections.isEmpty {
                 state = .loaded(createModels(from: sections))
@@ -186,7 +187,7 @@ private extension TrackersViewModel {
             let sections = try await fetchSections(isPaginating: true, params: commonParams)
             
             fetchParameters.nextPage()
-                        
+            
             state = .loaded(currentModels + createModels(from: sections))
             
             paginationState = .idle
@@ -233,7 +234,9 @@ private extension TrackersViewModel {
     }
     
     func createPinnedModel(from trackers: [Tracker]) -> TrackerSection? {
-        trackers.isEmpty ? nil : .init(title: R.string.localizable.mainPinned(), trackers: trackers)
+        let uuid = UUID()
+        pinnedSectionID = uuid
+        return trackers.isEmpty ? nil : .init(id: uuid, title: R.string.localizable.mainPinned(), trackers: trackers)
     }
 }
 
@@ -248,11 +251,30 @@ private extension TrackersViewModel {
         )
     }
     
-    var amountSensitiveParams: RequestParameters {
+    var amountSensitiveParamsUnPin: RequestParameters {
+        var uniqueSectionIds = Set<UUID>()
+        let models = state.models
+        
+        if let pinnedSection = models.first, pinnedSection.id == pinnedSectionID {
+            uniqueSectionIds.formUnion(pinnedSection.trackers.map { $0.categoryId })
+        }
+        
+        uniqueSectionIds.formUnion(models.map { $0.id })
+        
+        return .init(
+            currentDate: currentDate,
+            weekDay: currentDate.weekDayString,
+            fetchLimit: uniqueSectionIds.count,
+            fetchOffset: .zero,
+            query: queryString
+        )
+    }
+    
+    var amountSensitiveParamsPin: RequestParameters {
         .init(
             currentDate: currentDate,
             weekDay: currentDate.weekDayString,
-            fetchLimit: state.count + 1,
+            fetchLimit: state.count,
             fetchOffset: .zero,
             query: queryString
         )

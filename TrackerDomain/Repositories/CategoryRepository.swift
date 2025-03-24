@@ -17,7 +17,8 @@ public protocol CategoryRepositoryProtocol: Sendable {
     func createSections(_ sections: [TrackerSection]) async throws
     
     // Read
-    func getSections(params: RequestParameters) async throws -> [TrackerSection]    
+    func getSections(params: RequestParameters) async throws -> [TrackerSection]
+    func getSectionsCompleted(params: RequestParameters) async throws -> [TrackerSection]
     func getCategory(by id: UUID) async throws -> TrackerSection
     
     // Update

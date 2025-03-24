@@ -4,7 +4,7 @@ public protocol TrackerManaging: Sendable {
     associatedtype StateSectionSequence: AsyncSequence where StateSectionSequence.Element == [TrackerSection]
     
     var sections: StateSectionSequence { get }
-        
+    
     // Create
     func addSection(withId id: UUID, toTracker tracker: Tracker) async throws
     func addSections(_ sections: [TrackerSection]) async throws
@@ -41,7 +41,7 @@ final class TrackerManager: TrackerManaging {
         self.trackerRepository = trackerRepository
         self.recordRepository = recordRepository
         self.categoryRepository = categoryRepository
-               
+        
         sections = mutableSections.readOnly()
     }
     
@@ -76,7 +76,7 @@ final class TrackerManager: TrackerManaging {
         }
         
         async let regular = fetchTrackers(for: sections, params: params).sorted { $0.title < $1.title }
-                       
+        
         return (try await regular, tempPinned)
     }
     
@@ -95,7 +95,7 @@ final class TrackerManager: TrackerManaging {
         }
         
         async let regular = fetchCompletedTrackers(for: sections, params: params).sorted { $0.title < $1.title }
-                       
+        
         return (try await regular, tempPinned)
     }
     
@@ -110,7 +110,7 @@ final class TrackerManager: TrackerManaging {
         }
         
         async let regular = fetchUnCompletedTrackers(for: sections, params: params).sorted { $0.title < $1.title }
-                       
+        
         return (try await regular, tempPinned)
     }
     
@@ -139,7 +139,7 @@ final class TrackerManager: TrackerManaging {
     // MARK: - Delete
     
     func delete(tracker: Tracker) async throws {
-        try await trackerRepository.deleteTracker(with: tracker.id)        
+        try await trackerRepository.deleteTracker(with: tracker.id)
     }
 }
 

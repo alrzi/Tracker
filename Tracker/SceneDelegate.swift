@@ -58,7 +58,10 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             trackerManager: trackerManager,
             hapticManager: hapticManager,
             trackersViewModelsFactory: trackersViewModelsFactory,
-            trackerCreationSwiftUIAssembly: TrackerCreationAssembly()
+            trackerCreationSwiftUIAssembly: TrackerCreationAssembly(
+                sectionsListAssembly: SectionsListAssembly(sectionRepository: categoryRepository),
+                weekDaysSelectionAssembly: WeekDaysSelectionAssembly()
+            )
         )
         
         let tabBarAssembly = TabBarAssembly(

@@ -13,7 +13,7 @@ import TrackerDomain
 protocol TrackerCreationViewModelProtocol: ObservableObject, TrackerCreationNavigationState {
     var newTrackerText: String { get set }
     var sectionName: String? { get }
-    var weekDaysFormatted: String? { get }
+    var weekDays: WeekDays { get }
     var emojiViewModel: GridViewModel<TrackerCreationGridItem> { get }
     var colorsViewModel: GridViewModel<TrackerCreationGridItem> { get }
     var invalidComponent: TrackerCreationInvalidComponent? { get }
@@ -25,6 +25,7 @@ protocol TrackerCreationViewModelProtocol: ObservableObject, TrackerCreationNavi
 
 final class TrackerCreationViewModel: TrackerCreationViewModelProtocol {
     private let eventsHandler: (TrackerCreationOutput) -> Void
+    private let tracker: Tracker?
     
     private var cancellables: Set<AnyCancellable> = []
     
@@ -33,7 +34,7 @@ final class TrackerCreationViewModel: TrackerCreationViewModelProtocol {
     
     @Published private(set) var invalidComponent: TrackerCreationInvalidComponent?
     @Published private(set) var sectionName: String?
-    @Published private(set) var weekDaysFormatted: String?
+    @Published private(set) var weekDays: WeekDays = []
     @Published var newTrackerText = ""
     
     @Published var route: TrackerCreationRoute?
@@ -45,6 +46,7 @@ final class TrackerCreationViewModel: TrackerCreationViewModelProtocol {
         tracker: Tracker? = nil,
         eventsHandler: @escaping (TrackerCreationOutput) -> Void
     ) {
+        self.tracker = tracker
         self.eventsHandler = eventsHandler
         
         let emojiArray = (0...17).map { _ in TrackerCreationGridItem(value: RandomEmojiService.emoji) }
@@ -65,8 +67,8 @@ final class TrackerCreationViewModel: TrackerCreationViewModelProtocol {
             newTrackerText = name
         }
         
-        if let weekDays = tracker?.weekDays {
-            weekDaysFormatted = weekDays.map({ $0.localizedString(format: .short) }).joined(separator: ", ")
+        if let weekDaysUnordered = tracker?.weekDays {
+            weekDays = weekDaysUnordered
         }
         
         emojiViewModel.$selectedItem
@@ -81,11 +83,23 @@ final class TrackerCreationViewModel: TrackerCreationViewModelProtocol {
     }
     
     func onSectionSelection() {
-        
+        route = .section(
+            tracker?.categoryId,
+            onCompletion: { [weak self] in
+                self?.route = nil
+                self?.sectionName = $0.title
+            }
+        )
     }
     
     func onWeekSelection() {
-        route = .weekDay("", onCompletion: { _ in })
+        route = .weekDay(
+            weekDays,
+            onCompletion: { [weak self] in
+                self?.route = nil
+                self?.weekDays = $0
+            }
+        )
     }
     
     func onCreate() {
@@ -93,7 +107,7 @@ final class TrackerCreationViewModel: TrackerCreationViewModelProtocol {
             let section = try Self.createSectionIfPossible(
                 name: newTrackerText,
                 sectionName: sectionName,
-                weekDaysFormatted: weekDaysFormatted,
+                weekDays: weekDays,
                 emoji: emoji,
                 color: colorHexString
             )
@@ -110,7 +124,7 @@ extension TrackerCreationViewModel {
     static func createSectionIfPossible(
         name: String,
         sectionName: String?,
-        weekDaysFormatted: String?,
+        weekDays: WeekDays,
         emoji: String?,
         color: String?
     ) throws(TrackerCreationInvalidComponent) -> TrackerSection {
@@ -122,7 +136,7 @@ extension TrackerCreationViewModel {
             throw .section
         }
         
-        guard let weekDaysFormatted else {
+        guard !weekDays.isEmpty else {
             throw .weekDays
         }
         
@@ -144,7 +158,7 @@ extension TrackerCreationViewModel {
                     name: name,
                     emoji: emoji,
                     color: color,
-                    schedule: [.friday],
+                    schedule: Set(weekDays),
                     categoryId: sectionID
                 )
             ]

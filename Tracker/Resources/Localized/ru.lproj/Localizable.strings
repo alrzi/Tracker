@@ -12,7 +12,7 @@ choosing.trackerType2 = "Нерегулярные событие";
 placeholder.question = "Что будем отслеживать?";
 placeholder.noResults = "Ничего не найдено";
 placeholder.noStatistic = "Анализировать пока нечего";
-placeholder.recomendation = "Привычки и события\n можно объединить по смыслу";
+placeholder.recomendation = "Привычки и события можно объединить по смыслу";
 
 // TabBar
 tabBar.trackers = "Трекеры";

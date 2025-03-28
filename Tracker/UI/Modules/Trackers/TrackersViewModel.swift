@@ -85,7 +85,12 @@ final class TrackersViewModel: TrackersViewModelProtocol {
     }
     
     func onAdd() {
-        route = .create(onCompletion: { _ in })
+        route = .create(
+            onCompletion: { [weak self] in
+                self?.route = nil
+                self?.onSectionCreated($0)
+            }
+        )
     }
     
     func onSectionAppear(at index: Int) {
@@ -127,15 +132,25 @@ private extension TrackersViewModel {
         }
     }
     
+    func onSectionCreated(_ section: TrackerSection) {
+        Task {
+            await create(section: section)
+        }
+    }
+    
     func onSectionUpdated(_ updatedSection: TrackerSection) {
         Task {
-            await add(section: updatedSection)
+            await update(section: updatedSection)
         }
     }
     
     // MARK: - Async
     
-    func add(section: TrackerSection) async {
+    func create(section: TrackerSection) async {
+        
+    }
+        
+    func update(section: TrackerSection) async {
         do {
             try await trackerManager.addSection(withId: section.id, toTracker: section.trackers[0])
         }

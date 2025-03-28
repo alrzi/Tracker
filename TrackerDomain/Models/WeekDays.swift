@@ -1,6 +1,6 @@
 import Foundation
 
-public typealias WeekDays = [WeekDay]
+public typealias WeekDays = Set<WeekDay>
 
 public enum WeekDay: Int {
     case sunday = 1
@@ -57,3 +57,13 @@ extension WeekDay: Identifiable {
 }
 
 extension WeekDay: Sendable { }
+
+extension WeekDays {
+    public func formatted() -> String? {
+        guard !self.isEmpty else {
+            return nil
+        }
+        
+        return self.sorted(by: { $0.rawValue < $1.rawValue }).map { $0.localizedString(format: .short) }.joined(separator: ", ")
+    }
+}

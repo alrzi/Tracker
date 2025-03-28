@@ -43,6 +43,11 @@ extension Placeholder {
         imageResource: ._13PlaceholderNoResult,
         info: "Ничего не найдено"
     )
+    
+    static let emptySections: Placeholder = .init(
+        imageResource: ._05PlaceholderTracker,
+        info: R.string.localizable.placeholderRecomendation()
+    )
 }
 
 #Preview {

@@ -10,8 +10,19 @@ import Foundation
 import TrackerDomain
 
 final class TrackerCreationAssembly {
+    private let sectionsListAssembly: SectionsListAssembly
+    private let weekDaysSelectionAssembly: WeekDaysSelectionAssembly
+        
+    init(
+        sectionsListAssembly: SectionsListAssembly,
+        weekDaysSelectionAssembly: WeekDaysSelectionAssembly
+    ) {
+        self.sectionsListAssembly = sectionsListAssembly
+        self.weekDaysSelectionAssembly = weekDaysSelectionAssembly
+    }
+    
     @MainActor
-    func assemble(_ context: Tracker?, onCompletion: @MainActor @Sendable @escaping (TrackerSection) -> Void) -> some View {
+    func assemble(_ context: Tracker?, onCompletion: @MainActor @escaping (sending TrackerSection) -> Void) -> some View {
         let viewModel = TrackerCreationViewModel(
             tracker: context,
             eventsHandler: {
@@ -22,7 +33,11 @@ final class TrackerCreationAssembly {
             }
         )
         
-        return TrackerCreationNavigator(navigationState: viewModel) {
+        return TrackerCreationNavigator(
+            sectionsListAssembly: sectionsListAssembly,
+            weekDaysSelectionAssembly: weekDaysSelectionAssembly,
+            navigationState: viewModel
+        ) {
             TrackerCreationView(viewModel: viewModel)
         }
     }

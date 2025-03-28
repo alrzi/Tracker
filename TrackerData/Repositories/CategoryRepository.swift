@@ -34,6 +34,16 @@ final class CategoryRepository: CategoryRepositoryProtocol {
     
     // MARK: - Read
     
+    func getSections(fetchLimit: Int, fetchOffset: Int) async throws -> [TrackerSection] {
+        let request = FetchRequestBuilder<CategoryObject>()
+            .setSortDescriptors([.init(keyPath: \.title)])
+            .setFetchLimit(fetchLimit)
+            .setFetchOffset(fetchOffset)
+            .build()
+        
+        return try await persistencyService.fetchObjects(with: request)
+    }
+    
     func getSections(params: RequestParameters) async throws -> [TrackerSection] {
         let request = FetchRequestBuilder<CategoryObject>()
             .setPredicate(

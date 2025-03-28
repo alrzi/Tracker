@@ -7,6 +7,7 @@
 
 import SwiftUI
 import Foundation
+import TrackerDomain
 
 @MainActor
 struct TrackerCreationView<ViewModel: TrackerCreationViewModelProtocol> {
@@ -48,7 +49,7 @@ extension TrackerCreationView: View {
                     
                     ButtonView(
                         title: R.string.localizable.schedule(),
-                        subtitle: viewModel.weekDaysFormatted,
+                        subtitle: viewModel.weekDays.formatted(),
                         onTap: viewModel.onWeekSelection
                     )
                     .shake(if: viewModel.invalidComponent == .weekDays)
@@ -181,7 +182,7 @@ private final class ViewModel: TrackerCreationViewModelProtocol {
     var newTrackerText: String = ""
     
     let sectionName: String? = "Sport"
-    let weekDaysFormatted: String? = Date.now.formatted(.dateTime.weekday(.short))
+    let weekDays: WeekDays = []
     
     let emojiViewModel: GridViewModel<TrackerCreationGridItem> = .init(
         items: (0...17).map { _ in .init(value: RandomEmojiService.emoji) }

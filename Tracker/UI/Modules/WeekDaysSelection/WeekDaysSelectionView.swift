@@ -10,11 +10,18 @@ import TrackerDomain
 import Foundation
 
 struct WeekDaysSelectionView {
-    let onNext: (WeekDays) -> Void
-    
-    private let tags = WeekDay.allCases()
+    private let onNext: (WeekDays) -> Void
+    private let weekDays = WeekDay.allCases()
     
     @State private var selectedTags: WeekDays = []
+    
+    init(
+        selectedTags: WeekDays,
+        onNext: @escaping (WeekDays) -> Void
+    ) {
+        self.selectedTags = selectedTags
+        self.onNext = onNext
+    }
 }
 
 // MARK: - View
@@ -24,25 +31,21 @@ extension WeekDaysSelectionView: View {
         NavigationStack {
             ScrollableLazyVStack {
                 VStack(spacing: 0) {
-                    ForEach(Array(tags.enumerated()), id: \.element.id) { index, tag in
-                        Button(action: {
-                            !selectedTags.contains(tag) ? selectedTags.append(tag) : selectedTags.removeAll { $0 == tag }
-                        }) {
-                            ToggleView(
-                                title: tag.localizedString().capitalized,
-                                isSelected: selectedTags.contains(tag),
-                                onToggle: { isSelected in
-                                    if isSelected {
-                                        selectedTags.append(tag)
-                                    }
-                                    else {
-                                        selectedTags.removeAll { $0 == tag }
-                                    }
+                    ForEach(Array(weekDays.enumerated()), id: \.element.id) { index, weekDay in
+                        ToggleView(
+                            title: weekDay.localizedString().capitalized,
+                            isSelected: selectedTags.contains(weekDay),
+                            onToggle: { isSelected in
+                                if isSelected {
+                                    selectedTags.insert(weekDay)
                                 }
-                            )
-                        }
+                                else {
+                                    selectedTags.remove(weekDay)
+                                }
+                            }
+                        )
                         
-                        if tags.count != index + 1 {
+                        if weekDays.count != index + 1 {
                             Divider()
                                 .padding(.horizontal, 16)
                         }
@@ -52,15 +55,12 @@ extension WeekDaysSelectionView: View {
                 .padding(.top, 24)
             }
             .safeAreaInset(edge: .bottom) {
-                Button("Готово", action: { onNext(selectedTags) })
-                    .buttonStyle(
-                        CommonButtonStyle(
-                            backgroundColor: selectedTags.isEmpty ? .gray : .black
-                        )
-                    )
+                Button(R.string.localizable.scheduleReady(), action: { onNext(selectedTags) })
+                    .buttonStyle(CommonButtonStyle(backgroundColor: .black))
                     .padding(.horizontal, 16)
+                    .padding(.bottom, 16)
             }
-            .navigationTitle("Выберите дни недели")
+            .navigationTitle(R.string.localizable.schedule())
         }
     }
 }
@@ -95,6 +95,9 @@ private struct ToggleView: View {
 
 #if DEBUG
 #Preview {
-    WeekDaysSelectionView { _ in }
+    WeekDaysSelectionView(
+        selectedTags: [.friday],
+        onNext: { _ in }
+    )
 }
 #endif

@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import TrackerDomain
 
 @MainActor
 protocol TrackerCreationNavigationState: ObservableObject {
@@ -13,8 +14,8 @@ protocol TrackerCreationNavigationState: ObservableObject {
 }
 
 enum TrackerCreationRoute: Identifiable {
-    case weekDay(String, onCompletion: @MainActor @Sendable (String) -> Void)
-    case section(String, onCompletion: @MainActor @Sendable (String) -> Void)
+    case weekDay(WeekDays, onCompletion: @MainActor (sending WeekDays) -> Void)
+    case section(UUID?, onCompletion: @MainActor (sending TrackerSection) -> Void)
     
     var id: ID {
         switch self {

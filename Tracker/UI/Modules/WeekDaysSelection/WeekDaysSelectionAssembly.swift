@@ -7,10 +7,16 @@
 
 import SwiftUI
 import Foundation
+import TrackerDomain
 
-final class WeekDaysSelectionAssembly {    
-    func assemble(_ context: String) -> some View {
-        let view = WeekDaysSelectionView { _ in }
+final class WeekDaysSelectionAssembly {
+    
+    @MainActor
+    func assemble(_ context: WeekDays, onCompletion: @MainActor @escaping (sending WeekDays) -> Void) -> some View {
+        let view = WeekDaysSelectionView(
+            selectedTags: context,
+            onNext: { onCompletion($0) }
+        )
         
         return view
     }

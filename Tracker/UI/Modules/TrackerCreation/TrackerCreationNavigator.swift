@@ -9,14 +9,21 @@ import Foundation
 import SwiftUI
 
 struct TrackerCreationNavigator<Content: View, NavigationState: TrackerCreationNavigationState> {
+    private let sectionsListAssembly: SectionsListAssembly
+    private let weekDaysSelectionAssembly: WeekDaysSelectionAssembly
+    
     @ObservedObject private var navigationState: NavigationState
     
     private let content: Content
     
     init(
+        sectionsListAssembly: SectionsListAssembly,
+        weekDaysSelectionAssembly: WeekDaysSelectionAssembly,
         navigationState: NavigationState,
         content: () -> Content
-    ) {        
+    ) {
+        self.sectionsListAssembly = sectionsListAssembly
+        self.weekDaysSelectionAssembly = weekDaysSelectionAssembly
         self.navigationState = navigationState
         self.content = content()
     }
@@ -27,11 +34,13 @@ extension TrackerCreationNavigator: View {
         content
             .sheet(item: $navigationState.route) { route in
                 switch route {
-                case .weekDay:
-                    WeekDaysSelectionAssembly().assemble("")                       
+                case .weekDay(let weekDays, let completion):
+                    weekDaysSelectionAssembly.assemble(weekDays, onCompletion: completion)
+                        .interactiveDismissDisabled()
                 
-                case .section:
-                    Text("DS")
+                case .section(let id, let onCompletion):
+                    sectionsListAssembly.assemble(id, onCompletion: onCompletion)
+                        .interactiveDismissDisabled()
                 }
             }
     }

@@ -1,0 +1,76 @@
+//
+//  SectionsListViewModel.swift
+//  Tracker
+//
+//  Created by Александр Зиновьев on 28.03.2025.
+//
+
+import Foundation
+import TrackerDomain
+
+@MainActor
+protocol SectionsListViewModelProtocol: ObservableObject {
+    var state: SectionsListState { get }
+    var selectedSection: TrackerSection? { get }
+    
+    func onSection(_ section: TrackerSection)
+}
+
+final class SectionsListViewModel: SectionsListViewModelProtocol {
+    private let sectionRepository: any CategoryRepositoryProtocol
+    private let eventsHandler: (TrackerSection) -> Void
+    
+    @Published private(set) var state: SectionsListState = .loading
+    private(set) var selectedSection: TrackerSection?
+    
+    init(
+        sectionRepository: some CategoryRepositoryProtocol,
+        sectionID: UUID?,
+        eventsHandler: @escaping (TrackerSection) -> Void
+    ) {
+        self.sectionRepository = sectionRepository
+        self.eventsHandler = eventsHandler
+        
+        Task {
+            await loadSections()
+            
+            guard let sectionID else {
+                return
+            }
+            
+            await loadSection(sectionID)
+        }
+    }
+    
+    func onSection(_ section: TrackerSection) {
+        selectedSection = section
+        
+        eventsHandler(section)
+    }
+}
+
+// MARK: - Private
+
+private extension SectionsListViewModel {
+    func loadSections() async {
+        do {
+            let sections = try await sectionRepository.getSections(fetchLimit: 200, fetchOffset: 0)
+            
+            state = .loaded(sections)
+        }
+        catch {
+            state = .error(NSError())
+        }
+    }
+    
+    func loadSection(_ sectionID: UUID) async {
+        do {
+            let section = try await sectionRepository.getCategory(by: sectionID)
+            
+            selectedSection = section
+        }
+        catch {
+            selectedSection = state.models.first
+        }
+    }
+}

@@ -14,8 +14,8 @@ protocol TrackersNavigationState: ObservableObject {
 }
 
 enum TrackersRoute: Identifiable {
-    case update(Tracker, onCompletion: @MainActor @Sendable (TrackerSection) -> Void)
-    case create(onCompletion: @MainActor @Sendable (TrackerSection) -> Void)
+    case update(Tracker, onCompletion: @MainActor (sending TrackerSection) -> Void)
+    case create(onCompletion: @MainActor (sending TrackerSection) -> Void)
     
     var id: ID {
         switch self {

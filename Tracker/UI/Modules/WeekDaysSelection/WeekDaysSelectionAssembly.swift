@@ -8,8 +8,7 @@
 import SwiftUI
 import Foundation
 
-final class WeekDaysSelectionAssembly {
-    
+final class WeekDaysSelectionAssembly {    
     func assemble(_ context: String) -> some View {
         let view = WeekDaysSelectionView { _ in }
         

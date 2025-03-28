@@ -21,53 +21,75 @@ struct WeekDaysSelectionView {
 
 extension WeekDaysSelectionView: View {
     var body: some View {
-        ScrollableLazyVStack {
-            VStack(spacing: 0) {
-                ForEach(Array(tags.enumerated()), id: \.element.id) { index, tag in
-                    Button(action: {
-                        !selectedTags.contains(tag) ? selectedTags.append(tag) : selectedTags.removeAll { $0 == tag }
-                    }) {
-                        HStack {
-                            Text(tag.localizedString().capitalized)
-                                .foregroundColor(.blue)
-                            
-                            Spacer()
-                            
-                            Toggle("", isOn: Binding(
-                                get: {
-                                    selectedTags.contains(tag)
-                                },
-                                set: { newValue in
-                                    if newValue {
+        NavigationStack {
+            ScrollableLazyVStack {
+                VStack(spacing: 0) {
+                    ForEach(Array(tags.enumerated()), id: \.element.id) { index, tag in
+                        Button(action: {
+                            !selectedTags.contains(tag) ? selectedTags.append(tag) : selectedTags.removeAll { $0 == tag }
+                        }) {
+                            ToggleView(
+                                title: tag.localizedString().capitalized,
+                                isSelected: selectedTags.contains(tag),
+                                onToggle: { isSelected in
+                                    if isSelected {
                                         selectedTags.append(tag)
                                     }
                                     else {
                                         selectedTags.removeAll { $0 == tag }
                                     }
                                 }
-                            ))
-                            .labelsHidden()
-                            .tint(.green)
+                            )
                         }
-                        .padding(.vertical, 20)
-                        .padding(.horizontal, 16)
-                    }
-                    
-                    if tags.count != index + 1 {
-                        Divider()
-                            .padding(.horizontal, 16)
+                        
+                        if tags.count != index + 1 {
+                            Divider()
+                                .padding(.horizontal, 16)
+                        }
                     }
                 }
+                .background(.tertiary.opacity(0.3), in: .rect(cornerRadius: 16))
+                .padding(.top, 24)
             }
-            .background(.tertiary.opacity(0.3), in: .rect(cornerRadius: 16))
-            .padding(.top, 24)
-        }
-        .safeAreaInset(edge: .bottom) {
-            Button(action: { onNext(selectedTags) }) {
-                Text("Готово")
-                    .foregroundStyle(.blue)
+            .safeAreaInset(edge: .bottom) {
+                Button("Готово", action: { onNext(selectedTags) })
+                    .buttonStyle(
+                        CommonButtonStyle(
+                            backgroundColor: selectedTags.isEmpty ? .gray : .black
+                        )
+                    )
+                    .padding(.horizontal, 16)
             }
+            .navigationTitle("Выберите дни недели")
         }
+    }
+}
+
+private struct ToggleView: View {
+    let title: String
+    let isSelected: Bool
+    let onToggle: (Bool) -> Void
+    
+    var body: some View {
+        HStack {
+            Text(title)
+                .font(.system(size: 17, weight: .regular))
+                .foregroundColor(.black)
+                .layoutPriority(1)
+            
+            Spacer()
+            
+            Toggle("", isOn: .init(
+                get: { isSelected },
+                set: { newValue in
+                    onToggle(newValue)
+                }
+            ))
+            .labelsHidden()
+            .tint(.blue)
+        }
+        .padding(.vertical, 20)
+        .padding(.horizontal, 16)
     }
 }
 

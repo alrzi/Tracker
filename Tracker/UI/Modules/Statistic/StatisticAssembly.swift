@@ -7,10 +7,9 @@
 
 import Foundation
 import UIKit
-import Presentation
 import TrackerDomain
 
-final class StatisticAssembly: ViewControllerAssembly {
+final class StatisticAssembly {
     typealias Context = ()
     
     private let recordRepository: any RecordRepositoryProtocol

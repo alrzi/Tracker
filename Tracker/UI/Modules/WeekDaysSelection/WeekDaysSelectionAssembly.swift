@@ -2,25 +2,17 @@
 //  WeekDaysSelectionAssembly.swift
 //  Tracker
 //
-//  Created by Александр Зиновьев on 06.07.2024.
+//  Created by Александр Зиновьев on 27.03.2025.
 //
 
-import UIKit
-import Presentation
+import SwiftUI
+import Foundation
 
-final class WeekDaysSelectionAssembly: ViewControllerAssembly {
-    typealias WeekDays = Set<Int>
-    typealias Context =  LifecycleManagingContext<WeekDays, Never, WeekDays>
+final class WeekDaysSelectionAssembly {
     
-    func assemble(_ context: Context) -> UIViewController {
-        let viewController = WeekDaysSelectionViewController(
-            weekDays: context.configuration,
-            weekDaysToShow: {
-                context.resultObserver.send($0)
-                context.closingContext.close()
-            }
-        )
+    func assemble(_ context: String) -> some View {
+        let view = WeekDaysSelectionView { _ in }
         
-        return viewController
+        return view
     }
 }

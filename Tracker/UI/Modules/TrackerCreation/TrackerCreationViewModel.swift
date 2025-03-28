@@ -1,263 +1,153 @@
+//
+//  TrackerCreationViewModel.swift
+//  Tracker
+//
+//  Created by Александр Зиновьев on 22.03.2025.
+//
+
+import Foundation
 import Combine
 import TrackerDomain
 
-protocol TrackerCreationViewModelProtocol {
-    var numberOfTableViewRows: Int { get }
-    var numberOfCollectionSections: Int { get }
-    var dataForTablView: [TableData] { get }
-    var isTrackersAddedToCoreData: Bool { get }
-    var updateTrackerViewModel: UpdateTrackerViewModel? { get }
-    var shouldUpdateButtonStylePublisher: AnyPublisher<Bool, Never> { get }
-    var isShakingButton: Bool { get }
+@MainActor
+protocol TrackerCreationViewModelProtocol: ObservableObject, TrackerCreationNavigationState {
+    var newTrackerText: String { get set }
+    var sectionName: String? { get }
+    var weekDaysFormatted: String? { get }
+    var emojiViewModel: GridViewModel<TrackerCreationGridItem> { get }
+    var colorsViewModel: GridViewModel<TrackerCreationGridItem> { get }
+    var invalidComponent: TrackerCreationInvalidComponent? { get }
     
-    func updateUI()
-    func createOrUpdateTracker()
-    func getHeaderName() -> String?
-    func onCategoryFlow()
-    func onSchedule()
-    func onCancel()
-    
-    // Data source
-    func addSection(header: String)
-    func setSchedule(schedule: Set<Int>)
-    func numberOfItemsInSection(_ section: Int) -> Int
-    func getSection(_ indexPath: IndexPath) -> CollectionViewData
+    func onSectionSelection()
+    func onWeekSelection()   
+    func onCreate()
 }
 
-final class TrackerCreationViewModel: ObservableObject {
-    private let userInputCollector: UserInputCollector
-    private var dataSource: DataSourceProtocol
-    private let trackerManager: any TrackerManaging
+final class TrackerCreationViewModel: TrackerCreationViewModelProtocol {
+    private let eventsHandler: (TrackerCreationOutput) -> Void
     
-    private let resultObserver: PassthroughSubject<Action, Never>
-    private var cancellable: Set<AnyCancellable> = []
+    private var cancellables: Set<AnyCancellable> = []
     
-    private let mode: CreateTrackerMode
+    private var emoji: String?
+    private var colorHexString: String?
     
-    private var categoryId: UUID?
-    private var date: Date?
-            
-    @Published var updateTrackerViewModel: UpdateTrackerViewModel?
-    @Published var updateTrackedDaysViewModel: UpdateTrackedDaysViewModel?
-    @Published var tracker: Tracker?
-    @Published var warningType: WarningType = .animateToHide
-    @Published var categoryHeader: String?
-    @Published var schedule: Set<Int> = []
+    @Published private(set) var invalidComponent: TrackerCreationInvalidComponent?
+    @Published private(set) var sectionName: String?
+    @Published private(set) var weekDaysFormatted: String?
+    @Published var newTrackerText = ""
+    
+    @Published var route: TrackerCreationRoute?
+    
+    let emojiViewModel: GridViewModel<TrackerCreationGridItem>
+    let colorsViewModel: GridViewModel<TrackerCreationGridItem>
     
     init(
-        userInputCollector: UserInputCollector,
-        dataSource: DataSourceProtocol = DataSourceImpl(),
-        trackerManager: some TrackerManaging,
-        resultObserver: PassthroughSubject<Action, Never>,
-        mode: CreateTrackerMode
+        tracker: Tracker? = nil,
+        eventsHandler: @escaping (TrackerCreationOutput) -> Void
     ) {
-        self.dataSource = dataSource
-        self.userInputCollector = userInputCollector
-        self.trackerManager = trackerManager
-        self.resultObserver = resultObserver
-        self.mode = mode
-        self.tracker = mode.tracker
-        self.date = mode.date
+        self.eventsHandler = eventsHandler
         
-        userInputCollector.trackerPublisher           
-            .sink { [weak self] in self?.tracker = $0 }
-            .store(in: &cancellable)
+        let emojiArray = (0...17).map { _ in TrackerCreationGridItem(value: RandomEmojiService.emoji) }
+        let colorsArray = (0...17).map { _ in TrackerCreationGridItem(value: RandomHexColorService.randomHexString) }
         
-        userInputCollector.weekDaysPublisher
-            .sink { [weak self] in
-                self?.dataSource.addSchedule($0.weekdayStringShort())
-                self?.schedule = $0
-            }
-            .store(in: &cancellable)
+        emojiViewModel = .init(items: emojiArray)
+        colorsViewModel = .init(items: colorsArray)
         
-        userInputCollector.categoryPublisher
-            .sink { [weak self] in
-                self?.dataSource.addSectionHeader($0.title)
-                self?.categoryHeader = $0.title
-                self?.categoryId = $0.id
-            }
-            .store(in: &cancellable)
-        
-        guard let tracker else {
-            return
+        if let emoji = emojiArray.first(where: { $0.value == tracker?.emoji }) {
+            emojiViewModel.selectItem(emoji)
         }
-                
-        userInputCollector.setTracker(tracker)
+        
+        if let color = colorsArray.first(where: { $0.value == tracker?.color }) {
+            colorsViewModel.selectItem(color)
+        }
+        
+        if let name = tracker?.name {
+            newTrackerText = name
+        }
+        
+        if let weekDays = tracker?.weekDays {
+            weekDaysFormatted = weekDays.map({ $0.localizedString(format: .short) }).joined(separator: ", ")
+        }
+        
+        emojiViewModel.$selectedItem
+            .compactMap({ $0 })
+            .sink { [weak self] item in self?.emoji = item.value }
+            .store(in: &cancellables)
+        
+        colorsViewModel.$selectedItem
+            .compactMap({ $0 })
+            .sink { [weak self] item in self?.colorHexString = item.value }
+            .store(in: &cancellables)
     }
     
-    func setValue(_ value: UserInputValue) {
-        userInputCollector.insert(value)
-    }
+    func onSectionSelection() {
         
-    func updateUI() {
-        guard 
-            let tracker,
-//            let date = date,
-//            let category = categoryHeader,
-            let colorIndexPath = dataSource.indexPath(forColor: tracker.color),
-            let emojiIndexPath = dataSource.indexPath(forEmoji: tracker.emoji)
-        else {
-            return
-        }
-              
-        updateTrackerViewModel = UpdateTrackerViewModel(
-            name: tracker.name,
-            emoji: emojiIndexPath,
-            color: colorIndexPath
-        )
-        
-        updateTrackedDaysViewModel = UpdateTrackedDaysViewModel(
-            trackedDays: "Strings.Localizable.daysNumber(3)",
-            isTrackedForToday: false
-        )
-                
-       
-        
-        userInputCollector.setTracker(tracker)
-        
-//        dataSource.addSectionHeader(category)
-//        userInputCollector.insert(.category(.init(title: category, trackers: [])))
     }
     
-    func createOrUpdateTracker() async {
-        guard let tracker, let categoryId else {
-            return
-        }
-        
-        switch mode {
-        case .create:
-            do {
-                try await trackerManager.addSection(withId: categoryId, toTracker: tracker)
-                
-                resultObserver.send(.onCreateTracker)                
-            }
-            catch {
-                debugPrint(error.localizedDescription)
-            }
+    func onWeekSelection() {
+        route = .weekDay("", onCompletion: { _ in })
+    }
+    
+    func onCreate() {
+        do {
+            let section = try Self.createSectionIfPossible(
+                name: newTrackerText,
+                sectionName: sectionName,
+                weekDaysFormatted: weekDaysFormatted,
+                emoji: emoji,
+                color: colorHexString
+            )
             
-        case .update:
-            break
+            eventsHandler(.section(section))
         }
-    }
-    
-    func incrementButtonTapped() {
-        do {
-//            try trackerManager.markAsTrackedFor(date: date, trackerWithId: tracker?.id)
-//            self.updateTrackedDaysViewModel = getDataForUpdateTrackedDaysViewModel()
-        } 
         catch {
-            print(error)
+            invalidComponent = error
         }
     }
-    
-    func decrementButtonTapped() {
-        do {
-//            try trackerManager.markAsTrackedFor(date: date, trackerWithId: tracker?.id)
-//            self.updateTrackedDaysViewModel = getDataForUpdateTrackedDaysViewModel()
-        } 
-        catch {
-            print(error)
-        }
-    }
+}
 
-    func handleNameLogic(name: String, newNameLength: Int) {
-        setValue(.name(name))
+extension TrackerCreationViewModel {
+    static func createSectionIfPossible(
+        name: String,
+        sectionName: String?,
+        weekDaysFormatted: String?,
+        emoji: String?,
+        color: String?
+    ) throws(TrackerCreationInvalidComponent) -> TrackerSection {
+        guard !name.isEmpty else {
+            throw .name
+        }
         
-        let isTextLong = isTextTooLong(newNameLength)
-        setEnterTextAnimationWarningType(isTextLong)
-    }
-    
-    func isTextTooLong(_ newLength: Int) -> Bool {
-        let maxLength = 38
-        return newLength > maxLength
-    }
-    
-    func onCategoryFlow() {
-        resultObserver.send(.onCategoryFlow)
-    }
-    
-    func onSchedule() {
-        resultObserver.send(.onSchedule)
-    }
-    
-    func onCancel() {
-        resultObserver.send(.onCancel)
-    }
-    
-    deinit {
-        resultObserver.send(completion: .finished)
-    }
-}
-
-// MARK: - Public DataSource
-extension TrackerCreationViewModel {
-    var numberOfTableViewRows: Int {
-        dataSource.numberOfTableViewRows(ofKind: .habit)
-    }
-    
-    var dataForTablView: [TableData] {
-        dataSource.dataForTablView(ofKind: .habit)
-    }
-    
-    var numberOfCollectionSections: Int {
-        dataSource.numberOfCollectionSections()
-    }
-    
-    func addSection(header: String) {
-        dataSource.addSectionHeader(header)
-        self.categoryHeader = header
-    }
-    
-    func setSchedule(schedule: Set<Int>) {
-        dataSource.addSchedule(schedule.weekdayStringShort())
-    }
-    
-    func numberOfItemsInSection(_ section: Int) -> Int {
-        dataSource.numberOfItemsInSection(section)
-    }
-    
-    func getSection(_ indexPath: IndexPath) -> CollectionViewData {
-        dataSource.getSection(indexPath)
-    }
-    
-    func getHeaderName() -> String? {
-//        trackerManager.getHeaderName()
-        nil
-    }
-}
-
-// MARK: - Private methods
-private extension TrackerCreationViewModel {
-//    func getDataForUpdateTrackedDaysViewModel() -> UpdateTrackedDaysViewModel {
-//        if let tracker = tracker,
-//            let date = date,
-//            let trackedDays = trackerManager.getTrackedDaysNumberFor(id: tracker.id)
-//        {
-//            return UpdateTrackedDaysViewModel(
-//                trackedDays: Strings.Localizable.daysNumber(trackedDays),
-//                isTrackedForToday: trackerManager.isCompletedFor(date: date, trackerWithId: tracker.id)
-//            )
-//        } 
-//        else {
-//            return UpdateTrackedDaysViewModel(trackedDays: "", isTrackedForToday: false)
-//        }
-//    }
-
-    func setEnterTextAnimationWarningType(_ isTextTooLong: Bool) {
-        warningType = isTextTooLong ? .animateToShow : .animateToHide
-    }
-}
-
-extension TrackerCreationViewModel {
-    enum Action {
-        case onSchedule
-        case onCategoryFlow
-        case onCreateTracker
-        case onCancel
-    }
-    
-    enum WarningType {
-        case animateToShow
-        case animateToHide
+        guard let sectionName else {
+            throw .section
+        }
+        
+        guard let weekDaysFormatted else {
+            throw .weekDays
+        }
+        
+        guard let emoji else {
+            throw .emoji
+        }
+        
+        guard let color else {
+            throw .color
+        }
+        
+        let sectionID = UUID()
+        
+        return .init(
+            id: sectionID,
+            title: sectionName,
+            trackers: [
+                .init(
+                    name: name,
+                    emoji: emoji,
+                    color: color,
+                    schedule: [.friday],
+                    categoryId: sectionID
+                )
+            ]
+        )
     }
 }

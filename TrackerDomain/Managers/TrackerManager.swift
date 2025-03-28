@@ -81,7 +81,7 @@ final class TrackerManager: TrackerManaging {
     }
     
     func fetchCompletedSections(params: RequestParameters, isPaginating: Bool) async throws -> ([TrackerSection], [Tracker]) {
-        let sections = try await categoryRepository.getSectionsCompleted(params: params)
+        let sections = try await categoryRepository.getSections(params: params, isCompleted: true)
         
         var tempPinned: [Tracker] = []
         
@@ -100,7 +100,7 @@ final class TrackerManager: TrackerManaging {
     }
     
     func fetchUnCompletedSections(params: RequestParameters, isPaginating: Bool) async throws -> ([TrackerSection], [Tracker]) {
-        let sections = try await categoryRepository.getSections(params: params)
+        let sections = try await categoryRepository.getSections(params: params, isCompleted: false)
         
         var tempPinned: [Tracker] = []
         

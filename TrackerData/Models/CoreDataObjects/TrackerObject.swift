@@ -15,8 +15,7 @@ public class TrackerObject: NSManagedObject {
     @NSManaged public var color: String
     @NSManaged public var emoji: String
     @NSManaged public var isPinned: Bool
-    @NSManaged public var weekDays: String
-    @NSManaged public var kind: TrackerKind
+    @NSManaged public var weekDays: Set<Int>
     @NSManaged public var category: CategoryObject
     @NSManaged public var trackerRecord: Set<RecordObject>
 }
@@ -27,19 +26,20 @@ extension TrackerObject: Entity {
 
 extension TrackerObject: ValueAddable {
     func addValue(_ value: CategoryObject) {
-        category = value        
+        category = value
     }
 }
 
-extension TrackerObject: CopyableEntity {       
+extension TrackerObject: CopyableEntity {
     func copy(from tracker: Tracker) {
         self.id = tracker.id
         self.name = tracker.name
         self.color = tracker.color
         self.emoji = tracker.emoji
         self.isPinned = tracker.isPinned
-        self.weekDays = tracker.weekDays.toNumbersString()
-        self.kind = tracker.kind.toKind()
+        self.weekDays = Set(tracker.weekDays.map { $0.rawValue })
+        self.category = category
+        self.trackerRecord = trackerRecord
     }
 }
 
@@ -50,30 +50,10 @@ extension Tracker: Initable {
             name: object.name,
             emoji: object.emoji,
             color: object.color,
-            schedule: Set.fromString(object.weekDays),
+            schedule: Set(object.weekDays.compactMap { WeekDay(rawValue: $0) }),
             isPinned: object.isPinned,
-            kind: object.kind.toKind(),
             trackedDays: object.trackerRecord.count,
-            categoryId: object.category.id            
+            categoryId: object.category.id
         )
-    }
-}
-
-private extension Tracker.Kind {
-    func toKind() -> TrackerKind {
-        switch self {
-        case .habit: .habit
-        case .occasional: .occasional
-        @unknown default: .habit
-        }
-    }
-}
-
-private extension TrackerKind {
-    func toKind() -> Tracker.Kind {
-        switch self {
-        case .habit: .habit
-        case .occasional: .occasional
-        }
     }
 }

@@ -238,7 +238,7 @@
 			buildRules = (
 			);
 			dependencies = (
-				F956F0872D8F29C200175338 /* PBXTargetDependency */,
+				F961FFEA2D95CB3500131277 /* PBXTargetDependency */,
 				F96D33302D7F6D82009208B9 /* PBXTargetDependency */,
 				F96D33632D7F6F56009208B9 /* PBXTargetDependency */,
 			);
@@ -531,9 +531,9 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		F956F0872D8F29C200175338 /* PBXTargetDependency */ = {
+		F961FFEA2D95CB3500131277 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			productRef = F956F0862D8F29C200175338 /* RswiftGenerateInternalResources */;
+			productRef = F961FFE92D95CB3500131277 /* RswiftGenerateInternalResources */;
 		};
 		F96D33282D7F6D82009208B9 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -1111,11 +1111,6 @@
 			package = F956F0832D8F299B00175338 /* XCRemoteSwiftPackageReference "R" */;
 			productName = RswiftLibrary;
 		};
-		F956F0862D8F29C200175338 /* RswiftGenerateInternalResources */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = F956F0832D8F299B00175338 /* XCRemoteSwiftPackageReference "R" */;
-			productName = "plugin:RswiftGenerateInternalResources";
-		};
 		F957BC362C7BBD9A0047559E /* Presentation */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = Presentation;
@@ -1123,6 +1118,11 @@
 		F957BC392C7BBF630047559E /* Presentation */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = Presentation;
+		};
+		F961FFE92D95CB3500131277 /* RswiftGenerateInternalResources */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = F956F0832D8F299B00175338 /* XCRemoteSwiftPackageReference "R" */;
+			productName = "plugin:RswiftGenerateInternalResources";
 		};
 		F97A0F8B2D80D2D600AC67A4 /* AppMetricaCore */ = {
 			isa = XCSwiftPackageProductDependency;

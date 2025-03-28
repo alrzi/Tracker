@@ -9,7 +9,7 @@ import Foundation
 
 public struct RequestParameters: Sendable {
     public let currentDate: Date
-    public let weekDay: String
+    public let weekDay: WeekDay
     public let query: String
     
     public let fetchLimit: Int
@@ -17,7 +17,7 @@ public struct RequestParameters: Sendable {
    
     public init(
         currentDate: Date,
-        weekDay: String,
+        weekDay: WeekDay,
         fetchLimit: Int,
         fetchOffset: Int,
         query: String

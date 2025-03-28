@@ -10,7 +10,7 @@ import TrackerDomain
 import Combine
 
 @MainActor
-protocol TrackersViewModelProtocol: ObservableObject {
+protocol TrackersViewModelProtocol: ObservableObject, TrackersNavigationState {
     associatedtype TrackersCollectionModel: TrackersCollectionViewModelProtocol
     
     var state: TrackersState<TrackersCollectionModel> { get }
@@ -22,6 +22,7 @@ protocol TrackersViewModelProtocol: ObservableObject {
     
     func onSectionAppear(at index: Int)
     func onToday()
+    func onAdd()
 }
 
 final class TrackersViewModel: TrackersViewModelProtocol {
@@ -41,6 +42,8 @@ final class TrackersViewModel: TrackersViewModelProtocol {
     @Published var filter: TrackerFilter = .forCurrentWeekDay
     @Published var queryString = ""
     @Published var currentDate: Date = .now
+    
+    @Published var route: TrackersRoute?
     
     var isToday: Bool { calendar.isDateInToday(currentDate) }
     
@@ -81,6 +84,10 @@ final class TrackersViewModel: TrackersViewModelProtocol {
         currentDate = .now
     }
     
+    func onAdd() {
+        route = .create(onCompletion: { _ in })
+    }
+    
     func onSectionAppear(at index: Int) {
         Task {
             await paginateMoreSectionsIfNeeded(index: index)
@@ -115,12 +122,27 @@ private extension TrackersViewModel {
                 await delete(tracker: tracker)
                 
             case .edit(let tracker):
-                break
+                route = .update(tracker, onCompletion: { [weak self] in self?.onSectionUpdated($0) })
             }
         }
     }
     
+    func onSectionUpdated(_ updatedSection: TrackerSection) {
+        Task {
+            await add(section: updatedSection)
+        }
+    }
+    
     // MARK: - Async
+    
+    func add(section: TrackerSection) async {
+        do {
+            try await trackerManager.addSection(withId: section.id, toTracker: section.trackers[0])
+        }
+        catch {
+            debugPrint(error)
+        }
+    }
     
     func togglePin(for tracker: Tracker) async {
         do {
@@ -141,7 +163,7 @@ private extension TrackersViewModel {
         do {
             try await trackerManager.delete(tracker: tracker)
             
-            let sections = try await fetchSections(isPaginating: false, params: amountSensitiveParamsPin)
+            let sections = try await fetchSections(isPaginating: false, params: amountSensitiveParamsUnPin)
             
             if !sections.isEmpty {
                 state = .loaded(createModels(from: sections))
@@ -244,7 +266,7 @@ private extension TrackersViewModel {
     var commonParams: RequestParameters {
         .init(
             currentDate: currentDate,
-            weekDay: currentDate.weekDayString,
+            weekDay: .getWeekDay(from: currentDate),
             fetchLimit: fetchParameters.fetchLimit,
             fetchOffset: fetchParameters.fetchOffset,
             query: queryString
@@ -263,7 +285,7 @@ private extension TrackersViewModel {
         
         return .init(
             currentDate: currentDate,
-            weekDay: currentDate.weekDayString,
+            weekDay: .getWeekDay(from: currentDate),
             fetchLimit: uniqueSectionIds.count,
             fetchOffset: .zero,
             query: queryString
@@ -273,7 +295,7 @@ private extension TrackersViewModel {
     var amountSensitiveParamsPin: RequestParameters {
         .init(
             currentDate: currentDate,
-            weekDay: currentDate.weekDayString,
+            weekDay: .getWeekDay(from: currentDate),
             fetchLimit: state.count,
             fetchOffset: .zero,
             query: queryString

@@ -67,7 +67,8 @@ struct StaticPredicateBuilder<T> {
         let subKey = NSExpression(forKeyPath: subKeyPath).keyPath
         let terKey = NSExpression(forKeyPath: terKeyPath).keyPath
         
-        let formatString = "SUBQUERY(%K, $g, SUBQUERY($g.%K, $h, $h.%K BETWEEN {%@, %@}).@count > 0).@count > 0"
+        let count = isMore ? ".@count > 0" : ".@count == 0"
+        let formatString = "SUBQUERY(%K, $g, SUBQUERY($g.%K, $h, $h.%K BETWEEN {%@, %@})\(count)).@count > 0"
         let predicate = NSPredicate(format: formatString, argumentArray: [key, subKey, terKey, subValue1, subValue2])
         
         var builder = self

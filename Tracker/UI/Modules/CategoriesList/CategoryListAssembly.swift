@@ -6,13 +6,9 @@
 //
 
 import UIKit
-import Presentation
 import TrackerDomain
 
-final class CategoryListAssembly: ViewControllerAssembly {
-    typealias Output = CategoriesListViewModel.Output
-    typealias Context = LifecycleManagingContext<Output, CategoriesListViewModelError, ()>
-    
+final class CategoryListAssembly {
     private let categoryRepository: CategoryRepositoryProtocol
     
     init(categoryRepository: CategoryRepositoryProtocol) {
@@ -20,16 +16,11 @@ final class CategoryListAssembly: ViewControllerAssembly {
     }
     
     @MainActor
-    func assemble(_ context: Context) -> UIViewController {
+    func assemble(_ context: ()) -> UIViewController {
         let viewModel = CategoriesListViewModel(
             categoryRepository: categoryRepository,
-            onAction: {
-                context.resultObserver.send($0)
-            },
-            onCategorySelected: {
-                context.resultObserver.send(completion: .failure(.onCategorySelected($0)))
-                context.closingContext.close()
-            }
+            onAction: { _ in },
+            onCategorySelected: { _ in }
         )
         
         let viewController = CategoriesListViewController(viewModel: viewModel)

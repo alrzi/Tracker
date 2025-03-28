@@ -36,7 +36,7 @@ final class TrackerRepository: TrackerRepositoryProtocol {
     
     // MARK: - Read
     
-    func getTrackers(for category: UUID, isPinned: Bool, weekDay: String, query: String) async throws -> [Tracker] {
+    func getTrackers(for category: UUID, isPinned: Bool, weekDay: WeekDay, query: String) async throws -> [Tracker] {
         let request = FetchRequestBuilder<TrackerObject>()
             .setPredicate(
                 query.isEmpty
@@ -49,7 +49,7 @@ final class TrackerRepository: TrackerRepositoryProtocol {
         return try await persistencyService.fetchObjects(with: request)
     }
     
-    func getTrackers(for category: UUID, isPinned: Bool, weekDay: String, query: String, date: Date) async throws -> [Tracker] {
+    func getTrackers(for category: UUID, isPinned: Bool, weekDay: WeekDay, query: String, date: Date) async throws -> [Tracker] {
         let request = FetchRequestBuilder<TrackerObject>()
             .setPredicate(
                 query.isEmpty
@@ -62,7 +62,7 @@ final class TrackerRepository: TrackerRepositoryProtocol {
         return try await persistencyService.fetchObjects(with: request)
     }
     
-    func getTrackers(isPinned: Bool, weekDay: String, query: String) async throws -> [Tracker] {
+    func getTrackers(isPinned: Bool, weekDay: WeekDay, query: String) async throws -> [Tracker] {
         let request = FetchRequestBuilder<TrackerObject>()
             .setPredicate(
                 query.isEmpty
@@ -75,7 +75,7 @@ final class TrackerRepository: TrackerRepositoryProtocol {
         return try await persistencyService.fetchObjects(with: request)
     }
     
-    func getTrackers(isPinned: Bool, weekDay: String, query: String, date: Date) async throws -> [Tracker] {
+    func getTrackers(isPinned: Bool, weekDay: WeekDay, query: String, date: Date) async throws -> [Tracker] {
         let request = FetchRequestBuilder<TrackerObject>()
             .setPredicate(
                 query.isEmpty
@@ -160,45 +160,45 @@ private extension StaticPredicateBuilder where T: TrackerObject {
         .filter(by: \.name, value: query, comparison: .contains)
     }
     
-    static func by(isPinned: Bool, weekDay: String) -> Self {
+    static func by(isPinned: Bool, weekDay: WeekDay) -> Self {
         .init()
         .filter(by: \.isPinned, value: isPinned, comparison: .equal)
-        .filter(by: \.weekDays, value: weekDay, comparison: .contains)
+        .filter(by: \.weekDays, value: Set([weekDay.rawValue]), comparison: .contains)
     }
     
-    static func by(isPinned: Bool, weekDay: String, query: String) -> Self {
+    static func by(isPinned: Bool, weekDay: WeekDay, query: String) -> Self {
         .by(isPinned: isPinned, weekDay: weekDay)
         .filter(by: \.name, value: query, comparison: .contains)
     }
     
-    static func by(isPinned: Bool, weekDay: String, sectionID: UUID) -> Self {
+    static func by(isPinned: Bool, weekDay: WeekDay, sectionID: UUID) -> Self {
         .by(isPinned: isPinned, weekDay: weekDay)
         .filter(by: \.category.id, value: sectionID, comparison: .equal)
     }
     
-    static func by(isPinned: Bool, weekDay: String, sectionID: UUID, query: String) -> Self {
+    static func by(isPinned: Bool, weekDay: WeekDay, sectionID: UUID, query: String) -> Self {
         .by(isPinned: isPinned, weekDay: weekDay, sectionID: sectionID)
         .filter(by: \.name, value: query, comparison: .contains)
     }
     
-    static func by(isPinned: Bool, weekDay: String, sectionID: UUID, query: String, interval: DateInterval) -> Self {
+    static func by(isPinned: Bool, weekDay: WeekDay, sectionID: UUID, query: String, interval: DateInterval) -> Self {
         .by(isPinned: isPinned, weekDay: weekDay, sectionID: sectionID)
         .filter(by: \.name, value: query, comparison: .contains)
         .subpredicateBetween(by: \.trackerRecord, subKeyPath: \.date, subValue1: interval.start, subValue2: interval.end)
     }
     
-    static func by(isPinned: Bool, weekDay: String, sectionID: UUID, interval: DateInterval) -> Self {
+    static func by(isPinned: Bool, weekDay: WeekDay, sectionID: UUID, interval: DateInterval) -> Self {
         .by(isPinned: isPinned, weekDay: weekDay, sectionID: sectionID)
         .subpredicateBetween(by: \.trackerRecord, subKeyPath: \.date, subValue1: interval.start, subValue2: interval.end)
     }
     
-    static func by(isPinned: Bool, weekDay: String, query: String, interval: DateInterval) -> Self {
+    static func by(isPinned: Bool, weekDay: WeekDay, query: String, interval: DateInterval) -> Self {
         .by(isPinned: isPinned, weekDay: weekDay, query: query)
         .filter(by: \.name, value: query, comparison: .contains)
         .subpredicateBetween(by: \.trackerRecord, subKeyPath: \.date, subValue1: interval.start, subValue2: interval.end)
     }
     
-    static func by(isPinned: Bool, weekDay: String, interval: DateInterval) -> Self {
+    static func by(isPinned: Bool, weekDay: WeekDay, interval: DateInterval) -> Self {
         .by(isPinned: isPinned, weekDay: weekDay)
         .subpredicateBetween(by: \.trackerRecord, subKeyPath: \.date, subValue1: interval.start, subValue2: interval.end)
     }

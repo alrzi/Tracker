@@ -49,14 +49,14 @@ final class CategoryRepository: CategoryRepositoryProtocol {
         return try await persistencyService.fetchObjects(with: request)
     }
     
-    func getSectionsCompleted(params: RequestParameters) async throws -> [TrackerSection] {
+    func getSections(params: RequestParameters, isCompleted: Bool) async throws -> [TrackerSection] {
         let interval = params.currentDate.fullDayInterval()
         
         let request = FetchRequestBuilder<CategoryObject>()
             .setPredicate(
                 params.query.isEmpty
-                ? .byComp(weekDay: params.weekDay, interval: interval)
-                : .byComp(weekDay: params.weekDay, interval: interval, query: params.query)
+                ? .byComp(weekDay: params.weekDay, interval: interval, isCompleted: isCompleted)
+                : .byComp(weekDay: params.weekDay, interval: interval, isCompleted: isCompleted, query: params.query)
             )
             .setSortDescriptors([.init(keyPath: \.title)])
             .setFetchLimit(params.fetchLimit)
@@ -111,9 +111,9 @@ private extension StaticPredicateBuilder where T: CategoryObject {
         .filter(by: \.id, value: id, comparison: .equal)
     }
     
-    static func by(weekDay: String) -> Self {
+    static func by(weekDay: WeekDay) -> Self {
         .init()
-        .subpredicate(by: \.trackers, subKeyPath: \.weekDays, subValue: weekDay, comparison: .contains)
+        .subpredicate(by: \.trackers, subKeyPath: \.weekDays, subValue: Set([weekDay.rawValue]), comparison: .contains)
         .subpredicate(by: \.trackers, subKeyPath: \.isPinned, subValue: false, comparison: .equal)
     }
     
@@ -123,21 +123,21 @@ private extension StaticPredicateBuilder where T: CategoryObject {
         .subpredicate(by: \.trackers, subKeyPath: \.isPinned, subValue: false, comparison: .equal)
     }
     
-    static func by(weekDay: String, query: String) -> Self {
+    static func by(weekDay: WeekDay, query: String) -> Self {
         .by(weekDay: weekDay)
         .subpredicate(by: \.trackers, subKeyPath: \.name, subValue: query, comparison: .contains)
         .subpredicate(by: \.trackers, subKeyPath: \.isPinned, subValue: false, comparison: .equal)
     }
     
-    static func byComp(weekDay: String, interval: DateInterval) -> Self {
+    static func byComp(weekDay: WeekDay, interval: DateInterval, isCompleted: Bool) -> Self {
         .init()
-        .subpredicate(by: \.trackers, subKeyPath: \.weekDays, subValue: weekDay, comparison: .contains)
-        .subpredicateInSubpredicate(by: \.trackers, subKeyPath: \.trackerRecord, terKeyPath: \.date, subValue1: interval.start, subValue2: interval.end)
+        .subpredicate(by: \.trackers, subKeyPath: \.weekDays, subValue: Set([weekDay.rawValue]), comparison: .contains)
+        .subpredicateInSubpredicate(by: \.trackers, subKeyPath: \.trackerRecord, terKeyPath: \.date, subValue1: interval.start, subValue2: interval.end, isMore: isCompleted)
     }
     
-    static func byComp(weekDay: String, interval: DateInterval, query: String) -> Self {
+    static func byComp(weekDay: WeekDay, interval: DateInterval, isCompleted: Bool, query: String) -> Self {
         .by(weekDay: weekDay)
         .subpredicate(by: \.trackers, subKeyPath: \.name, subValue: query, comparison: .contains)
-        .subpredicateInSubpredicate(by: \.trackers, subKeyPath: \.trackerRecord, terKeyPath: \.date, subValue1: interval.start, subValue2: interval.end)
+        .subpredicateInSubpredicate(by: \.trackers, subKeyPath: \.trackerRecord, terKeyPath: \.date, subValue1: interval.start, subValue2: interval.end, isMore: isCompleted)
     }
 }

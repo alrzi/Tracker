@@ -77,7 +77,7 @@ extension TrackersView: View, KeyboardReadable {
                             .transition(.opacity)
                         }
                         
-                        Button(action: { }) {
+                        Button(action: viewModel.onAdd) {
                             Image(systemName: "plus")
                                 .resizable()
                                 .symbolVariant(.circle.fill)
@@ -130,14 +130,17 @@ extension TrackersView: View, KeyboardReadable {
 }
 
 private final class ViewModel: TrackersViewModelProtocol {
+    var route: TrackersRoute?
     var filter: TrackerFilter = .completedForDate
     var queryString: String = ""
     var currentDate: Date = .now
+    
     let isToday = false
     let isPaginating = false
     let state: TrackersState<CollectionViewModel> = .idle
     
     func onSectionAppear(at index: Int) { }
     func onToday() { }
+    func onAdd() { }
 }
 #endif

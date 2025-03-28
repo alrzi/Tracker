@@ -2,44 +2,28 @@
 //  TrackerCreationAssembly.swift
 //  Tracker
 //
-//  Created by Александр Зиновьев on 06.07.2024.
+//  Created by Александр Зиновьев on 22.03.2025.
 //
 
-import UIKit
-import Presentation
+import SwiftUI
+import Foundation
 import TrackerDomain
 
-final class TrackerCreationAssembly: ViewControllerAssembly {
-    typealias Context = LifecycleManagingContext<TrackerCreationViewModel.Action, Never, CreateTrackerMode>
-    
-    private let trackerManager: any TrackerManaging
-    private let userInputCollector: UserInputCollector
-    
-    private let categoryFlowCoordinatorAssembly: CategoryFlowCoordinatorAssembly
-    private let chooseScheduleAssembly: WeekDaysSelectionAssembly
-    
-    init(
-        trackerManager: some TrackerManaging,
-        userInputCollector: UserInputCollector,
-        categoryFlowCoordinatorAssembly: CategoryFlowCoordinatorAssembly,
-        chooseScheduleAssembly: WeekDaysSelectionAssembly
-    ) {
-        self.trackerManager = trackerManager
-        self.userInputCollector = userInputCollector
-        self.categoryFlowCoordinatorAssembly = categoryFlowCoordinatorAssembly
-        self.chooseScheduleAssembly = chooseScheduleAssembly
-    }
-    
-    func assemble(_ context: Context) -> UIViewController {
+final class TrackerCreationAssembly {
+    @MainActor
+    func assemble(_ context: Tracker?, onCompletion: @MainActor @Sendable @escaping (TrackerSection) -> Void) -> some View {
         let viewModel = TrackerCreationViewModel(
-            userInputCollector: userInputCollector,
-            trackerManager: trackerManager,
-            resultObserver: context.resultObserver, 
-            mode: context.configuration
+            tracker: context,
+            eventsHandler: {
+                switch $0 {
+                case .section(let section):
+                    onCompletion(section)
+                }
+            }
         )
         
-        let viewController = TrackerCreationViewController(viewModel: viewModel)
-        
-        return viewController
+        return TrackerCreationNavigator(navigationState: viewModel) {
+            TrackerCreationView(viewModel: viewModel)
+        }
     }
 }

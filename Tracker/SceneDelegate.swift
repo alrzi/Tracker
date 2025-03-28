@@ -25,6 +25,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         
         // MARK: - Servises
         
+        let hapticManager = VibrationFeedbackManager()
         let analyticsTracker = TrackerDataContainer.analyticsTracker
         let trackerFiltersDataStorage = TrackerDataContainer.trackerFiltersDataStorage
         let authDataStorage = TrackerDataContainer.authDataStorage
@@ -39,7 +40,6 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         )
         
         let authService = TrackerDomainContainer.authService(dataStorage: authDataStorage)
-        let userInputCollector: UserInputCollector = .init()
         
         // MARK: - Assembly
         
@@ -47,34 +47,9 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             recordRepository: recordRepository,
             trackerManager: trackerManager
         )
-                
-        let chooseScheduleAssembly = WeekDaysSelectionAssembly()
+        
         let createNewCategoryAssembly = CategoryCreationAssembly(categoryRepository: categoryRepository)
         let categoryListAssembly = CategoryListAssembly(categoryRepository: categoryRepository)
-        
-        let categoryFlowCoordinatorAssembly = CategoryFlowCoordinatorAssembly(
-            categoryListAssembly: categoryListAssembly,
-            createCategory: createNewCategoryAssembly
-        )
-        
-        let createTrackerAssembly = TrackerCreationAssembly(
-            trackerManager: trackerManager, 
-            userInputCollector: userInputCollector,
-            categoryFlowCoordinatorAssembly: categoryFlowCoordinatorAssembly,
-            chooseScheduleAssembly: chooseScheduleAssembly
-        )
-        
-        let trackerUpdatingFlowCoordinatorAssembly = TrackerUpdatingFlowCoordinatorAssembly(
-            userInputCollector: userInputCollector,
-            createTrackerAssembly: createTrackerAssembly,
-            chooseScheduleAssembly: chooseScheduleAssembly,
-            categoryFlowCoordinatorAssembly: categoryFlowCoordinatorAssembly
-        )
-        
-        let trackerCreationFlowCoordinatorAssembly = TrackerCreationFlowCoordinatorAssembly(
-            trackerUpdatingFlowCoordinatorAssembly: trackerUpdatingFlowCoordinatorAssembly
-        )
-        let hapticManager = VibrationFeedbackManager()
         
         let trackersViewModelsFactory = TrackersViewModelsFactory(
             trackerManager: trackerManager,
@@ -86,7 +61,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         let trackersAssembly = TrackersAssembly(
             trackerManager: trackerManager,
             hapticManager: hapticManager,
-            trackersViewModelsFactory: trackersViewModelsFactory
+            trackersViewModelsFactory: trackersViewModelsFactory,
+            trackerCreationSwiftUIAssembly: TrackerCreationAssembly()
         )
         
         let tabBarAssembly = TabBarAssembly(

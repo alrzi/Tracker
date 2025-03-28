@@ -7,25 +7,28 @@
 
 import SwiftUI
 import Foundation
-import Presentation
 import TrackerDomain
 
-final class TrackersAssembly: ViewControllerAssembly {
+final class TrackersAssembly {
     typealias Context = ()
     
     private let trackerManager: any TrackerManaging
     private let hapticManager: any VibrationFeedbackManaging
     
     private let trackersViewModelsFactory: TrackersViewModelsFactory
+    
+    private let trackerCreationSwiftUIAssembly: TrackerCreationAssembly
    
     init(
         trackerManager: some TrackerManaging,
         hapticManager: some VibrationFeedbackManaging,
-        trackersViewModelsFactory: TrackersViewModelsFactory
+        trackersViewModelsFactory: TrackersViewModelsFactory,
+        trackerCreationSwiftUIAssembly: TrackerCreationAssembly
     ) {
         self.trackerManager = trackerManager
         self.hapticManager = hapticManager
         self.trackersViewModelsFactory = trackersViewModelsFactory
+        self.trackerCreationSwiftUIAssembly = trackerCreationSwiftUIAssembly
     }
     
     @MainActor
@@ -36,8 +39,14 @@ final class TrackersAssembly: ViewControllerAssembly {
             trackersViewModelsFactory: trackersViewModelsFactory
         )
         
-        let view = TrackersView(viewModel: viewModel)
-        let viewController = UIHostingController(rootView: view)
+        let viewT = TrackersNavigator(
+            trackerCreationSwiftUIAssembly: trackerCreationSwiftUIAssembly,
+            navigationState: viewModel
+        ) {
+            TrackersView(viewModel: viewModel)
+        }
+        
+        let viewController = UIHostingController(rootView: viewT)
         return viewController
     }
 }

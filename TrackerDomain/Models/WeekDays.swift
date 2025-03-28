@@ -1,74 +1,59 @@
 import Foundation
 
-@objc
-public enum WeekDay: Int64, CaseIterable, Sendable {
-    case monday, tuesday, wednesday, thursday, friday, saturday, sunday
-    
-    // create set of ints 0...6
-    public static let allDaysOfWeek = Set(Self.allCases.map { Int($0.rawValue) })
-    public static var count: Int { allDaysOfWeek.count }
-    
-    public var abbreviationLong: String {
-        switch self {
-        case .monday: "Strings.Localizable.Schedule.monday"
-        case .tuesday: "Strings.Localizable.Schedule.tuesday"
-        case .wednesday: "Strings.Localizable.Schedule.wednesday"
-        case .thursday: "Strings.Localizable.Schedule.thursday"
-        case .friday: "Strings.Localizable.Schedule.friday"
-        case .saturday: "Strings.Localizable.Schedule.saturday"
-        case .sunday: "Strings.Localizable.Schedule.sunday"
-        }
-    }
-    
-    public var abbreviationShort: String {
-        switch self {
-        case .monday: "Strings.Localizable.Schedule.mon"
-        case .tuesday: "Strings.Localizable.Schedule.tue"
-        case .wednesday: "Strings.Localizable.Schedule.wed"
-        case .thursday: "Strings.Localizable.Schedule.thu"
-        case .friday: "Strings.Localizable.Schedule.fri"
-        case .saturday: "Strings.Localizable.Schedule.sat"
-        case .sunday: "Strings.Localizable.Schedule.sun"
-        }
-    }
-}
+public typealias WeekDays = [WeekDay]
 
-extension WeekDay: Comparable {
-    public static func < (lhs: WeekDay, rhs: WeekDay) -> Bool {
-        lhs.rawValue < rhs.rawValue
-    }
-}
-
-public extension Set<Int> {
-    static func fromString(_ str: String) -> Set<Int> {
-        let maxElement = 6
-        let elements = str
-            .components(separatedBy: ", ") // turn to array of string numbers
-            .compactMap { Int($0.trimmingCharacters(in: .whitespaces)) }
-            .filter { 0...maxElement ~= $0 } // filter to have only numbers from 0..<7
+public enum WeekDay: Int {
+    case sunday = 1
+    case monday
+    case tuesday
+    case wednesday
+    case thursday
+    case friday
+    case saturday
+    
+    public static func allCases(for calendar: Calendar = .autoupdatingCurrent) -> [Self] {
+        let firstWeekDay = calendar.firstWeekday
         
-        return Set(elements) // turn to set
-    }
-    
-    func weekdayStringShort() -> String {
-        if self == WeekDay.allDaysOfWeek {
-            return "Strings.Localizable.Schedule.everyday"
-        } 
-        else {
-            let weekDay = WeekDay
-                .allCases // take all cases  from Mon to Sun
-                .filter { self.contains(Int($0.rawValue)) } // check if set has any of weekDays
-                .map { $0.abbreviationShort } // map(transform) to string
-                .joined(separator: ", ") // joing with coma
-            return weekDay
+        // Create an array to hold the ordered weekdays
+        var orderedWeekdays: [Self] = []
+        
+        // Loop through the days of the week based on the first weekday
+        for i in 0..<7 {
+            // Calculate the index based on the first weekday
+            let index = (firstWeekDay - 1 + i) % 7
+            
+            // Append the corresponding weekday case
+            if let weekday = Self(rawValue: index + 1) {
+                orderedWeekdays.append(weekday)
+            }
         }
+        
+        return orderedWeekdays
     }
     
-    func toNumbersString() -> String {
-        self
-            .filter { 0..<7 ~= $0 } // take only numbers from 0 to 6
-            .sorted() // sort Comparable
-            .map { String($0) } // map(transform) to string
-            .joined(separator: ", ") // joing with coma
+    public static func getWeekDay(from date: Date) -> Self {
+        let calendar = Calendar.autoupdatingCurrent
+        let weekday = calendar.component(.weekday, from: date)
+        
+        return Self(rawValue: weekday) ?? .monday
+    }
+    
+    public func localizedString(
+        locale: Locale = .autoupdatingCurrent,
+        format: Date.FormatStyle.Symbol.Weekday = .wide
+    ) -> String {
+        let calendar = Calendar.autoupdatingCurrent
+        
+        if let date = calendar.date(from: DateComponents(weekday: rawValue)) {
+            return date.formatted(.dateTime.weekday(format).locale(locale))
+        }
+        
+        return ""
     }
 }
+
+extension WeekDay: Identifiable {
+    public var id: Self { self }
+}
+
+extension WeekDay: Sendable { }

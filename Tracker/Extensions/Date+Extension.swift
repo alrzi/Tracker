@@ -8,11 +8,6 @@ extension Date {
         String(currentWeekDayNumber)
     }
 
-    var dateString: String {
-        Date.dateFormatter.dateFormat = "yyyy-MM-dd"
-        return Date.dateFormatter.string(from: self)
-    }
-
     var currentWeekDayNumber: Int {
         var calendar = Calendar(identifier: .iso8601)
         calendar.locale = .current

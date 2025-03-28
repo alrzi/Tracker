@@ -5,9 +5,8 @@ public struct Tracker: Hashable, Identifiable, Sendable {
     public let name: String
     public let emoji: String
     public let color: String
-    public let weekDays: Set<Int>
+    public let weekDays: Set<WeekDay>
     public let isPinned: Bool
-    public let kind: Kind
     public let trackedDays: Int
     public let categoryId: UUID
     public let isCompleted: Bool
@@ -17,10 +16,9 @@ public struct Tracker: Hashable, Identifiable, Sendable {
         name: String,
         emoji: String,
         color: String,
-        schedule: Set<Int>,
-        isPinned: Bool,
-        kind: Kind,
-        trackedDays: Int,
+        schedule: Set<WeekDay>,
+        isPinned: Bool = false,
+        trackedDays: Int = .zero,
         categoryId: UUID,
         isCompleted: Bool = false
     ) {
@@ -30,17 +28,9 @@ public struct Tracker: Hashable, Identifiable, Sendable {
         self.color = color
         self.weekDays = schedule
         self.isPinned = isPinned
-        self.kind = kind
         self.trackedDays = trackedDays
         self.categoryId = categoryId
         self.isCompleted = isCompleted
-    }
-}
-
-public extension Tracker {
-    enum Kind: Sendable {
-        case habit
-        case occasional
     }
 }
 
@@ -53,7 +43,6 @@ public extension Tracker {
             color: color,
             schedule: weekDays,
             isPinned: !isPinned,
-            kind: kind, 
             trackedDays: trackedDays,
             categoryId: categoryId
         )
@@ -67,7 +56,6 @@ public extension Tracker {
             color: color,
             schedule: weekDays,
             isPinned: isPinned,
-            kind: kind,
             trackedDays: trackedDays,
             categoryId: categoryId,
             isCompleted: isCompleted
@@ -82,7 +70,6 @@ public extension Tracker {
             color: color,
             schedule: weekDays,
             isPinned: isPinned,
-            kind: kind,
             trackedDays: trackedDays,
             categoryId: categoryId,
             isCompleted: isCompleted

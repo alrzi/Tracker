@@ -15,7 +15,7 @@ func createSectionsWithTrackers(sectionCount: Int, trackerCount: Int) -> [Tracke
         var trackers: [Tracker] = []
         
         let sectionID: UUID = .init()
-        let schedule: Set<Int> = [sectionIndex % 6]
+        let schedule: Set<WeekDay> = [.friday]
         
         for trackerIndex in 0..<trackerCount {
             let id = UUID()
@@ -24,9 +24,8 @@ func createSectionsWithTrackers(sectionCount: Int, trackerCount: Int) -> [Tracke
                 name: "Section \(sectionIndex) - Item \(trackerIndex)",
                 emoji: RandomEmojiService.emoji,
                 color: RandomHexColorService.randomHexString,
-                schedule: schedule,
+                schedule: [.friday],
                 isPinned: false,
-                kind: .habit,
                 trackedDays: 0,
                 categoryId: sectionID
             )
@@ -45,3 +44,165 @@ func createSectionsWithTrackers(sectionCount: Int, trackerCount: Int) -> [Tracke
     
     return sections
 }
+
+let work = [
+    Tracker(
+        name: "Проверить пулРеквесты",
+        emoji: RandomEmojiService.emoji,
+        color: RandomHexColorService.randomHexString,
+        schedule: [.friday],
+        isPinned: false,
+        trackedDays: 0,
+        categoryId: .init()
+    ),
+    Tracker(
+        name: "Задать вопросы",
+        emoji: RandomEmojiService.emoji,
+        color: RandomHexColorService.randomHexString,
+        schedule: [.friday],
+        isPinned: false,
+        
+        trackedDays: 0,
+        categoryId: .init()
+    ),
+]
+
+let life = [
+    Tracker(
+        name: "Погулять в пакре",
+        emoji: RandomEmojiService.emoji,
+        color: RandomHexColorService.randomHexString,
+        schedule: [.friday],
+        isPinned: false,
+        
+        trackedDays: 0,
+        categoryId: .init()
+    ),
+    Tracker(
+        name: "Поговорить с девушкой незнакомой",
+        emoji: RandomEmojiService.emoji,
+        color: RandomHexColorService.randomHexString,
+        schedule: [.friday],
+        isPinned: true,
+        
+        trackedDays: 0,
+        categoryId: .init()
+    )
+]
+
+let cooking = [
+    Tracker(
+        name: "Приготовить что то вкусненькое",
+        emoji: RandomEmojiService.emoji,
+        color: RandomHexColorService.randomHexString,
+        schedule: [.friday],
+        isPinned: true,
+        
+        trackedDays: 0,
+        categoryId: .init()
+    )
+]
+
+let movie = [
+    Tracker(
+        name: "Посмотреть фильм или мультик",
+        emoji: RandomEmojiService.emoji,
+        color: RandomHexColorService.randomHexString,
+        schedule: [.friday],
+        isPinned: true,
+        
+        trackedDays: 0,
+        categoryId: .init()
+    )
+]
+
+let socialization = [
+    Tracker(
+        name: "Сходить в антикафе",
+        emoji: RandomEmojiService.emoji,
+        color: RandomHexColorService.randomHexString,
+        schedule: [.friday],
+        isPinned: true,
+        
+        trackedDays: 0,
+        categoryId: .init()
+    )
+]
+
+let relations = [
+    Tracker(
+        name: "Позвонить родственникам",
+        emoji: RandomEmojiService.emoji,
+        color: RandomHexColorService.randomHexString,
+        schedule: [.friday],
+        isPinned: true,
+        
+        trackedDays: 0,
+        categoryId: .init()
+    )
+]
+
+let adventure = [
+    Tracker(
+        name: "Погулять в новом месте",
+        emoji: RandomEmojiService.emoji,
+        color: RandomHexColorService.randomHexString,
+        schedule: [.friday],
+        isPinned: false,
+        
+        trackedDays: 0,
+        categoryId: .init()
+    )
+]
+
+let books = [
+    Tracker(
+        name: "Почитать книгу",
+        emoji: RandomEmojiService.emoji,
+        color: RandomHexColorService.randomHexString,
+        schedule: [.friday],
+        isPinned: false,
+        
+        trackedDays: 0,
+        categoryId: .init()
+    )
+]
+
+let hobbie = [
+    Tracker(
+        name: "Порефакторить проект",
+        emoji: RandomEmojiService.emoji,
+        color: RandomHexColorService.randomHexString,
+        schedule: [.friday],
+        isPinned: false,
+        
+        trackedDays: 0,
+        categoryId: .init()
+    )
+]
+
+let englishClub = [
+    Tracker(
+        name: "Сходить на английский",
+        emoji: RandomEmojiService.emoji,
+        color: RandomHexColorService.randomHexString,
+        schedule: [.friday],
+        isPinned: true,
+        
+        trackedDays: 0,
+        categoryId: .init()
+    )
+]
+
+let mockTrackerSections = [
+    TrackerSection(title: "Работа", trackers: work),
+    TrackerSection(title: "Жизнь", trackers: life),
+    TrackerSection(title: "Вкусная еда", trackers: cooking),
+    TrackerSection(title: "Кинематограф", trackers: movie),
+    TrackerSection(title: "Общение", trackers: socialization),
+    TrackerSection(title: "Родственники", trackers: relations),
+    TrackerSection(title: "Приключения", trackers: adventure),
+    TrackerSection(title: "Книги", trackers: books),
+    TrackerSection(title: "Хобби", trackers: hobbie),
+    TrackerSection(title: "Английский клуб", trackers: englishClub),
+]

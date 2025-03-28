@@ -6,11 +6,9 @@
 //
 
 import Foundation
-
-import Foundation
 import SwiftUI
 
-struct GridView<T: View, Item: Equatable & Hashable & Identifiable>: View {
+struct GridView<T: View, Item: Equatable & Hashable & Identifiable> {
     @ObservedObject private var viewModel: GridViewModel<Item>
     
     private let columns: Int
@@ -32,7 +30,9 @@ struct GridView<T: View, Item: Equatable & Hashable & Identifiable>: View {
         self.spacing = spacing
         self.content = content
     }
+}
 
+extension GridView: View {
     var body: some View {
         LazyVGrid(columns: gridItems, spacing: spacing) {
             ForEach(viewModel.items) { item in

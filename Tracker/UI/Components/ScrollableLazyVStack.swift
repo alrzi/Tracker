@@ -37,3 +37,9 @@ extension ScrollableLazyVStack: View {
         }
     }
 }
+
+#Preview {
+    ScrollableLazyVStack {
+        Text("ScrollableLazyVStack")
+    }
+}

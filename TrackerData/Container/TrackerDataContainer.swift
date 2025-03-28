@@ -22,10 +22,6 @@ public enum TrackerDataContainer {
         dataStorage
     }
     
-    public static var trackerFiltersDataStorage: TrackerFiltersDataStorage {
-        dataStorage
-    }
-    
     public static var analyticsTracker: AnalyticsTracking {
         YMMYandexMetricaAnaliticsTracker()
     }

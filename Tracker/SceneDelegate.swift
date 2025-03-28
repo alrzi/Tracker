@@ -9,7 +9,7 @@ import UIKit
 import TrackerData
 import TrackerDomain
 
-class SceneDelegate: UIResponder, UIWindowSceneDelegate {
+final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     var window: UIWindow?
 
     func scene(
@@ -27,7 +27,6 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         
         let hapticManager = VibrationFeedbackManager()
         let analyticsTracker = TrackerDataContainer.analyticsTracker
-        let trackerFiltersDataStorage = TrackerDataContainer.trackerFiltersDataStorage
         let authDataStorage = TrackerDataContainer.authDataStorage
         let recordRepository = TrackerDataContainer.recordRepository
         let trackerRepository = TrackerDataContainer.trackerRepository
@@ -47,9 +46,6 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             recordRepository: recordRepository,
             trackerManager: trackerManager
         )
-        
-        let createNewCategoryAssembly = CategoryCreationAssembly(categoryRepository: categoryRepository)
-        let categoryListAssembly = CategoryListAssembly(categoryRepository: categoryRepository)
         
         let trackersViewModelsFactory = TrackersViewModelsFactory(
             trackerManager: trackerManager,

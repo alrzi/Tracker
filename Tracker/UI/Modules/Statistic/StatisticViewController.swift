@@ -2,8 +2,6 @@ import UIKit
 import Combine
 
 final class StatisticViewController: UIViewController {
-    private let placeholder = PlaceholderView(state: .noStatistic)
-    
     private lazy var tableView: UITableView = {
         let view = UITableView()
         view.contentInset.top = 77
@@ -43,11 +41,9 @@ final class StatisticViewController: UIViewController {
             .dropFirst()
             .sink { [weak self] isAny in
                 if isAny {
-                    self?.placeholder.state = .invisible(animate: false)
                     self?.tableView.reloadData()
                 } 
                 else {
-                    self?.placeholder.state = .noStatistic
                     self?.tableView.reloadData()
                 }
             }
@@ -58,16 +54,13 @@ final class StatisticViewController: UIViewController {
         title = "Strings.Localizable.Statistic.title"
         navigationController?.navigationBar.prefersLargeTitles = true
         view.backgroundColor = .white
-        view.addSubviews(placeholder, tableView)
+        view.addSubviews(tableView)
 
         NSLayoutConstraint.activate([
             tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
             tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
             tableView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-            tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
-
-            placeholder.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            placeholder.centerYAnchor.constraint(equalTo: view.centerYAnchor)
+            tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor),        
         ])
     }
 }

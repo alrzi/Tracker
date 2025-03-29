@@ -12,7 +12,7 @@ struct WeekDaysProvider {
     let calendar: Calendar = .autoupdatingCurrent
     
     func getWeekDays() -> [WeekDay] {
-        if calendar.firstWeekday == 1 {
+        if calendar.firstWeekday == 2 {
             WeekDay.allCases
         }
         else {

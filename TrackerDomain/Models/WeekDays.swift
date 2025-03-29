@@ -9,7 +9,7 @@ public enum WeekDay: Int, CaseIterable {
     case thursday
     case friday
     case saturday
-    case sunday
+    case sunday       
     
     public static func getWeekDay(from date: Date) -> Self {
         var calendar = Calendar(identifier: .iso8601)
@@ -21,16 +21,6 @@ public enum WeekDay: Int, CaseIterable {
     
     public func toNumberString() -> String {
         String(rawValue)
-    }
-    
-    public func localizedString(
-        calendar: Calendar = .autoupdatingCurrent,
-        locale: Locale = .autoupdatingCurrent,
-        format: Date.FormatStyle.Symbol.Weekday = .wide
-    ) -> String {
-        let date = calendar.date(from: DateComponents(weekday: rawValue)) ?? .now
-        
-        return date.formatted(.dateTime.weekday().locale(locale))
     }
 }
 
@@ -62,12 +52,6 @@ public extension WeekDay {
 
 extension WeekDay: Sendable { }
 
-extension WeekDay: Comparable {
-    public static func < (lhs: WeekDay, rhs: WeekDay) -> Bool {
-        lhs.rawValue < rhs.rawValue
-    }
-}
-
 extension WeekDay: Identifiable {
     public var id: Self { self }
 }
@@ -84,7 +68,7 @@ public extension WeekDays {
         
         return self
             .sorted(by: { $0.sortOrder < $1.sortOrder })
-            .compactMap { $0.localizedString(calendar: calendar, locale: locale, format: format) }
+            .compactMap { String($0.rawValue) }
             .joined(separator: ", ")
     }
 }

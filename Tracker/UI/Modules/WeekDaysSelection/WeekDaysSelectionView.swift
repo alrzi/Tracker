@@ -35,7 +35,7 @@ extension WeekDaysSelectionView: View {
                 VStack(spacing: 0) {
                     ForEach(Array(weekDays.enumerated()), id: \.element.id) { index, weekDay in
                         ToggleView(
-                            title: weekDay.localizedString().capitalized,
+                            title: weekDay.abbreviationLong.capitalized,
                             isSelected: selectedTags.contains(weekDay),
                             onToggle: { isSelected in
                                 if isSelected {

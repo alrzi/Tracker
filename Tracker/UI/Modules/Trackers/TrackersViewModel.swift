@@ -17,7 +17,6 @@ protocol TrackersViewModelProtocol: ObservableObject, TrackersNavigationState {
     var queryString: String { get set }
     var currentDate: Date { get set }
     var filter: TrackerFilter { get set }
-    var isPaginating: Bool { get }
     var isToday: Bool { get }
     
     func onSectionAppear(at index: Int)
@@ -34,10 +33,9 @@ final class TrackersViewModel: TrackersViewModelProtocol {
     private var cancellables: Set<AnyCancellable> = []
     private var fetchParameters: FetchParameters = .init(fetchLimit: 5, fetchOffset: 0)
     private var pinnedSectionID: UUID?
+    private var paginationState: LoadingState = .idle
     
     @Published private(set) var state: TrackersState<TrackersCollectionViewModel> = .idle
-    @Published private(set) var paginationState: LoadingState = .idle
-    @Published private(set) var isPaginating = false
     
     @Published var filter: TrackerFilter = .forCurrentWeekDay
     @Published var queryString = ""
@@ -70,13 +68,9 @@ final class TrackersViewModel: TrackersViewModelProtocol {
             .sink { [weak self] _, _ in self?.onFilterOrDateTrigger() }
             .store(in: &cancellables)
         
-        $paginationState
-            .map { $0.isLoading }
-            .assign(to: &$isPaginating)
-        
-//        Task { @MainActor in
-//            try await trackerManager.addSections(mockTrackerSections)
-//        }
+//                Task { @MainActor in
+//                    try await trackerManager.addSections(mockTrackerSections)
+//                }
     }
     
     func onToday() {
@@ -88,8 +82,8 @@ final class TrackersViewModel: TrackersViewModelProtocol {
     }
     
     func onSectionAppear(at index: Int) {
-        Task {
-            await paginateMoreSectionsIfNeeded(index: index)
+        Task.detached { [weak self] in
+            await self?.paginateMoreSectionsIfNeeded(index: index)
         }
     }
 }
@@ -147,7 +141,7 @@ private extension TrackersViewModel {
     func create(section: TrackerSection) async {
         
     }
-        
+    
     func update(section: TrackerSection) async {
         do {
             try await trackerManager.addSection(withId: section.id, toTracker: section.trackers[0])
@@ -208,7 +202,7 @@ private extension TrackersViewModel {
     }
     
     func paginateMoreSectionsIfNeeded(index: Int) async {
-        guard index == state.lastElementIndex else {
+        guard index + 1 == state.lastElementIndex else {
             return
         }
         
@@ -221,11 +215,11 @@ private extension TrackersViewModel {
         do {
             let sections = try await fetchSections(isPaginating: true, params: commonParams)
             
-            fetchParameters.nextPage()
-            
-            state = .loaded(currentModels + createModels(from: sections))
-            
-            paginationState = .idle
+            if !sections.isEmpty {
+                state = .loaded(currentModels + createModels(from: sections))
+                fetchParameters.nextPage()
+                paginationState = .idle
+            }
         }
         catch {
             debugPrint(error)

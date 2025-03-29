@@ -136,7 +136,6 @@ private final class ViewModel: TrackersViewModelProtocol {
     var currentDate: Date = .now
     
     let isToday = false
-    let isPaginating = false
     let state: TrackersState<CollectionViewModel> = .idle
     
     func onSectionAppear(at index: Int) { }

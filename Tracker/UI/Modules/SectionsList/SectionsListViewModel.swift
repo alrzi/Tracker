@@ -9,7 +9,7 @@ import Foundation
 import TrackerDomain
 
 @MainActor
-protocol SectionsListViewModelProtocol: ObservableObject {
+protocol SectionsListViewModelProtocol: ObservableObject, SectionListNavigationState {
     var state: SectionsListState { get }
     var selectedSection: TrackerSection? { get }
     
@@ -22,6 +22,8 @@ final class SectionsListViewModel: SectionsListViewModelProtocol {
     
     @Published private(set) var state: SectionsListState = .loading
     private(set) var selectedSection: TrackerSection?
+    
+    @Published var route: SectionListRoute?
     
     init(
         sectionRepository: some CategoryRepositoryProtocol,

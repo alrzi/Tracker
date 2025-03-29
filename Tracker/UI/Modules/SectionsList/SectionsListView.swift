@@ -99,9 +99,11 @@ private struct ButtonView: View {
     SectionsListView(viewModel: ViewModel())
 }
 
-private final class ViewModel: SectionsListViewModelProtocol {   
+private final class ViewModel: SectionsListViewModelProtocol {
     let selectedSection: TrackerSection?
     let state: SectionsListState
+    
+    var route: SectionListRoute?
     
     init() {
         let section1: TrackerSection = .init(title: "asd", trackers: [])

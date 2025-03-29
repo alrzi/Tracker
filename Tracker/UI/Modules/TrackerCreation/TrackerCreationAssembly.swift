@@ -22,7 +22,7 @@ final class TrackerCreationAssembly {
     }
     
     @MainActor
-    func assemble(_ context: Tracker?, onCompletion: @MainActor @escaping (sending TrackerSection) -> Void) -> some View {
+    func assemble(_ context: Tracker?, onCompletion: @escaping (TrackerSection) -> Void) -> some View {
         let viewModel = TrackerCreationViewModel(
             tracker: context,
             eventsHandler: {

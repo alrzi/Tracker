@@ -78,6 +78,7 @@ final class TrackersViewModel: TrackersViewModelProtocol {
     }
     
     func onAdd() {
+        hapticManager.makeVibration(for: .selection)
         route = .create(onCompletion: { [weak self] in self?.onSectionCreated($0) })
     }
     

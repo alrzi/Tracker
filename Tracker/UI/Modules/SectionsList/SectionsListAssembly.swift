@@ -19,15 +19,15 @@ final class SectionsListAssembly {
     }
     
     @MainActor
-    func assemble(_ context: Context, onCompletion: @MainActor @escaping (sending TrackerSection) -> Void) -> some View {
+    func assemble(_ context: Context, onCompletion: @escaping (TrackerSection) -> Void) -> some View {
         let viewModel = SectionsListViewModel(
             sectionRepository: sectionRepository,
             sectionID: context,
             eventsHandler: { onCompletion($0) }
         )
         
-        let view = SectionsListView(viewModel: viewModel)
-        
-        return view
+        return SectionListNavigator(navigationState: viewModel) {
+            SectionsListView(viewModel: viewModel)
+        }
     }
 }

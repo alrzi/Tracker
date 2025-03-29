@@ -14,8 +14,8 @@ protocol TrackerCreationNavigationState: ObservableObject {
 }
 
 enum TrackerCreationRoute: Identifiable {
-    case weekDay(WeekDays, onCompletion: @MainActor (sending WeekDays) -> Void)
-    case section(UUID?, onCompletion: @MainActor (sending TrackerSection) -> Void)
+    case weekDay(WeekDays, onCompletion: (WeekDays) -> Void)
+    case section(UUID?, onCompletion: (TrackerSection) -> Void)
     
     var id: ID {
         switch self {

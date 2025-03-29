@@ -17,7 +17,7 @@ final class WeekDaysSelectionAssembly {
     }
     
     @MainActor
-    func assemble(_ context: WeekDays, onCompletion: @MainActor @escaping (sending WeekDays) -> Void) -> some View {
+    func assemble(_ context: WeekDays, onCompletion: @escaping (WeekDays) -> Void) -> some View {
         let view = WeekDaysSelectionView(
             weekDays: weekDaysProvider.getWeekDays(),
             selectedTags: context,

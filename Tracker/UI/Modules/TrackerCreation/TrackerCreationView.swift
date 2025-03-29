@@ -120,6 +120,7 @@ extension TrackerCreationView: View {
                 .padding(16)
                 .background(Color(uiColor: .systemBackground))
             }
+            .ignoresSafeArea(.keyboard, edges: .bottom)
             .navigationTitle(R.string.localizable.createNewHabit())
         }
     }

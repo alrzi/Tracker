@@ -50,7 +50,7 @@ let work = [
         name: "Проверить пулРеквесты",
         emoji: RandomEmojiService.emoji,
         color: RandomHexColorService.randomHexString,
-        schedule: [.friday],
+        schedule: Set(WeekDay.allCases),
         isPinned: false,
         trackedDays: 0,
         categoryId: .init()
@@ -59,9 +59,8 @@ let work = [
         name: "Задать вопросы",
         emoji: RandomEmojiService.emoji,
         color: RandomHexColorService.randomHexString,
-        schedule: [.friday],
+        schedule: [.tuesday],
         isPinned: false,
-        
         trackedDays: 0,
         categoryId: .init()
     ),
@@ -72,9 +71,8 @@ let life = [
         name: "Погулять в пакре",
         emoji: RandomEmojiService.emoji,
         color: RandomHexColorService.randomHexString,
-        schedule: [.friday],
+        schedule: Set(WeekDay.allCases),
         isPinned: false,
-        
         trackedDays: 0,
         categoryId: .init()
     ),
@@ -82,9 +80,8 @@ let life = [
         name: "Поговорить с девушкой незнакомой",
         emoji: RandomEmojiService.emoji,
         color: RandomHexColorService.randomHexString,
-        schedule: [.friday],
+        schedule: Set(WeekDay.allCases),
         isPinned: true,
-        
         trackedDays: 0,
         categoryId: .init()
     )
@@ -97,7 +94,6 @@ let cooking = [
         color: RandomHexColorService.randomHexString,
         schedule: [.friday],
         isPinned: true,
-        
         trackedDays: 0,
         categoryId: .init()
     )
@@ -108,9 +104,8 @@ let movie = [
         name: "Посмотреть фильм или мультик",
         emoji: RandomEmojiService.emoji,
         color: RandomHexColorService.randomHexString,
-        schedule: [.friday],
+        schedule: [.wednesday, .friday, .sunday],
         isPinned: true,
-        
         trackedDays: 0,
         categoryId: .init()
     )
@@ -121,9 +116,8 @@ let socialization = [
         name: "Сходить в антикафе",
         emoji: RandomEmojiService.emoji,
         color: RandomHexColorService.randomHexString,
-        schedule: [.friday],
+        schedule: [.sunday],
         isPinned: true,
-        
         trackedDays: 0,
         categoryId: .init()
     )
@@ -136,7 +130,6 @@ let relations = [
         color: RandomHexColorService.randomHexString,
         schedule: [.friday],
         isPinned: true,
-        
         trackedDays: 0,
         categoryId: .init()
     )
@@ -147,9 +140,8 @@ let adventure = [
         name: "Погулять в новом месте",
         emoji: RandomEmojiService.emoji,
         color: RandomHexColorService.randomHexString,
-        schedule: [.friday],
+        schedule: [.saturday],
         isPinned: false,
-        
         trackedDays: 0,
         categoryId: .init()
     )
@@ -160,9 +152,8 @@ let books = [
         name: "Почитать книгу",
         emoji: RandomEmojiService.emoji,
         color: RandomHexColorService.randomHexString,
-        schedule: [.friday],
+        schedule: Set(WeekDay.allCases),
         isPinned: false,
-        
         trackedDays: 0,
         categoryId: .init()
     )
@@ -173,9 +164,8 @@ let hobbie = [
         name: "Порефакторить проект",
         emoji: RandomEmojiService.emoji,
         color: RandomHexColorService.randomHexString,
-        schedule: [.friday],
+        schedule: Set(WeekDay.allCases),
         isPinned: false,
-        
         trackedDays: 0,
         categoryId: .init()
     )
@@ -186,9 +176,8 @@ let englishClub = [
         name: "Сходить на английский",
         emoji: RandomEmojiService.emoji,
         color: RandomHexColorService.randomHexString,
-        schedule: [.friday],
+        schedule: [.sunday],
         isPinned: true,
-        
         trackedDays: 0,
         categoryId: .init()
     )

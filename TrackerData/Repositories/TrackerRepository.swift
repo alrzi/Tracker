@@ -163,7 +163,7 @@ private extension StaticPredicateBuilder where T: TrackerObject {
     static func by(isPinned: Bool, weekDay: WeekDay) -> Self {
         .init()
         .filter(by: \.isPinned, value: isPinned, comparison: .equal)
-        .filter(by: \.weekDays, value: Set([weekDay.rawValue]), comparison: .contains)
+        .filter(by: \.weekDays, value: weekDay.toNumberString(), comparison: .contains)
     }
     
     static func by(isPinned: Bool, weekDay: WeekDay, query: String) -> Self {

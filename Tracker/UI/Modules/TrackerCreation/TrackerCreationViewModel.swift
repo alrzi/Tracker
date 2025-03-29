@@ -120,7 +120,7 @@ final class TrackerCreationViewModel: TrackerCreationViewModelProtocol {
     }
 }
 
-extension TrackerCreationViewModel {
+private extension TrackerCreationViewModel {
     static func createSectionIfPossible(
         name: String,
         sectionName: String?,

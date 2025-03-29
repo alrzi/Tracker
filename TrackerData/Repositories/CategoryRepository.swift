@@ -123,7 +123,7 @@ private extension StaticPredicateBuilder where T: CategoryObject {
     
     static func by(weekDay: WeekDay) -> Self {
         .init()
-        .subpredicate(by: \.trackers, subKeyPath: \.weekDays, subValue: Set([weekDay.rawValue]), comparison: .contains)
+        .subpredicate(by: \.trackers, subKeyPath: \.weekDays, subValue: weekDay.toNumberString(), comparison: .contains)
         .subpredicate(by: \.trackers, subKeyPath: \.isPinned, subValue: false, comparison: .equal)
     }
     
@@ -141,7 +141,7 @@ private extension StaticPredicateBuilder where T: CategoryObject {
     
     static func byComp(weekDay: WeekDay, interval: DateInterval, isCompleted: Bool) -> Self {
         .init()
-        .subpredicate(by: \.trackers, subKeyPath: \.weekDays, subValue: Set([weekDay.rawValue]), comparison: .contains)
+        .subpredicate(by: \.trackers, subKeyPath: \.weekDays, subValue: weekDay.toNumberString(), comparison: .contains)
         .subpredicateInSubpredicate(by: \.trackers, subKeyPath: \.trackerRecord, terKeyPath: \.date, subValue1: interval.start, subValue2: interval.end, isMore: isCompleted)
     }
     

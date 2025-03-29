@@ -15,7 +15,7 @@ public class TrackerObject: NSManagedObject {
     @NSManaged public var color: String
     @NSManaged public var emoji: String
     @NSManaged public var isPinned: Bool
-    @NSManaged public var weekDays: Set<Int>
+    @NSManaged public var weekDays: String
     @NSManaged public var category: CategoryObject
     @NSManaged public var trackerRecord: Set<RecordObject>
 }
@@ -37,7 +37,7 @@ extension TrackerObject: CopyableEntity {
         self.color = tracker.color
         self.emoji = tracker.emoji
         self.isPinned = tracker.isPinned
-        self.weekDays = Set(tracker.weekDays.map { $0.rawValue })
+        self.weekDays = tracker.weekDays.toNumbersString()
         self.category = category
         self.trackerRecord = trackerRecord
     }
@@ -50,7 +50,7 @@ extension Tracker: Initable {
             name: object.name,
             emoji: object.emoji,
             color: object.color,
-            schedule: Set(object.weekDays.compactMap { WeekDay(rawValue: $0) }),
+            schedule: WeekDay.fromNumberString(object.weekDays),
             isPinned: object.isPinned,
             trackedDays: object.trackerRecord.count,
             categoryId: object.category.id

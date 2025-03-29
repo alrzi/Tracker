@@ -74,10 +74,9 @@ final class TrackersViewModel: TrackersViewModelProtocol {
             .map { $0.isLoading }
             .assign(to: &$isPaginating)
         
-        //        Task { @MainActor in
-        //            let sections = createSectionsWithTrackers(sectionCount: 80, trackerCount: 4)
-        //            try await trackerManager.addSections(sections)
-        //        }
+//        Task { @MainActor in
+//            try await trackerManager.addSections(mockTrackerSections)
+//        }
     }
     
     func onToday() {
@@ -85,12 +84,7 @@ final class TrackersViewModel: TrackersViewModelProtocol {
     }
     
     func onAdd() {
-        route = .create(
-            onCompletion: { [weak self] in
-                self?.route = nil
-                self?.onSectionCreated($0)
-            }
-        )
+        route = .create(onCompletion: { [weak self] in self?.onSectionCreated($0) })
     }
     
     func onSectionAppear(at index: Int) {
@@ -133,12 +127,16 @@ private extension TrackersViewModel {
     }
     
     func onSectionCreated(_ section: TrackerSection) {
+        route = nil
+        
         Task {
             await create(section: section)
         }
     }
     
     func onSectionUpdated(_ updatedSection: TrackerSection) {
+        route = nil
+        
         Task {
             await update(section: updatedSection)
         }

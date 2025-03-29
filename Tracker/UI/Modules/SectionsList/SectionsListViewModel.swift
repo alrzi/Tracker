@@ -59,7 +59,7 @@ private extension SectionsListViewModel {
             state = .loaded(sections)
         }
         catch {
-            state = .error(NSError())
+            state = .error
         }
     }
     

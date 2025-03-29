@@ -10,10 +10,16 @@ import Foundation
 import TrackerDomain
 
 final class WeekDaysSelectionAssembly {
+    private let weekDaysProvider: WeekDaysProvider
+    
+    init(weekDaysProvider: WeekDaysProvider = WeekDaysProvider()) {
+        self.weekDaysProvider = weekDaysProvider
+    }
     
     @MainActor
     func assemble(_ context: WeekDays, onCompletion: @MainActor @escaping (sending WeekDays) -> Void) -> some View {
         let view = WeekDaysSelectionView(
+            weekDays: weekDaysProvider.getWeekDays(),
             selectedTags: context,
             onNext: { onCompletion($0) }
         )

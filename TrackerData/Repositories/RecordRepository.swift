@@ -109,7 +109,7 @@ private extension StaticPredicateBuilder where T: RecordObject {
     static func by(for dateInterval: DateInterval, weekDay: WeekDay, isPinned: Bool) -> Self {
         .init()
         .filter(by: \.tracker.isPinned, value: isPinned, comparison: .equal)
-        .filter(by: \.tracker.weekDays, value: Set([weekDay.rawValue]), comparison: .contains)
+        .filter(by: \.tracker.weekDays, value: weekDay.toNumberString(), comparison: .contains)
         .filter(by: \.date, value: dateInterval.start, comparison: .greaterThanOrEqual)
         .filter(by: \.date, value: dateInterval.end, comparison: .lessThan)
     }
@@ -117,7 +117,7 @@ private extension StaticPredicateBuilder where T: RecordObject {
     static func by(for dateInterval: DateInterval, weekDay: WeekDay, isPinned: Bool, query: String) -> Self {
         .init()
         .filter(by: \.tracker.isPinned, value: isPinned, comparison: .equal)
-        .filter(by: \.tracker.weekDays, value: Set([weekDay.rawValue]), comparison: .contains)
+        .filter(by: \.tracker.weekDays, value: weekDay.toNumberString(), comparison: .contains)
         .filter(by: \.tracker.name, value: query, comparison: .contains)
         .filter(by: \.date, value: dateInterval.start, comparison: .greaterThanOrEqual)
         .filter(by: \.date, value: dateInterval.end, comparison: .lessThan)
@@ -127,7 +127,7 @@ private extension StaticPredicateBuilder where T: RecordObject {
         .init()
         .filter(by: \.tracker.category.id, value: sectionId, comparison: .equal)
         .filter(by: \.tracker.isPinned, value: isPinned, comparison: .equal)
-        .filter(by: \.tracker.weekDays, value: Set([weekDay.rawValue]), comparison: .contains)
+        .filter(by: \.tracker.weekDays, value: weekDay.toNumberString(), comparison: .contains)
         .filter(by: \.date, value: dateInterval.start, comparison: .greaterThanOrEqual)
         .filter(by: \.date, value: dateInterval.end, comparison: .lessThan)
     }
@@ -136,7 +136,7 @@ private extension StaticPredicateBuilder where T: RecordObject {
         .init()
         .filter(by: \.tracker.category.id, value: sectionId, comparison: .equal)
         .filter(by: \.tracker.isPinned, value: isPinned, comparison: .equal)
-        .filter(by: \.tracker.weekDays, value: Set([weekDay.rawValue]), comparison: .contains)
+        .filter(by: \.tracker.weekDays, value: weekDay.toNumberString(), comparison: .contains)
         .filter(by: \.tracker.name, value: query, comparison: .contains)
         .filter(by: \.date, value: dateInterval.start, comparison: .greaterThanOrEqual)
         .filter(by: \.date, value: dateInterval.end, comparison: .lessThan)

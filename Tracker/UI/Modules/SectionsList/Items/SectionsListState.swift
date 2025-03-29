@@ -11,7 +11,7 @@ import TrackerDomain
 enum SectionsListState {
     case loading
     case loaded([TrackerSection])
-    case error(Error)
+    case error
 
     var models: [TrackerSection] {
         if case .loaded(let model) = self {

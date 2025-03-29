@@ -2,53 +2,69 @@ import Foundation
 
 public typealias WeekDays = Set<WeekDay>
 
-public enum WeekDay: Int {
-    case sunday = 1
+public enum WeekDay: Int, CaseIterable {
     case monday
     case tuesday
     case wednesday
     case thursday
     case friday
     case saturday
-    
-    public static func allCases(for calendar: Calendar = .autoupdatingCurrent) -> [Self] {
-        let firstWeekDay = calendar.firstWeekday
-        
-        // Create an array to hold the ordered weekdays
-        var orderedWeekdays: [Self] = []
-        
-        // Loop through the days of the week based on the first weekday
-        for i in 0..<7 {
-            // Calculate the index based on the first weekday
-            let index = (firstWeekDay - 1 + i) % 7
-            
-            // Append the corresponding weekday case
-            if let weekday = Self(rawValue: index + 1) {
-                orderedWeekdays.append(weekday)
-            }
-        }
-        
-        return orderedWeekdays
-    }
+    case sunday
     
     public static func getWeekDay(from date: Date) -> Self {
-        let calendar = Calendar.autoupdatingCurrent
-        let weekday = calendar.component(.weekday, from: date)
+        var calendar = Calendar(identifier: .iso8601)
+        calendar.locale = .autoupdatingCurrent
+        let weekday = (calendar.component(.weekday, from: date) + 5) % 7
         
         return Self(rawValue: weekday) ?? .monday
     }
     
+    public func toNumberString() -> String {
+        String(rawValue)
+    }
+    
     public func localizedString(
+        calendar: Calendar = .autoupdatingCurrent,
         locale: Locale = .autoupdatingCurrent,
         format: Date.FormatStyle.Symbol.Weekday = .wide
     ) -> String {
-        let calendar = Calendar.autoupdatingCurrent
+        let date = calendar.date(from: DateComponents(weekday: rawValue)) ?? .now
         
-        if let date = calendar.date(from: DateComponents(weekday: rawValue)) {
-            return date.formatted(.dateTime.weekday(format).locale(locale))
-        }
+        return date.formatted(.dateTime.weekday().locale(locale))
+    }
+}
+
+public extension Set where Element == WeekDay {
+    func toNumbersString() -> String {
+        let string = self
+            .map { String($0.rawValue) }
+            .joined(separator: ", ")
         
-        return ""
+        return string
+    }
+}
+
+public extension WeekDay {
+    static func fromNumberString(_ string: String) -> WeekDays {
+        let elements: [WeekDay] = string
+            .components(separatedBy: ", ")
+            .compactMap { numberString in
+                guard let rawValue = Int(numberString) else {
+                    return nil
+                }
+                
+                return WeekDay(rawValue: rawValue)
+            }
+        
+        return Set(elements)
+    }
+}
+
+extension WeekDay: Sendable { }
+
+extension WeekDay: Comparable {
+    public static func < (lhs: WeekDay, rhs: WeekDay) -> Bool {
+        lhs.rawValue < rhs.rawValue
     }
 }
 
@@ -56,14 +72,37 @@ extension WeekDay: Identifiable {
     public var id: Self { self }
 }
 
-extension WeekDay: Sendable { }
-
-extension WeekDays {
-    public func formatted() -> String? {
+public extension WeekDays {
+    func formatted(
+        calendar: Calendar = .autoupdatingCurrent,
+        locale: Locale = .autoupdatingCurrent,
+        format: Date.FormatStyle.Symbol.Weekday = .short
+    ) -> String? {
         guard !self.isEmpty else {
             return nil
         }
         
-        return self.sorted(by: { $0.rawValue < $1.rawValue }).map { $0.localizedString(format: .short) }.joined(separator: ", ")
+        return self
+            .sorted(by: { $0.sortOrder < $1.sortOrder })
+            .compactMap { $0.localizedString(calendar: calendar, locale: locale, format: format) }
+            .joined(separator: ", ")
+    }
+}
+
+private extension WeekDay {
+    var sortOrder: Int {
+        Calendar.autoupdatingCurrent.firstWeekday == 1 ? sundaySortOrder : rawValue
+    }
+    
+    var sundaySortOrder: Int {
+        switch self {
+        case .sunday: 0
+        case .monday: 1
+        case .tuesday: 2
+        case .wednesday: 3
+        case .thursday: 4
+        case .friday: 5
+        case .saturday: 6
+        }
     }
 }

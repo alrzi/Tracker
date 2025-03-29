@@ -11,14 +11,16 @@ import Foundation
 
 struct WeekDaysSelectionView {
     private let onNext: (WeekDays) -> Void
-    private let weekDays = WeekDay.allCases()
+    private let weekDays: [WeekDay]
     
     @State private var selectedTags: WeekDays = []
     
     init(
+        weekDays: [WeekDay],
         selectedTags: WeekDays,
         onNext: @escaping (WeekDays) -> Void
     ) {
+        self.weekDays = weekDays
         self.selectedTags = selectedTags
         self.onNext = onNext
     }
@@ -54,7 +56,7 @@ extension WeekDaysSelectionView: View {
                 .background(.tertiary.opacity(0.3), in: .rect(cornerRadius: 16))
                 .padding(.top, 24)
             }
-            .safeAreaInset(edge: .bottom) {
+            .safeAreaInset(edge: .bottom, spacing: 16) {
                 Button(R.string.localizable.scheduleReady(), action: { onNext(selectedTags) })
                     .buttonStyle(CommonButtonStyle(backgroundColor: .black))
                     .padding(.horizontal, 16)
@@ -96,6 +98,7 @@ private struct ToggleView: View {
 #if DEBUG
 #Preview {
     WeekDaysSelectionView(
+        weekDays: WeekDay.allCases,
         selectedTags: [.friday],
         onNext: { _ in }
     )

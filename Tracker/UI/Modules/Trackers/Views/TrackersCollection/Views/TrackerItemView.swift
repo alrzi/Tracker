@@ -74,6 +74,7 @@ private struct TrackerView: View {
                     .foregroundStyle(.white)
                     .layoutPriority(1)
             }
+            .layoutPriority(1)
             
             Spacer(minLength: 0)
         }
@@ -97,7 +98,7 @@ private struct TrackerView: View {
             .padding(.top, 12)
             .padding(.trailing, 4)
         }
-        .frame(height: 90)
+        .frame(height: 100)
     }
 }
 

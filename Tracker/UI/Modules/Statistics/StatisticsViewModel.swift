@@ -1,14 +1,25 @@
+//
+//  StatisticsViewModel.swift
+//  Tracker
+//
+//  Created by Александр Зиновьев on 02.04.2025.
+//
+
 import Foundation
-import Combine
 import TrackerDomain
 
 @MainActor
-final class StatisticViewModel {
+protocol StatisticsViewModelProtocol: ObservableObject {
+    var statisticData: [StatisticTableData] { get }
+    
+    func onAppear()
+}
+
+final class StatisticsViewModel: StatisticsViewModelProtocol {
     private let recordRepository: RecordRepositoryProtocol
     private let trackerManager: any TrackerManaging
-    
-    @Published private(set) var isAnyTrackers = false
-    private(set) var statisticData: [StatisticTableData] = []
+        
+    @Published private(set) var statisticData: [StatisticTableData] = []
     
     init(
         recordRepository: RecordRepositoryProtocol,
@@ -16,8 +27,20 @@ final class StatisticViewModel {
     ) {
         self.recordRepository = recordRepository
         self.trackerManager = trackerManager
-        
+    }
+    
+    func onAppear() {
         Task {
+            await updateStatisticData()
+        }
+    }
+}
+
+// MARK: - Private
+
+private extension StatisticsViewModel {
+    func updateStatisticData() async {
+        do {
             let numberOfCompletedTrackers = try await recordRepository.numberOfCompletedTrackers
             
             statisticData = [
@@ -26,6 +49,9 @@ final class StatisticViewModel {
                 .completedTrackers(.init(completedTrackersCount: numberOfCompletedTrackers)),
                 .averageValue(.init())
             ]
+        }
+        catch {
+            debugPrint(error)
         }
     }
 }

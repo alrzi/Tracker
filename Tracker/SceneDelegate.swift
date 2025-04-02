@@ -42,7 +42,7 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         
         // MARK: - Assembly
         
-        let statisticAssembly = StatisticAssembly(
+        let statisticsAssembly = StatisticsAssembly(
             recordRepository: recordRepository,
             trackerManager: trackerManager
         )
@@ -66,7 +66,7 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         
         let tabBarAssembly = TabBarAssembly(
             trackersAssembly: trackersAssembly,
-            statisticAssembly: statisticAssembly
+            statisticAssembly: statisticsAssembly
         )
         
         let splash = SplashViewAssembly(tabBarAssembly: tabBarAssembly, authService: authService)

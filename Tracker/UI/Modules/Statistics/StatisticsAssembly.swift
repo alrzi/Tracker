@@ -1,17 +1,15 @@
 //
-//  StatisticAssembly.swift
+//  StatisticsAssembly.swift
 //  Tracker
 //
-//  Created by Александр Зиновьев on 27.07.2024.
+//  Created by Александр Зиновьев on 02.04.2025.
 //
 
+import SwiftUI
 import Foundation
-import UIKit
 import TrackerDomain
 
-final class StatisticAssembly {
-    typealias Context = ()
-    
+final class StatisticsAssembly {
     private let recordRepository: any RecordRepositoryProtocol
     private let trackerManager: any TrackerManaging
     
@@ -24,13 +22,14 @@ final class StatisticAssembly {
     }
     
     @MainActor
-    func assemble(_ context: Context) -> UIViewController {
-        let viewModel = StatisticViewModel(
+    func assemble() -> UIViewController {
+        let viewModel = StatisticsViewModel(
             recordRepository: recordRepository,
             trackerManager: trackerManager
         )
         
-        let viewController = StatisticViewController(viewModel: viewModel)
+        let view = StatisticsView(viewModel: viewModel)
+        let viewController = UIHostingController(rootView: view)
         
         return viewController
     }

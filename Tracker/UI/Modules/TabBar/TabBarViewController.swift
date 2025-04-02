@@ -2,13 +2,13 @@ import UIKit
 
 final class TabBarViewController: UITabBarController {
     private let trackersAssembly: TrackersAssembly
-    private let statisticAssembly: StatisticAssembly
+    private let statisticAssembly: StatisticsAssembly
     
     private let viewModel: TabBarViewModel
     
     init(
         trackersAssembly: TrackersAssembly,
-        statisticAssembly: StatisticAssembly,
+        statisticAssembly: StatisticsAssembly,
         viewModel: TabBarViewModel
     ) {
         self.viewModel = viewModel
@@ -27,7 +27,7 @@ final class TabBarViewController: UITabBarController {
         
         viewControllers = [
             trackersAssembly.assemble(()),
-            statisticAssembly.assemble(())
+            statisticAssembly.assemble()
         ]
         
         TabItem.allCases.enumerated().forEach { index, item in

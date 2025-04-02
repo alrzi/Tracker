@@ -11,6 +11,7 @@ import Foundation
 /// Вспомогательная логика пометки компонентов ошибочными
 ///
 /// Может использоваться для управления шейком полей из вьюмодели в SwiftUI вью
+@MainActor
 protocol InvalidComponentManaging<Component> {
     associatedtype Component: Equatable
     associatedtype InvalidComponentPublisher: Publisher<Component?, Never>

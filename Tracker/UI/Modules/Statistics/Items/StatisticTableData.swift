@@ -8,10 +8,10 @@
 import Foundation
 
 enum StatisticTableData {
-    case bestPeriod(StatisticCellViewModel)
-    case idealDays(StatisticCellViewModel)
-    case completedTrackers(StatisticCellViewModel)
-    case averageValue(StatisticCellViewModel)
+    case bestPeriod(StatisticViewModel)
+    case idealDays(StatisticViewModel)
+    case completedTrackers(StatisticViewModel)
+    case averageValue(StatisticViewModel)
 
     var title: String {
         switch self {
@@ -22,12 +22,23 @@ enum StatisticTableData {
         }
     }
     
-    var viewModel: StatisticCellViewModel {
+    var viewModel: StatisticViewModel {
         switch self {
         case .bestPeriod(let viewModel): viewModel
         case .idealDays(let viewModel): viewModel
         case .completedTrackers(let viewModel): viewModel
         case .averageValue(let viewModel): viewModel
+        }
+    }
+}
+
+extension StatisticTableData: Identifiable {
+    var id: UUID {
+        switch self {
+        case .bestPeriod(let viewModel): viewModel.id
+        case .idealDays(let viewModel): viewModel.id
+        case .completedTrackers(let viewModel): viewModel.id
+        case .averageValue(let viewModel): viewModel.id
         }
     }
 }

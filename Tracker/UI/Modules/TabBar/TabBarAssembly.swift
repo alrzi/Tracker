@@ -11,11 +11,11 @@ final class TabBarAssembly {
     typealias Context = ()
     
     private let trackersAssembly: TrackersAssembly
-    private let statisticAssembly: StatisticAssembly
+    private let statisticAssembly: StatisticsAssembly
     
     init(
         trackersAssembly: TrackersAssembly,
-        statisticAssembly: StatisticAssembly
+        statisticAssembly: StatisticsAssembly
     ) {
         self.trackersAssembly = trackersAssembly
         self.statisticAssembly = statisticAssembly

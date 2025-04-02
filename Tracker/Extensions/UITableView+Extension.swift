@@ -1,6 +1,10 @@
 import UIKit
 
 extension UITableViewCell {
+    static var reuseIdentifier: String {
+        String(describing: self)
+    }
+    
     // MARK: - Public
     func setSeparatorInset(in tableView: UITableView, at indexPath: IndexPath) {
         if tableView.cellIsOnlyOne(at: indexPath) {
@@ -29,7 +33,7 @@ extension UITableViewCell {
         }
     }
     
-    func setCorners(in tableView: UITableView, at indexPath: IndexPath, radius: CGFloat = .cornerRadius) {
+    func setCorners(in tableView: UITableView, at indexPath: IndexPath, radius: CGFloat = 12) {
         let corners: CACornerMask
         
         if tableView.cellIsOnlyOne(at: indexPath) {

@@ -2,6 +2,7 @@ import Foundation
 
 public typealias WeekDays = Set<WeekDay>
 
+@frozen
 public enum WeekDay: Int, CaseIterable {
     case monday
     case tuesday

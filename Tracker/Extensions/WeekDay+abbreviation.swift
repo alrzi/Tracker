@@ -1,5 +1,5 @@
 //
-//  File.swift
+//  WeekDay+abbreviation.swift
 //  Tracker
 //
 //  Created by Александр Зиновьев on 29.03.2025.

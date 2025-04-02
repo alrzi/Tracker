@@ -48,7 +48,7 @@ struct TrackerItemView: View {
             RecordView(
                 trackedDays: tracker.trackedDays,
                 isCompleted: tracker.isCompleted,
-                color: Color(UIColor(hexString: tracker.color)!),
+                color: Color(hexString: tracker.color) ?? .green,
                 onToggleCompletion: onToggleCompletion
             )
         }
@@ -78,7 +78,7 @@ private struct TrackerView: View {
             Spacer(minLength: 0)
         }
         .padding(12)
-        .background(Color(UIColor(hexString: tracker.color)!), in: .rect(cornerRadius: 16))
+        .background(Color(hexString: tracker.color) ?? .green, in: .rect(cornerRadius: 16))
         .overlay {
             RoundedRectangle(cornerRadius: 16)
                 .stroke(.opacity(0.3), lineWidth: 1)

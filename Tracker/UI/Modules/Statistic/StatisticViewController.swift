@@ -54,7 +54,7 @@ final class StatisticViewController: UIViewController {
         title = "Strings.Localizable.Statistic.title"
         navigationController?.navigationBar.prefersLargeTitles = true
         view.backgroundColor = .white
-        view.addSubviews(tableView)
+        view.addSubview(tableView)
 
         NSLayoutConstraint.activate([
             tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),

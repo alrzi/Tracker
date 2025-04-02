@@ -35,7 +35,7 @@ final class SplashViewController: UIViewController {
     }
     
     func setLayout() {
-        view.addSubviews(imageView)
+        view.addSubview(imageView)
         view.backgroundColor = R.color.myBlue()
         
         imageView.centerYAnchor.constraint(equalTo: view.centerYAnchor).isActive = true

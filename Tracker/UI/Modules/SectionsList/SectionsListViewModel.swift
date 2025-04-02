@@ -80,6 +80,7 @@ private extension SectionsListViewModel {
         Task {
             await updateSection(section)
             await loadSections()
+            await loadSection(section.id)
         }
     }
     
@@ -89,6 +90,7 @@ private extension SectionsListViewModel {
         Task {
             await createSection(section)
             await loadSections()
+            await loadSection(section.id)
         }
     }
     

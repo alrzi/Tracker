@@ -102,7 +102,7 @@ final class TrackerCreationViewModel: TrackerCreationViewModelProtocol {
         do {
             let section = try Self.validate(
                 name: tackerTitle,
-                sectionTitle: sectionTitle,
+                section: section,
                 weekDays: weekDays,
                 emoji: emojiViewModel.selectedItem?.value,
                 color: colorsViewModel.selectedItem?.value
@@ -144,7 +144,7 @@ private extension TrackerCreationViewModel {
 private extension TrackerCreationViewModel {
     static func validate(
         name: String,
-        sectionTitle: String?,
+        section: TrackerSection?,
         weekDays: WeekDays,
         emoji: String?,
         color: String?
@@ -153,7 +153,7 @@ private extension TrackerCreationViewModel {
             throw .title
         }
         
-        guard let sectionTitle else {
+        guard let section else {
             throw .section
         }
         
@@ -169,20 +169,14 @@ private extension TrackerCreationViewModel {
             throw .color
         }
         
-        let sectionID = UUID()
-        
-        return .init(
-            id: sectionID,
-            title: sectionTitle,
-            trackers: [
-                .init(
-                    name: name,
-                    emoji: emoji,
-                    color: color,
-                    schedule: Set(weekDays),
-                    categoryId: sectionID
-                )
-            ]
+        let tracker = Tracker(
+            name: name,
+            emoji: emoji,
+            color: color,
+            schedule: Set(weekDays),
+            categoryId: section.id
         )
+        
+        return section.addingTracker(tracker)
     }
 }

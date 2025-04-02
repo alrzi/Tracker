@@ -15,7 +15,7 @@ final class GridViewModel<T: Equatable & Hashable & Identifiable>: ObservableObj
         self.items = items
         self.selectedItem = items.randomElement()
     }
-
+    
     func selectItem(_ item: T) {
         selectedItem = item
     }

@@ -9,14 +9,18 @@ import Foundation
 import SwiftUI
 
 struct SectionListNavigator<Content: View, NavigationState: SectionListNavigationState> {
+    private let sectionCreationAssembly: SectionCreationAssembly
+    
     @ObservedObject private var navigationState: NavigationState
     
     private let content: Content
     
     init(
+        sectionCreationAssembly: SectionCreationAssembly,
         navigationState: NavigationState,
         content: () -> Content
     ) {
+        self.sectionCreationAssembly = sectionCreationAssembly
         self.navigationState = navigationState
         self.content = content()
     }
@@ -28,7 +32,10 @@ extension SectionListNavigator: View {
             .sheet(item: $navigationState.route) { route in
                 switch route {
                 case .createSection(let completion):
-                    Text("SADSAD")
+                    sectionCreationAssembly.assemble(sectionTitle: nil, completion: completion)
+                    
+                case .updateSection(let title, let completion):
+                    sectionCreationAssembly.assemble(sectionTitle: title, completion: completion)
                 }
             }
     }

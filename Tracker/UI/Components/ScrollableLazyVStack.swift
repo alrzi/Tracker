@@ -13,7 +13,7 @@ struct ScrollableLazyVStack<Content: View> {
     private let spacing: CGFloat?
     private let showsIndicators: Bool
     private let content: Content
-       
+    
     init(
         showsIndicators: Bool = false,
         spacing: CGFloat? = nil,

@@ -8,7 +8,7 @@
 import Foundation
 
 enum TrackerCreationInvalidComponent: Error {
-    case name
+    case title
     case section
     case weekDays
     case emoji

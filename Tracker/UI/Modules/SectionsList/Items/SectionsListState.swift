@@ -12,7 +12,7 @@ enum SectionsListState {
     case loading
     case loaded([TrackerSection])
     case error
-
+    
     var models: [TrackerSection] {
         if case .loaded(let model) = self {
             model

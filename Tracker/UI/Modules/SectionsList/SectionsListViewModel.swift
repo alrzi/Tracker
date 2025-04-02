@@ -14,6 +14,8 @@ protocol SectionsListViewModelProtocol: ObservableObject, SectionListNavigationS
     var selectedSection: TrackerSection? { get }
     
     func onSection(_ section: TrackerSection)
+    func onSectionCreation()
+    func onSectionUpdate(_ section: TrackerSection)
 }
 
 final class SectionsListViewModel: SectionsListViewModelProtocol {
@@ -49,11 +51,28 @@ final class SectionsListViewModel: SectionsListViewModelProtocol {
         
         eventsHandler(section)
     }
+    
+    func onSectionCreation() {
+        route = .createSection(onCompletion: { [weak self] in self?.onSectionCreated($0) })
+    }
+    
+    func onSectionUpdate(_ section: TrackerSection) {
+        route = .updateSection(title: section.title, onCompletion: { [weak self] in self?.onSectionUpdated($0) })
+    }
 }
 
 // MARK: - Private
 
 private extension SectionsListViewModel {
+    func onSectionUpdated(_ title: String) {
+        route = nil
+    }
+    
+    func onSectionCreated(_ title: String) {
+        route = nil
+        
+    }
+    
     func loadSections() async {
         do {
             let sections = try await sectionRepository.getSections(fetchLimit: 200, fetchOffset: 0)

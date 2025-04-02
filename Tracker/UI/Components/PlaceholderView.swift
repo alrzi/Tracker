@@ -1,5 +1,5 @@
 //
-//  PlaceholderSwiftUIView.swift
+//  PlaceholderView.swift
 //  Tracker
 //
 //  Created by Александр Зиновьев on 22.03.2025.
@@ -8,7 +8,7 @@
 import Foundation
 import SwiftUI
 
-struct PlaceholderSwiftUIView: View {
+struct PlaceholderView: View {
     let placeholder: Placeholder
     
     var body: some View {

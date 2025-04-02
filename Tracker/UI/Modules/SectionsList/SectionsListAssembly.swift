@@ -11,11 +11,17 @@ import TrackerDomain
 
 final class SectionsListAssembly {
     typealias Context = UUID?
-    
+        
     private let sectionRepository: CategoryRepositoryProtocol
     
-    init(sectionRepository: CategoryRepositoryProtocol) {
+    private let sectionCreationAssembly: SectionCreationAssembly
+    
+    init(
+        sectionRepository: CategoryRepositoryProtocol,
+        sectionCreationAssembly: SectionCreationAssembly
+    ) {
         self.sectionRepository = sectionRepository
+        self.sectionCreationAssembly = sectionCreationAssembly
     }
     
     @MainActor
@@ -26,7 +32,10 @@ final class SectionsListAssembly {
             eventsHandler: { onCompletion($0) }
         )
         
-        return SectionListNavigator(navigationState: viewModel) {
+        return SectionListNavigator(
+            sectionCreationAssembly: sectionCreationAssembly,
+            navigationState: viewModel
+        ) {
             SectionsListView(viewModel: viewModel)
         }
     }

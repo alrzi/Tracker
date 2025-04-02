@@ -31,7 +31,7 @@ extension SectionsListView: View {
             NavigationStack {
                 Group {
                     if sections.isEmpty {
-                        PlaceholderSwiftUIView(placeholder: .emptySections)
+                        PlaceholderView(placeholder: .emptySections)
                     }
                     else {
                         ScrollableLazyVStack {
@@ -53,7 +53,7 @@ extension SectionsListView: View {
                             .padding(.top, 24)
                         }
                         .safeAreaInset(edge: .bottom, spacing: 16) {
-                            Button(R.string.localizable.categoryAddNew(), action: { })
+                            Button(R.string.localizable.categoryAddNew(), action: viewModel.onSectionCreation)
                                 .buttonStyle(CommonButtonStyle(backgroundColor: .black))
                                 .padding(.horizontal, 16)
                                 .padding(.bottom, 16)
@@ -115,5 +115,7 @@ private final class ViewModel: SectionsListViewModelProtocol {
     }
     
     func onSection(_ section: TrackerSection) { }
+    func onSectionCreation() { }
+    func onSectionUpdate(_ section: TrackerSection) { }
 }
 #endif

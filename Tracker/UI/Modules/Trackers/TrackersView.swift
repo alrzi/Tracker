@@ -51,7 +51,7 @@ extension TrackersView: View, KeyboardReadable {
                         }
                         
                     case .empty(let placeholder):
-                        PlaceholderSwiftUIView(placeholder: placeholder)
+                        PlaceholderView(placeholder: placeholder)
                         
                     case .error:
                         ErrorView(onRetry: { })

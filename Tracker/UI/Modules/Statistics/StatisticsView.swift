@@ -24,7 +24,7 @@ extension StatisticsView: View {
             ScrollableLazyVStack {
                 VStack(spacing: 12) {
                     if viewModel.statisticData.isEmpty {
-                        PlaceholderSwiftUIView(placeholder: .empty)
+                        PlaceholderView(placeholder: .empty)
                     }
                     else {
                         ForEach(viewModel.statisticData) { data in

@@ -28,18 +28,20 @@ extension TrackerCreationView: View {
         // swiftlint: disable next closure_body_length
         NavigationStack {
             ScrollableLazyVStack(spacing: 24) {
-                TextField(R.string.localizable.createEnterName(), text: $viewModel.newTrackerText)
+                TextField(R.string.localizable.createEnterName(), text: $viewModel.tackerTitle)
+                    .textContentType(.name)
+                    .keyboardType(.default)
                     .foregroundStyle(.primary)
                     .padding(.horizontal, 16)
                     .padding(.vertical, 27)
                     .background(.tertiary.opacity(0.3), in: .rect(cornerRadius: 16))
                     .padding(.top, 24)
-                    .shake(if: viewModel.invalidComponent == .name)
+                    .shake(if: viewModel.invalidComponent == .title)
                 
                 VStack(spacing: 0) {
                     ButtonView(
                         title: R.string.localizable.categoryCategory(),
-                        subtitle: viewModel.sectionName,
+                        subtitle: viewModel.sectionTitle,
                         onTap: viewModel.onSectionSelection
                     )
                     .shake(if: viewModel.invalidComponent == .section)
@@ -180,10 +182,10 @@ private struct ButtonView: View {
 private final class ViewModel: TrackerCreationViewModelProtocol {
     var route: TrackerCreationRoute?
     
-    var newTrackerText: String = ""
+    var tackerTitle: String = ""
     
     let title: String = ""
-    let sectionName: String? = "Sport"
+    let sectionTitle: String? = "Sport"
     let weekDays: WeekDays = []
     
     let emojiViewModel: GridViewModel<TrackerCreationGridItem> = .init(

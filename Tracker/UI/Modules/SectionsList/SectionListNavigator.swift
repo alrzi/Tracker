@@ -32,10 +32,10 @@ extension SectionListNavigator: View {
             .sheet(item: $navigationState.route) { route in
                 switch route {
                 case .createSection(let completion):
-                    sectionCreationAssembly.assemble(sectionTitle: nil, completion: completion)
+                    sectionCreationAssembly.assemble(section: nil, completion: completion)
                     
-                case .updateSection(let title, let completion):
-                    sectionCreationAssembly.assemble(sectionTitle: title, completion: completion)
+                case .updateSection(let section, let completion):
+                    sectionCreationAssembly.assemble(section: section, completion: completion)
                 }
             }
     }

@@ -20,21 +20,23 @@ final class SectionCreationViewModel: SectionCreationViewModelProtocol {
     typealias InvalidComponent = SectionCreationInvalidComponent
     
     private let invalidComponentManager: any InvalidComponentManaging<InvalidComponent>
-    private let eventsHandler: (String) -> Void
+    private let eventsHandler: (TrackerSection) -> Void
+    private let section: TrackerSection?
     
     @Published private(set) var invalidComponent: InvalidComponent?
     @Published var sectionTitle: String = ""
     
     init(
         invalidComponentManager: some InvalidComponentManaging<InvalidComponent> = InvalidComponentManager(),
-        sectionTitle: String?,
-        eventsHandler: @escaping (String) -> Void
+        section: TrackerSection?,
+        eventsHandler: @escaping (TrackerSection) -> Void
     ) {
         self.invalidComponentManager = invalidComponentManager
         self.eventsHandler = eventsHandler
+        self.section = section
         
-        if let sectionTitle {
-            self.sectionTitle = sectionTitle
+        if let section {
+            self.sectionTitle = section.title
         }
         
         invalidComponentManager.invalidComponent.assign(to: &$invalidComponent)
@@ -44,7 +46,12 @@ final class SectionCreationViewModel: SectionCreationViewModelProtocol {
         do {
             let sectionTitle = try Self.validate(sectionTitle: sectionTitle)
             
-            eventsHandler(sectionTitle)
+            if let section {
+                eventsHandler(.init(id: section.id, title: sectionTitle, trackers: []))
+            }
+            else {
+                eventsHandler(.init(title: sectionTitle, trackers: []))
+            }
         }
         catch {
             invalidComponentManager.markComponentInvalid(error)

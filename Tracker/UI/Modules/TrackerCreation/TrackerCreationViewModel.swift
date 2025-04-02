@@ -27,9 +27,14 @@ protocol TrackerCreationViewModelProtocol: ObservableObject, TrackerCreationNavi
 final class TrackerCreationViewModel: TrackerCreationViewModelProtocol {
     typealias InvalidComponent = TrackerCreationInvalidComponent
     
+    private let sectionRepository: CategoryRepositoryProtocol
     private let invalidComponentManager: any InvalidComponentManaging<InvalidComponent>
-    private let tracker: Tracker?
     private let eventsHandler: (TrackerCreationOutput) -> Void
+    
+    private let tracker: Tracker?
+    private var section: TrackerSection? {
+        didSet { sectionTitle = section?.title }
+    }
     
     private var cancellables: Set<AnyCancellable> = []
     
@@ -45,10 +50,12 @@ final class TrackerCreationViewModel: TrackerCreationViewModelProtocol {
     let colorsViewModel: GridViewModel<TrackerCreationGridItem>
     
     init(
+        sectionRepository: CategoryRepositoryProtocol,
         invalidComponentManager: some InvalidComponentManaging<InvalidComponent> = InvalidComponentManager(),
         tracker: Tracker?,
         eventsHandler: @escaping (TrackerCreationOutput) -> Void
     ) {
+        self.sectionRepository = sectionRepository
         self.invalidComponentManager = invalidComponentManager
         self.tracker = tracker
         self.eventsHandler = eventsHandler
@@ -71,6 +78,10 @@ final class TrackerCreationViewModel: TrackerCreationViewModelProtocol {
             if let color = colorsArray.first(where: { $0.value == tracker.color }) {
                 colorsViewModel.selectItem(color)
             }
+            
+            Task {
+                await fetchSection(id: tracker.categoryId)
+            }
         }
         else {
             title = R.string.localizable.createNewHabit()
@@ -80,7 +91,7 @@ final class TrackerCreationViewModel: TrackerCreationViewModelProtocol {
     }
     
     func onSectionSelection() {
-        route = .section(tracker?.categoryId, onCompletion: { [weak self] in self?.onSection($0) })
+        route = .section(section?.id, onCompletion: { [weak self] in self?.onSection($0) })
     }
     
     func onWeekSelection() {
@@ -89,7 +100,7 @@ final class TrackerCreationViewModel: TrackerCreationViewModelProtocol {
     
     func onCreate() {
         do {
-            let section = try Self.createSectionIfPossible(
+            let section = try Self.validate(
                 name: tackerTitle,
                 sectionTitle: sectionTitle,
                 weekDays: weekDays,
@@ -108,19 +119,30 @@ final class TrackerCreationViewModel: TrackerCreationViewModelProtocol {
 // MARK: - Private
 
 private extension TrackerCreationViewModel {
-    func onSection(_ section: TrackerSection) {
+    func onSection(_ updatedSection: TrackerSection) {
         route = nil
-        sectionTitle = section.title
+        section = updatedSection
     }
     
     func onWeekDays(_ days: WeekDays) {
         route = nil
         weekDays = days
     }
+    
+    func fetchSection(id: UUID) async {
+        do {
+            let selectedSection = try await sectionRepository.getCategory(by: id)
+            
+            section = selectedSection
+        }
+        catch {
+            debugPrint(error)
+        }
+    }
 }
 
 private extension TrackerCreationViewModel {
-    static func createSectionIfPossible(
+    static func validate(
         name: String,
         sectionTitle: String?,
         weekDays: WeekDays,

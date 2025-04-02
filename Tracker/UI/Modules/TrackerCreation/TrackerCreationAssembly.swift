@@ -9,14 +9,18 @@ import SwiftUI
 import Foundation
 import TrackerDomain
 
-final class TrackerCreationAssembly {    
+final class TrackerCreationAssembly {
+    private let sectionRepository: CategoryRepositoryProtocol
+    
     private let sectionsListAssembly: SectionsListAssembly
     private let weekDaysSelectionAssembly: WeekDaysSelectionAssembly
         
     init(
+        sectionRepository: CategoryRepositoryProtocol,
         sectionsListAssembly: SectionsListAssembly,
         weekDaysSelectionAssembly: WeekDaysSelectionAssembly
     ) {
+        self.sectionRepository = sectionRepository
         self.sectionsListAssembly = sectionsListAssembly
         self.weekDaysSelectionAssembly = weekDaysSelectionAssembly
     }
@@ -24,6 +28,7 @@ final class TrackerCreationAssembly {
     @MainActor
     func assemble(_ context: Tracker?, onCompletion: @escaping (TrackerSection) -> Void) -> some View {
         let viewModel = TrackerCreationViewModel(
+            sectionRepository: sectionRepository,
             tracker: context,
             eventsHandler: {
                 switch $0 {

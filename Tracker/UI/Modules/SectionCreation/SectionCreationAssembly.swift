@@ -7,12 +7,13 @@
 
 import SwiftUI
 import Foundation
+import TrackerDomain
 
 final class SectionCreationAssembly {    
     @MainActor
-    func assemble(sectionTitle: String?, completion: @escaping (String) -> Void) -> some View {
+    func assemble(section: TrackerSection?, completion: @escaping (TrackerSection) -> Void) -> some View {
         let viewModel = SectionCreationViewModel(
-            sectionTitle: sectionTitle,
+            section: section,
             eventsHandler: { completion($0) }
         )
         

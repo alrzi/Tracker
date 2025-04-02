@@ -14,8 +14,8 @@ protocol SectionListNavigationState: ObservableObject {
 }
 
 enum SectionListRoute: Identifiable {
-    case createSection(onCompletion: (String) -> Void)
-    case updateSection(title: String, onCompletion: (String) -> Void)
+    case createSection(onCompletion: (TrackerSection) -> Void)
+    case updateSection(_ section: TrackerSection, onCompletion: (TrackerSection) -> Void)
     
     var id: ID {
         switch self {

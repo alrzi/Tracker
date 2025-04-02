@@ -39,6 +39,8 @@ final class SectionsListViewModel: SectionsListViewModelProtocol {
         Task {
             await loadSections()
             
+            selectedSection = state.models.first
+            
             guard let sectionID else {
                 return
             }
@@ -58,23 +60,65 @@ final class SectionsListViewModel: SectionsListViewModelProtocol {
     }
     
     func onSectionUpdate(_ section: TrackerSection) {
-        route = .updateSection(title: section.title, onCompletion: { [weak self] in self?.onSectionUpdated($0) })
+        route = .updateSection(section, onCompletion: { [weak self] in self?.onSectionUpdated($0) })
     }
     
     func onSectionDelete(_ section: TrackerSection) {
-        
+        Task {
+            await deleteSection(section.id)
+            await loadSections()
+        }
     }
 }
 
 // MARK: - Private
 
 private extension SectionsListViewModel {
-    func onSectionUpdated(_ title: String) {
+    func onSectionUpdated(_ section: TrackerSection) {
         route = nil
+        
+        Task {
+            await updateSection(section)
+            await loadSections()
+        }
     }
     
-    func onSectionCreated(_ title: String) {
+    func onSectionCreated(_ section: TrackerSection) {
         route = nil
+        
+        Task {
+            await createSection(section)
+            await loadSections()
+        }
+    }
+    
+    // Async
+    
+    func createSection(_ section: TrackerSection) async {
+        do {
+            try await sectionRepository.createSection(section)
+        }
+        catch {
+            debugPrint(error)
+        }
+    }
+    
+    func updateSection(_ section: TrackerSection) async {
+        do {
+            try await sectionRepository.updateCategory(section)
+        }
+        catch {
+            debugPrint(error)
+        }
+    }
+    
+    func deleteSection(_ sectionID: UUID) async {
+        do {
+            try await sectionRepository.deleteCategory(with: sectionID)
+        }
+        catch {
+            debugPrint(error)
+        }
     }
     
     func loadSections() async {

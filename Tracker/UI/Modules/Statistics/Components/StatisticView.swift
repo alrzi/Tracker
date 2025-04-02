@@ -19,31 +19,31 @@ struct StatisticView<ViewModel: StatisticViewModelProtocol> {
 
 extension StatisticView: View {
     var body: some View {
-        VStack {
-            ZStack {
-                RoundedRectangle(cornerRadius: 16)
-                    .fill(
-                        LinearGradient(
-                            gradient: Gradient(
-                                colors: [
-                                    Color.green,
-                                    Color.red,
-                                    Color.blue
-                                ]
-                            ),
-                            startPoint: .leading,
-                            endPoint: .trailing
-                        )
+        ZStack {
+            RoundedRectangle(cornerRadius: 16)
+                .fill(
+                    LinearGradient(
+                        gradient: Gradient(
+                            colors: [
+                                Color.green,
+                                Color.red,
+                                Color.blue
+                            ]
+                        ),
+                        startPoint: .leading,
+                        endPoint: .trailing
                     )
-                    .frame(height: 90)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 16)
-                            .stroke(Color.black, lineWidth: 2)
-                    )
-                
+                )
+                .frame(height: 90)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 16)
+                        .stroke(Color.black, lineWidth: 2)
+                )
+            
+            HStack {
                 VStack(alignment: .leading) {
                     Text(viewModel.completedTrackersCount.formatted(.number))
-                        .font(.headline)
+                        .font(.largeTitle)
                         .padding(.top, 12)
                         .padding(.leading, 12)
                     
@@ -55,11 +55,12 @@ extension StatisticView: View {
                         .padding(.bottom, 12)
                 }
                 .padding(.top, 12)
+                .layoutPriority(1)
+                
+                Spacer()
             }
-            .padding(.horizontal, 6)
         }
-        .background(Color.white)
-        .edgesIgnoringSafeArea(.all)
+        .padding(.horizontal, 6)
     }
 }
 

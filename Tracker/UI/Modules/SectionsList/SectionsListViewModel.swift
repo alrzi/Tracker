@@ -16,6 +16,7 @@ protocol SectionsListViewModelProtocol: ObservableObject, SectionListNavigationS
     func onSection(_ section: TrackerSection)
     func onSectionCreation()
     func onSectionUpdate(_ section: TrackerSection)
+    func onSectionDelete(_ section: TrackerSection)
 }
 
 final class SectionsListViewModel: SectionsListViewModelProtocol {
@@ -59,6 +60,10 @@ final class SectionsListViewModel: SectionsListViewModelProtocol {
     func onSectionUpdate(_ section: TrackerSection) {
         route = .updateSection(title: section.title, onCompletion: { [weak self] in self?.onSectionUpdated($0) })
     }
+    
+    func onSectionDelete(_ section: TrackerSection) {
+        
+    }
 }
 
 // MARK: - Private
@@ -70,7 +75,6 @@ private extension SectionsListViewModel {
     
     func onSectionCreated(_ title: String) {
         route = nil
-        
     }
     
     func loadSections() async {

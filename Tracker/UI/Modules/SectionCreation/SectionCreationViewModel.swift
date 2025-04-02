@@ -54,7 +54,7 @@ final class SectionCreationViewModel: SectionCreationViewModelProtocol {
 
 private extension SectionCreationViewModel {
     static func validate(sectionTitle: String) throws(InvalidComponent) -> String {
-        guard !sectionTitle.isEmpty else {
+        guard !sectionTitle.isEmpty && sectionTitle.count < 39 else {
             throw .title
         }
         

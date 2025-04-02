@@ -42,6 +42,20 @@ extension SectionsListView: View {
                                         isSelected: viewModel.selectedSection == section,
                                         onTap: { viewModel.onSection(section) }
                                     )
+                                    .contentShape(.contextMenuPreview, RoundedRectangle(cornerRadius: 16))
+                                    .contextMenu {
+                                        Section("Modifications") {
+                                            Button(action: { viewModel.onSectionUpdate(section) }) {
+                                                Label(R.string.localizable.contextUpdate(), systemImage: "repeat.circle")
+                                            }
+                                        }
+                                        
+                                        Divider()
+                                        
+                                        Button(role: .destructive, action: { viewModel.onSectionDelete(section) }) {
+                                            Label(R.string.localizable.contextDelete(), systemImage: "xmark.bin")
+                                        }
+                                    }
                                     
                                     if sections.count != index + 1 {
                                         Divider()
@@ -117,5 +131,6 @@ private final class ViewModel: SectionsListViewModelProtocol {
     func onSection(_ section: TrackerSection) { }
     func onSectionCreation() { }
     func onSectionUpdate(_ section: TrackerSection) { }
+    func onSectionDelete(_ section: TrackerSection) { }
 }
 #endif

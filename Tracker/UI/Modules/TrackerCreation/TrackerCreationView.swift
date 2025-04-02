@@ -121,7 +121,7 @@ extension TrackerCreationView: View {
                 .background(Color(uiColor: .systemBackground))
             }
             .ignoresSafeArea(.keyboard, edges: .bottom)
-            .navigationTitle(R.string.localizable.createNewHabit())
+            .navigationTitle(viewModel.title)
         }
     }
 }
@@ -182,6 +182,7 @@ private final class ViewModel: TrackerCreationViewModelProtocol {
     
     var newTrackerText: String = ""
     
+    let title: String = ""
     let sectionName: String? = "Sport"
     let weekDays: WeekDays = []
     

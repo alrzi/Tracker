@@ -12,6 +12,7 @@ import TrackerDomain
 @MainActor
 protocol TrackerCreationViewModelProtocol: ObservableObject, TrackerCreationNavigationState {
     var newTrackerText: String { get set }
+    var title: String { get }
     var sectionName: String? { get }
     var weekDays: WeekDays { get }
     var emojiViewModel: GridViewModel<TrackerCreationGridItem> { get }
@@ -39,11 +40,12 @@ final class TrackerCreationViewModel: TrackerCreationViewModelProtocol {
     
     @Published var route: TrackerCreationRoute?
     
+    let title: String
     let emojiViewModel: GridViewModel<TrackerCreationGridItem>
     let colorsViewModel: GridViewModel<TrackerCreationGridItem>
     
     init(
-        tracker: Tracker? = nil,
+        tracker: Tracker?,
         eventsHandler: @escaping (TrackerCreationOutput) -> Void
     ) {
         self.tracker = tracker
@@ -63,14 +65,15 @@ final class TrackerCreationViewModel: TrackerCreationViewModelProtocol {
             colorsViewModel.selectItem(color)
         }
         
-        if let name = tracker?.name {
-            newTrackerText = name
+        if let tracker {
+            newTrackerText = tracker.name
+            weekDays = tracker.weekDays
+            title = "Редактировние"
         }
-        
-        if let weekDaysUnordered = tracker?.weekDays {
-            weekDays = weekDaysUnordered
+        else {
+            title = R.string.localizable.createNewHabit()
         }
-        
+                
         emojiViewModel.$selectedItem
             .compactMap({ $0 })
             .sink { [weak self] item in self?.emoji = item.value }
@@ -83,23 +86,11 @@ final class TrackerCreationViewModel: TrackerCreationViewModelProtocol {
     }
     
     func onSectionSelection() {
-        route = .section(
-            tracker?.categoryId,
-            onCompletion: { [weak self] in
-                self?.route = nil
-                self?.sectionName = $0.title
-            }
-        )
+        route = .section(tracker?.categoryId, onCompletion: { [weak self] in self?.onSection($0) })
     }
     
     func onWeekSelection() {
-        route = .weekDay(
-            weekDays,
-            onCompletion: { [weak self] in
-                self?.route = nil
-                self?.weekDays = $0
-            }
-        )
+        route = .weekDay(weekDays, onCompletion: { [weak self] in self?.onWeekDays($0) })
     }
     
     func onCreate() {
@@ -117,6 +108,20 @@ final class TrackerCreationViewModel: TrackerCreationViewModelProtocol {
         catch {
             invalidComponent = error
         }
+    }
+}
+
+// MARK: - Private
+
+private extension TrackerCreationViewModel {
+    func onSection(_ section: TrackerSection) {
+        route = nil
+        sectionName = section.title
+    }
+    
+    func onWeekDays(_ days: WeekDays) {
+        route = nil
+        weekDays = days
     }
 }
 

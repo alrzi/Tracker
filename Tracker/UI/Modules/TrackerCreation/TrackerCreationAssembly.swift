@@ -9,7 +9,7 @@ import SwiftUI
 import Foundation
 import TrackerDomain
 
-final class TrackerCreationAssembly {
+final class TrackerCreationAssembly {    
     private let sectionsListAssembly: SectionsListAssembly
     private let weekDaysSelectionAssembly: WeekDaysSelectionAssembly
         

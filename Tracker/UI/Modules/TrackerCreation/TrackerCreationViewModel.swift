@@ -25,15 +25,18 @@ protocol TrackerCreationViewModelProtocol: ObservableObject, TrackerCreationNavi
 }
 
 final class TrackerCreationViewModel: TrackerCreationViewModelProtocol {
-    private let eventsHandler: (TrackerCreationOutput) -> Void
+    typealias Component = TrackerCreationInvalidComponent
+    
+    private let invalidComponentManager: any InvalidComponentManaging<Component>
     private let tracker: Tracker?
+    private let eventsHandler: (TrackerCreationOutput) -> Void
     
     private var cancellables: Set<AnyCancellable> = []
     
     private var emoji: String?
     private var colorHexString: String?
     
-    @Published private(set) var invalidComponent: TrackerCreationInvalidComponent?
+    @Published private(set) var invalidComponent: Component?
     @Published private(set) var sectionName: String?
     @Published private(set) var weekDays: WeekDays = []
     @Published var newTrackerText = ""
@@ -45,9 +48,11 @@ final class TrackerCreationViewModel: TrackerCreationViewModelProtocol {
     let colorsViewModel: GridViewModel<TrackerCreationGridItem>
     
     init(
+        invalidComponentManager: some InvalidComponentManaging<Component> = InvalidComponentManager(),
         tracker: Tracker?,
         eventsHandler: @escaping (TrackerCreationOutput) -> Void
     ) {
+        self.invalidComponentManager = invalidComponentManager
         self.tracker = tracker
         self.eventsHandler = eventsHandler
         
@@ -81,8 +86,11 @@ final class TrackerCreationViewModel: TrackerCreationViewModelProtocol {
         
         colorsViewModel.$selectedItem
             .compactMap({ $0 })
+            
             .sink { [weak self] item in self?.colorHexString = item.value }
             .store(in: &cancellables)
+        
+        invalidComponentManager.invalidComponent.assign(to: &$invalidComponent)
     }
     
     func onSectionSelection() {
@@ -106,7 +114,7 @@ final class TrackerCreationViewModel: TrackerCreationViewModelProtocol {
             eventsHandler(.section(section))
         }
         catch {
-            invalidComponent = error
+            invalidComponentManager.markComponentInvalid(error)
         }
     }
 }

@@ -8,6 +8,7 @@
 import Foundation
 import Presentation
 
+@MainActor
 final class SplashViewRouter {
     private let tabBarAssembly: TabBarAssembly
     
@@ -20,14 +21,14 @@ final class SplashViewRouter {
         self.tabBarAssembly = tabBarAssembly
         self.presentationContext = presentationContext
     }
-    
+        
     func showTabBar() {
         guard let window = presentationContext.window else {
             assertionFailure()
             return
         }
         
-        let presenter = DefaultWindowPresenter(tabBarAssembly.assemble(()))
+        let presenter = DefaultWindowPresenter(tabBarAssembly.assemble())
         
         presenter.present(at: window)
     }

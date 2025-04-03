@@ -8,8 +8,6 @@
 import UIKit
 
 final class TabBarAssembly {
-    typealias Context = ()
-    
     private let trackersAssembly: TrackersAssembly
     private let statisticAssembly: StatisticsAssembly
     
@@ -21,13 +19,14 @@ final class TabBarAssembly {
         self.statisticAssembly = statisticAssembly
     }
     
-    func assemble(_ context: Context) -> UIViewController {
+    @MainActor
+    func assemble() -> UIViewController {
         let router = TabBarViewRouter(trackersAssembly: trackersAssembly)
         
         let viewModel = TabBarViewModel(router: router)
         
         let viewController = TabBarViewController(
-            trackersAssembly: trackersAssembly, 
+            trackersAssembly: trackersAssembly,
             statisticAssembly: statisticAssembly,
             viewModel: viewModel
         )

@@ -21,7 +21,7 @@ extension TrackerFilter {
         switch self {
         case .completedForDate: "checklist.checked"
         case .forCurrentWeekDay: "xmark.triangle.circle.square"
-        case .uncompletedForDate: "checklist.unchecked"        
+        case .uncompletedForDate: "checklist.unchecked"
         }
     }
 }

@@ -8,6 +8,7 @@
 import Foundation
 import SwiftUI
 
+@MainActor
 struct TrackerCreationNavigator<Content: View, NavigationState: TrackerCreationNavigationState> {
     private let sectionsListAssembly: SectionsListAssembly
     private let weekDaysSelectionAssembly: WeekDaysSelectionAssembly

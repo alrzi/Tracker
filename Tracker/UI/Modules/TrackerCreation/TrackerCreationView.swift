@@ -12,10 +12,7 @@ import TrackerDomain
 @MainActor
 struct TrackerCreationView<ViewModel: TrackerCreationViewModelProtocol> {
     @ObservedObject private var viewModel: ViewModel
-    
-    @Environment(\.dismiss)
-    private var dismiss
-    
+       
     init(viewModel: ViewModel) {
         self.viewModel = viewModel
     }
@@ -72,7 +69,7 @@ extension TrackerCreationView: View {
                     )
                     .shake(if: viewModel.invalidComponent == .color)
                 } header: {
-                    HeaderView(text: R.string.localizable.createEmoji())
+                    SectionHeaderView(text: R.string.localizable.createEmoji())
                 }
                 
                 Section {
@@ -93,34 +90,11 @@ extension TrackerCreationView: View {
                     )
                     .shake(if: viewModel.invalidComponent == .emoji)
                 } header: {
-                    HeaderView(text: R.string.localizable.createColor())
+                    SectionHeaderView(text: R.string.localizable.createColor())
                 }
             }
             .safeAreaInset(edge: .bottom, spacing: 16) {
-                HStack {
-                    Button(action: { dismiss() }) {
-                        Text(R.string.localizable.createCancel())
-                            .frame(maxWidth: .infinity)
-                            .padding(16)
-                            .foregroundStyle(.red)
-                            .background(.clear, in: RoundedRectangle(cornerRadius: 12))
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 12)
-                                    .stroke(.red, lineWidth: 1)
-                            )
-                    }
-                    
-                    Button(action: viewModel.onCreate) {
-                        Text(R.string.localizable.createCreateNew())
-                            .frame(maxWidth: .infinity)
-                            .foregroundStyle(.white)
-                            .padding(16)
-                            .background(.secondary, in: RoundedRectangle(cornerRadius: 12))
-                    }
-                    .buttonStyle(.plain)
-                }
-                .padding(16)
-                .background(Color(uiColor: .systemBackground))
+                MainFooterView(onCreate: viewModel.onCreate)
             }
             .ignoresSafeArea(.keyboard, edges: .bottom)
             .navigationTitle(viewModel.title)
@@ -128,7 +102,41 @@ extension TrackerCreationView: View {
     }
 }
 
-private struct HeaderView: View {
+private struct MainFooterView: View {
+    @Environment(\.dismiss)
+    private var dismiss
+    
+    let onCreate: () -> Void
+    
+    var body: some View {
+        HStack {
+            Button(action: { dismiss() }) {
+                Text(R.string.localizable.createCancel())
+                    .frame(maxWidth: .infinity)
+                    .padding(16)
+                    .foregroundStyle(.red)
+                    .background(.clear, in: RoundedRectangle(cornerRadius: 12))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 12)
+                            .stroke(.red, lineWidth: 1)
+                    )
+            }
+            
+            Button(action: onCreate) {
+                Text(R.string.localizable.createCreateNew())
+                    .frame(maxWidth: .infinity)
+                    .foregroundStyle(.white)
+                    .padding(16)
+                    .background(.secondary, in: RoundedRectangle(cornerRadius: 12))
+            }
+            .buttonStyle(.plain)
+        }
+        .padding(16)
+        .background(Color(uiColor: .systemBackground))
+    }
+}
+
+private struct SectionHeaderView: View {
     let text: String
     
     var body: some View {

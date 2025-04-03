@@ -8,6 +8,7 @@
 import Foundation
 import SwiftUI
 
+@MainActor
 struct GridView<T: View, Item: Equatable & Hashable & Identifiable> {
     @ObservedObject private var viewModel: GridViewModel<Item>
     

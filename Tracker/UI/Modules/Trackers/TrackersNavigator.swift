@@ -8,6 +8,7 @@
 import Foundation
 import SwiftUI
 
+@MainActor
 struct TrackersNavigator<Content: View, NavigationState: TrackersNavigationState> {
     private let trackerCreationSwiftUIAssembly: TrackerCreationAssembly
     

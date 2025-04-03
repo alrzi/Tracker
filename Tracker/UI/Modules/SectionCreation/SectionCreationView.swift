@@ -8,6 +8,7 @@
 import SwiftUI
 import Foundation
 
+@MainActor
 struct SectionCreationView<ViewModel: SectionCreationViewModelProtocol> {
     @ObservedObject private var viewModel: ViewModel
     

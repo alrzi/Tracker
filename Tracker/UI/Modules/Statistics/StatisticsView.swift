@@ -8,6 +8,7 @@
 import SwiftUI
 import Foundation
 
+@MainActor
 struct StatisticsView<ViewModel: StatisticsViewModelProtocol> {
     @ObservedObject private var viewModel: ViewModel
     

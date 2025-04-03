@@ -8,6 +8,7 @@
 import SwiftUI
 import TrackerDomain
 
+@MainActor
 struct TrackersCollectionView<ViewModel: TrackersCollectionViewModelProtocol> {
     @ObservedObject private var viewModel: ViewModel
     

@@ -9,6 +9,7 @@ import SwiftUI
 import Foundation
 import TrackerDomain
 
+@MainActor
 struct SectionsListView<ViewModel: SectionsListViewModelProtocol> {
     @ObservedObject private var viewModel: ViewModel
     

@@ -8,6 +8,7 @@
 import Foundation
 import SwiftUI
 
+@MainActor
 struct SectionListNavigator<Content: View, NavigationState: SectionListNavigationState> {
     private let sectionCreationAssembly: SectionCreationAssembly
     

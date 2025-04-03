@@ -1,5 +1,5 @@
 //
-//  TrackerCreationViewModel.swift
+//  TrackerFormViewModel.swift
 //  Tracker
 //
 //  Created by Александр Зиновьев on 22.03.2025.
@@ -10,26 +10,26 @@ import Combine
 import TrackerDomain
 
 @MainActor
-protocol TrackerCreationViewModelProtocol: ObservableObject, TrackerCreationNavigationState {
+protocol TrackerFormViewModelProtocol: ObservableObject, TrackerFormNavigationState {
     var tackerTitle: String { get set }
     var title: String { get }
     var sectionTitle: String? { get }
     var weekDays: WeekDays { get }
-    var emojiViewModel: GridViewModel<TrackerCreationGridItem> { get }
-    var colorsViewModel: GridViewModel<TrackerCreationGridItem> { get }
-    var invalidComponent: TrackerCreationInvalidComponent? { get }
+    var emojiViewModel: GridViewModel<TrackerFormGridItem> { get }
+    var colorsViewModel: GridViewModel<TrackerFormGridItem> { get }
+    var invalidComponent: TrackerFormInvalidComponent? { get }
     
     func onSectionSelection()
     func onWeekSelection()
     func onCreate()
 }
 
-final class TrackerCreationViewModel: TrackerCreationViewModelProtocol {
-    typealias InvalidComponent = TrackerCreationInvalidComponent
+final class TrackerFormViewModel: TrackerFormViewModelProtocol {
+    typealias InvalidComponent = TrackerFormInvalidComponent
     
     private let sectionRepository: CategoryRepositoryProtocol
     private let invalidComponentManager: any InvalidComponentManaging<InvalidComponent>
-    private let eventsHandler: (TrackerCreationOutput) -> Void
+    private let eventsHandler: (TrackerFormOutput) -> Void
     
     private let tracker: Tracker?
     private var section: TrackerSection? {
@@ -43,25 +43,25 @@ final class TrackerCreationViewModel: TrackerCreationViewModelProtocol {
     @Published private(set) var weekDays: WeekDays = []
     @Published var tackerTitle = ""
     
-    @Published var route: TrackerCreationRoute?
+    @Published var route: TrackerFormRoute?
     
     let title: String
-    let emojiViewModel: GridViewModel<TrackerCreationGridItem>
-    let colorsViewModel: GridViewModel<TrackerCreationGridItem>
+    let emojiViewModel: GridViewModel<TrackerFormGridItem>
+    let colorsViewModel: GridViewModel<TrackerFormGridItem>
     
     init(
         sectionRepository: CategoryRepositoryProtocol,
         invalidComponentManager: some InvalidComponentManaging<InvalidComponent> = InvalidComponentManager(),
         tracker: Tracker?,
-        eventsHandler: @escaping (TrackerCreationOutput) -> Void
+        eventsHandler: @escaping (TrackerFormOutput) -> Void
     ) {
         self.sectionRepository = sectionRepository
         self.invalidComponentManager = invalidComponentManager
         self.tracker = tracker
         self.eventsHandler = eventsHandler
         
-        let emojiArray = (0...17).map { _ in TrackerCreationGridItem(value: RandomEmojiService.emoji) }
-        let colorsArray = (0...17).map { _ in TrackerCreationGridItem(value: RandomHexColorService.randomHexString) }
+        let emojiArray = (0...17).map { _ in TrackerFormGridItem(value: RandomEmojiService.emoji) }
+        let colorsArray = (0...17).map { _ in TrackerFormGridItem(value: RandomHexColorService.randomHexString) }
         
         emojiViewModel = .init(items: emojiArray)
         colorsViewModel = .init(items: colorsArray)
@@ -118,7 +118,7 @@ final class TrackerCreationViewModel: TrackerCreationViewModelProtocol {
 
 // MARK: - Private
 
-private extension TrackerCreationViewModel {
+private extension TrackerFormViewModel {
     func onSection(_ updatedSection: TrackerSection) {
         route = nil
         section = updatedSection
@@ -141,14 +141,14 @@ private extension TrackerCreationViewModel {
     }
 }
 
-private extension TrackerCreationViewModel {
+private extension TrackerFormViewModel {
     static func validate(
         name: String,
         section: TrackerSection?,
         weekDays: WeekDays,
         emoji: String?,
         color: String?
-    ) throws(TrackerCreationInvalidComponent) -> TrackerSection {
+    ) throws(TrackerFormInvalidComponent) -> TrackerSection {
         guard !name.isEmpty else {
             throw .title
         }

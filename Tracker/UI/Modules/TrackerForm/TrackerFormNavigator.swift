@@ -1,5 +1,5 @@
 //
-//  TrackerCreationNavigator.swift
+//  TrackerFormNavigator.swift
 //  Tracker
 //
 //  Created by Александр Зиновьев on 27.03.2025.
@@ -9,7 +9,7 @@ import Foundation
 import SwiftUI
 
 @MainActor
-struct TrackerCreationNavigator<Content: View, NavigationState: TrackerCreationNavigationState> {
+struct TrackerFormNavigator<Content: View, NavigationState: TrackerFormNavigationState> {
     private let sectionsListAssembly: SectionsListAssembly
     private let weekDaysSelectionAssembly: WeekDaysSelectionAssembly
     
@@ -30,7 +30,7 @@ struct TrackerCreationNavigator<Content: View, NavigationState: TrackerCreationN
     }
 }
 
-extension TrackerCreationNavigator: View {
+extension TrackerFormNavigator: View {
     var body: some View {
         content
             .sheet(item: $navigationState.route) { route in

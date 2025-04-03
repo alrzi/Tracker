@@ -1,5 +1,5 @@
 //
-//  TrackerCreationAssembly.swift
+//  TrackerFormAssembly.swift
 //  Tracker
 //
 //  Created by Александр Зиновьев on 22.03.2025.
@@ -9,7 +9,7 @@ import SwiftUI
 import Foundation
 import TrackerDomain
 
-final class TrackerCreationAssembly {
+final class TrackerFormAssembly {
     private let sectionRepository: CategoryRepositoryProtocol
     
     private let sectionsListAssembly: SectionsListAssembly
@@ -27,7 +27,7 @@ final class TrackerCreationAssembly {
     
     @MainActor
     func assemble(_ context: Tracker?, onCompletion: @escaping (TrackerSection) -> Void) -> some View {
-        let viewModel = TrackerCreationViewModel(
+        let viewModel = TrackerFormViewModel(
             sectionRepository: sectionRepository,
             tracker: context,
             eventsHandler: {
@@ -38,12 +38,12 @@ final class TrackerCreationAssembly {
             }
         )
         
-        return TrackerCreationNavigator(
+        return TrackerFormNavigator(
             sectionsListAssembly: sectionsListAssembly,
             weekDaysSelectionAssembly: weekDaysSelectionAssembly,
             navigationState: viewModel
         ) {
-            TrackerCreationView(viewModel: viewModel)
+            TrackerFormView(viewModel: viewModel)
         }
     }
 }

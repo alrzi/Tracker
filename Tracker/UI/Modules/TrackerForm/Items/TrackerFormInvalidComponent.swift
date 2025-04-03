@@ -1,5 +1,5 @@
 //
-//  TrackerCreationInvalidComponent.swift
+//  TrackerFormInvalidComponent.swift
 //  Tracker
 //
 //  Created by Александр Зиновьев on 26.03.2025.
@@ -7,7 +7,7 @@
 
 import Foundation
 
-enum TrackerCreationInvalidComponent: Error {
+enum TrackerFormInvalidComponent: Error {
     case title
     case section
     case weekDays

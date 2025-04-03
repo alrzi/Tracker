@@ -1,5 +1,5 @@
 //
-//  TrackerCreationView.swift
+//  TrackerFormView.swift
 //  Tracker
 //
 //  Created by Александр Зиновьев on 22.03.2025.
@@ -10,7 +10,7 @@ import Foundation
 import TrackerDomain
 
 @MainActor
-struct TrackerCreationView<ViewModel: TrackerCreationViewModelProtocol> {
+struct TrackerFormView<ViewModel: TrackerFormViewModelProtocol> {
     @ObservedObject private var viewModel: ViewModel
        
     init(viewModel: ViewModel) {
@@ -20,7 +20,7 @@ struct TrackerCreationView<ViewModel: TrackerCreationViewModelProtocol> {
 
 // MARK: - View
 
-extension TrackerCreationView: View {
+extension TrackerFormView: View {
     var body: some View {
         // swiftlint: disable next closure_body_length
         NavigationStack {
@@ -215,11 +215,11 @@ private extension WeekDay {
 
 #if DEBUG
 #Preview {
-    TrackerCreationView(viewModel: ViewModel())
+    TrackerFormView(viewModel: ViewModel())
 }
 
-private final class ViewModel: TrackerCreationViewModelProtocol {
-    var route: TrackerCreationRoute?
+private final class ViewModel: TrackerFormViewModelProtocol {
+    var route: TrackerFormRoute?
     
     var tackerTitle: String = ""
     
@@ -227,14 +227,14 @@ private final class ViewModel: TrackerCreationViewModelProtocol {
     let sectionTitle: String? = "Sport"
     let weekDays: WeekDays = []
     
-    let emojiViewModel: GridViewModel<TrackerCreationGridItem> = .init(
+    let emojiViewModel: GridViewModel<TrackerFormGridItem> = .init(
         items: (0...17).map { _ in .init(value: RandomEmojiService.emoji) }
     )
-    let colorsViewModel: GridViewModel<TrackerCreationGridItem> = .init(
+    let colorsViewModel: GridViewModel<TrackerFormGridItem> = .init(
         items: (0...17).map { _ in .init(value: RandomHexColorService.randomHexString) }
     )
     
-    let invalidComponent: TrackerCreationInvalidComponent? = nil
+    let invalidComponent: TrackerFormInvalidComponent? = nil
     
     func onSectionSelection() { }
     func onWeekSelection() { }

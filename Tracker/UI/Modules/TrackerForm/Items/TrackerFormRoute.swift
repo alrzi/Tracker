@@ -1,5 +1,5 @@
 //
-//  TrackerCreationNavigationState.swift
+//  TrackerFormNavigationState.swift
 //  Tracker
 //
 //  Created by Александр Зиновьев on 27.03.2025.
@@ -9,11 +9,11 @@ import Foundation
 import TrackerDomain
 
 @MainActor
-protocol TrackerCreationNavigationState: ObservableObject {
-    var route: TrackerCreationRoute? { get set }
+protocol TrackerFormNavigationState: ObservableObject {
+    var route: TrackerFormRoute? { get set }
 }
 
-enum TrackerCreationRoute: Identifiable {
+enum TrackerFormRoute: Identifiable {
     case weekDay(WeekDays, onCompletion: (WeekDays) -> Void)
     case section(UUID?, onCompletion: (TrackerSection) -> Void)
     

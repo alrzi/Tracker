@@ -6,15 +6,13 @@ public protocol TrackerManaging: Sendable {
     var sections: StateSectionSequence { get }
     
     // Create
-    func addSection(withId id: UUID, toTracker tracker: Tracker) async throws
     func addSections(_ sections: [TrackerSection]) async throws
     func createTrackerAndAddToSection(with id: UUID, tracker: Tracker) async throws
     
     // Read
     func fetchCompletedSections(params: RequestParameters, isPaginating: Bool) async throws -> ([TrackerSection], [Tracker])
     func fetchUnCompletedSections(params: RequestParameters, isPaginating: Bool) async throws -> ([TrackerSection], [Tracker])
-    func fetchSections(params: RequestParameters, isPaginating: Bool) async throws -> ([TrackerSection], [Tracker])
-    func fetchSection(by id: UUID) async throws -> TrackerSection
+    func fetchSections(params: RequestParameters, isPaginating: Bool) async throws -> ([TrackerSection], [Tracker])    
     func daysTracked(for tracker: Tracker) async throws -> Int
     func isCompleted(tracker: Tracker, for date: Date) async throws -> Bool
     
@@ -47,10 +45,6 @@ final class TrackerManager: TrackerManaging {
     }
     
     // MARK: - Create
-    
-    func addSection(withId id: UUID, toTracker tracker: Tracker) async throws {
-        try await trackerRepository.addSection(withId: id, toTracker: tracker)
-    }
     
     func addSections(_ sections: [TrackerSection]) async throws {
         try await categoryRepository.createSections(sections)
@@ -117,10 +111,6 @@ final class TrackerManager: TrackerManaging {
         async let regular = fetchUnCompletedTrackers(for: sections, params: params).sorted { $0.title < $1.title }
         
         return (try await regular, tempPinned)
-    }
-    
-    func fetchSection(by id: UUID) async throws -> TrackerSection {
-        try await categoryRepository.getCategory(by: id)
     }
     
     func daysTracked(for tracker: Tracker) async throws -> Int {

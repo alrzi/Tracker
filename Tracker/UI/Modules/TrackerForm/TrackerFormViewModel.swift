@@ -18,10 +18,11 @@ protocol TrackerFormViewModelProtocol: ObservableObject, TrackerFormNavigationSt
     var emojiViewModel: GridViewModel<TrackerFormGridItem> { get }
     var colorsViewModel: GridViewModel<TrackerFormGridItem> { get }
     var invalidComponent: TrackerFormInvalidComponent? { get }
+    var completeFormButtonTitle: String { get }
     
     func onSectionSelection()
     func onWeekSelection()
-    func onCreate()
+    func onCompleteFrom()
 }
 
 final class TrackerFormViewModel: TrackerFormViewModelProtocol {
@@ -31,16 +32,18 @@ final class TrackerFormViewModel: TrackerFormViewModelProtocol {
     private let invalidComponentManager: any InvalidComponentManaging<InvalidComponent>
     private let eventsHandler: (TrackerFormOutput) -> Void
     
-    private let tracker: Tracker?
+    private let mode: TrackerFormMode
+    
     private var section: TrackerSection? {
         didSet { sectionTitle = section?.title }
     }
     
     private var cancellables: Set<AnyCancellable> = []
-    
-    @Published private(set) var invalidComponent: InvalidComponent?
+        
     @Published private(set) var sectionTitle: String?
     @Published private(set) var weekDays: WeekDays = []
+    @Published private(set) var invalidComponent: InvalidComponent?
+    
     @Published var tackerTitle = ""
     
     @Published var route: TrackerFormRoute?
@@ -48,43 +51,26 @@ final class TrackerFormViewModel: TrackerFormViewModelProtocol {
     let title: String
     let emojiViewModel: GridViewModel<TrackerFormGridItem>
     let colorsViewModel: GridViewModel<TrackerFormGridItem>
+    let completeFormButtonTitle: String
     
     init(
         sectionRepository: CategoryRepositoryProtocol,
         invalidComponentManager: some InvalidComponentManaging<InvalidComponent> = InvalidComponentManager(),
-        tracker: Tracker?,
+        mode: TrackerFormMode,
         eventsHandler: @escaping (TrackerFormOutput) -> Void
     ) {
         self.sectionRepository = sectionRepository
         self.invalidComponentManager = invalidComponentManager
-        self.tracker = tracker
+        self.mode = mode
         self.eventsHandler = eventsHandler
         
-        let emojiArray = (0...17).map { _ in TrackerFormGridItem(value: RandomEmojiService.emoji) }
-        let colorsArray = (0...17).map { _ in TrackerFormGridItem(value: RandomHexColorService.randomHexString) }
+        title = mode.screenTitle
+        completeFormButtonTitle = mode.completeFormButtonTitle
+        emojiViewModel = .init(items: (0...17).map { _ in TrackerFormGridItem(value: RandomEmojiService.emoji) })
+        colorsViewModel = .init(items: (0...17).map { _ in TrackerFormGridItem(value: RandomHexColorService.randomHexString) })
         
-        emojiViewModel = .init(items: emojiArray)
-        colorsViewModel = .init(items: colorsArray)
-        
-        if let tracker {
-            tackerTitle = tracker.name
-            weekDays = tracker.weekDays
-            title = "Редактировние"
-            
-            if let emoji = emojiArray.first(where: { $0.value == tracker.emoji }) {
-                emojiViewModel.selectItem(emoji)
-            }
-            
-            if let color = colorsArray.first(where: { $0.value == tracker.color }) {
-                colorsViewModel.selectItem(color)
-            }
-            
-            Task {
-                await fetchSection(id: tracker.categoryId)
-            }
-        }
-        else {
-            title = R.string.localizable.createNewHabit()
+        if case .editTracker(let tracker) = mode {
+            fillForm(with: tracker)
         }
         
         invalidComponentManager.invalidComponent.assign(to: &$invalidComponent)
@@ -98,17 +84,18 @@ final class TrackerFormViewModel: TrackerFormViewModelProtocol {
         route = .weekDay(weekDays, onCompletion: { [weak self] in self?.onWeekDays($0) })
     }
     
-    func onCreate() {
+    func onCompleteFrom() {
         do {
-            let section = try Self.validate(
+            let (tracker, section) = try Self.validate(
                 name: tackerTitle,
                 section: section,
                 weekDays: weekDays,
                 emoji: emojiViewModel.selectedItem?.value,
-                color: colorsViewModel.selectedItem?.value
+                color: colorsViewModel.selectedItem?.value,
+                mode: mode
             )
             
-            eventsHandler(.section(section))
+            eventsHandler(.init(tracker: tracker, section: section))
         }
         catch {
             invalidComponentManager.markComponentInvalid(error)
@@ -129,6 +116,23 @@ private extension TrackerFormViewModel {
         weekDays = days
     }
     
+    func fillForm(with tracker: Tracker) {
+        tackerTitle = tracker.name
+        weekDays = tracker.weekDays
+        
+        if let emoji = emojiViewModel.items.first(where: { $0.value == tracker.emoji }) {
+            emojiViewModel.selectItem(emoji)
+        }
+        
+        if let color = colorsViewModel.items.first(where: { $0.value == tracker.color }) {
+            colorsViewModel.selectItem(color)
+        }
+        
+        Task {
+            await fetchSection(id: tracker.categoryId)
+        }
+    }
+    
     func fetchSection(id: UUID) async {
         do {
             let selectedSection = try await sectionRepository.getCategory(by: id)
@@ -142,13 +146,16 @@ private extension TrackerFormViewModel {
 }
 
 private extension TrackerFormViewModel {
+    typealias ValidationResult = (Tracker, TrackerSection)
+    
     static func validate(
         name: String,
         section: TrackerSection?,
         weekDays: WeekDays,
         emoji: String?,
-        color: String?
-    ) throws(TrackerFormInvalidComponent) -> TrackerSection {
+        color: String?,
+        mode: TrackerFormMode
+    ) throws(TrackerFormInvalidComponent) -> ValidationResult {
         guard !name.isEmpty else {
             throw .title
         }
@@ -168,15 +175,63 @@ private extension TrackerFormViewModel {
         guard let color else {
             throw .color
         }
-        
+                
         let tracker = Tracker(
+            id: mode.trackerId,
             name: name,
             emoji: emoji,
             color: color,
             schedule: Set(weekDays),
-            categoryId: section.id
+            isPinned: mode.isPinned,
+            trackedDays: mode.trackedDays,
+            categoryId: section.id,
+            isCompleted: mode.isCompleted
         )
         
-        return section.addingTracker(tracker)
+        return (tracker, section)
+    }
+}
+
+private extension TrackerFormMode {
+    var screenTitle: String {
+        switch self {
+        case .createTracker: R.string.localizable.createNewHabit()
+        case .editTracker: "Редактировние"
+        }
+    }
+    
+    var completeFormButtonTitle: String {
+        switch self {
+        case .createTracker: R.string.localizable.createCreateNew()
+        case .editTracker: "Обновить"
+        }
+    }
+    
+    var trackerId: UUID {
+        switch self {
+        case .createTracker: .init()
+        case .editTracker(let tracker): tracker.id
+        }
+    }
+    
+    var isPinned: Bool {
+        switch self {
+        case .createTracker: false
+        case .editTracker(let tracker): tracker.isPinned
+        }
+    }
+    
+    var trackedDays: Int {
+        switch self {
+        case .createTracker: .zero
+        case .editTracker(let tracker): tracker.trackedDays
+        }
+    }
+    
+    var isCompleted: Bool {
+        switch self {
+        case .createTracker: false
+        case .editTracker(let tracker): tracker.isCompleted
+        }
     }
 }

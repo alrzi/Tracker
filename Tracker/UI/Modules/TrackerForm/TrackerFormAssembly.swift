@@ -26,16 +26,11 @@ final class TrackerFormAssembly {
     }
     
     @MainActor
-    func assemble(_ context: Tracker?, onCompletion: @escaping (TrackerSection) -> Void) -> some View {
+    func assemble(_ mode: TrackerFormMode, onCompletion: @escaping (TrackerFormOutput) -> Void) -> some View {
         let viewModel = TrackerFormViewModel(
             sectionRepository: sectionRepository,
-            tracker: context,
-            eventsHandler: {
-                switch $0 {
-                case .section(let section):
-                    onCompletion(section)
-                }
-            }
+            mode: mode,
+            eventsHandler: { onCompletion($0) }
         )
         
         return TrackerFormNavigator(

@@ -33,11 +33,11 @@ extension TrackersNavigator: View {
             .sheet(item: $navigationState.route) { route in
                 switch route {
                 case .update(let tracker, let completion):
-                    trackerFormAssembly.assemble(tracker, onCompletion: completion)
+                    trackerFormAssembly.assemble(.editTracker(tracker), onCompletion: completion)
                         .interactiveDismissDisabled()
                     
                 case .create(let completion):
-                    trackerFormAssembly.assemble(nil, onCompletion: completion)
+                    trackerFormAssembly.assemble(.createTracker, onCompletion: completion)
                         .interactiveDismissDisabled()
                 }
             }

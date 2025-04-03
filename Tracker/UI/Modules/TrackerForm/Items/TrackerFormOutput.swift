@@ -8,6 +8,7 @@
 import Foundation
 import TrackerDomain
 
-enum TrackerFormOutput {
-    case section(TrackerSection)
+struct TrackerFormOutput {
+    let tracker: Tracker
+    let section: TrackerSection
 }

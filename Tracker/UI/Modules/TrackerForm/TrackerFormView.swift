@@ -94,7 +94,10 @@ extension TrackerFormView: View {
                 }
             }
             .safeAreaInset(edge: .bottom, spacing: 16) {
-                MainFooterView(onCreate: viewModel.onCreate)
+                MainFooterView(
+                    title: viewModel.completeFormButtonTitle,
+                    onCompleteFrom: viewModel.onCompleteFrom
+                )
             }
             .ignoresSafeArea(.keyboard, edges: .bottom)
             .navigationTitle(viewModel.title)
@@ -106,7 +109,8 @@ private struct MainFooterView: View {
     @Environment(\.dismiss)
     private var dismiss
     
-    let onCreate: () -> Void
+    let title: String
+    let onCompleteFrom: () -> Void
     
     var body: some View {
         HStack {
@@ -122,8 +126,8 @@ private struct MainFooterView: View {
                     )
             }
             
-            Button(action: onCreate) {
-                Text(R.string.localizable.createCreateNew())
+            Button(action: onCompleteFrom) {
+                Text(title)
                     .frame(maxWidth: .infinity)
                     .foregroundStyle(.white)
                     .padding(16)
@@ -226,6 +230,7 @@ private final class ViewModel: TrackerFormViewModelProtocol {
     let title: String = ""
     let sectionTitle: String? = "Sport"
     let weekDays: WeekDays = []
+    let completeFormButtonTitle = "Create"
     
     let emojiViewModel: GridViewModel<TrackerFormGridItem> = .init(
         items: (0...17).map { _ in .init(value: RandomEmojiService.emoji) }
@@ -238,6 +243,6 @@ private final class ViewModel: TrackerFormViewModelProtocol {
     
     func onSectionSelection() { }
     func onWeekSelection() { }
-    func onCreate() { }
+    func onCompleteFrom() { }
 }
 #endif

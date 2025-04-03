@@ -10,18 +10,18 @@ import SwiftUI
 
 @MainActor
 struct TrackersNavigator<Content: View, NavigationState: TrackersNavigationState> {
-    private let trackerCreationSwiftUIAssembly: TrackerCreationAssembly
+    private let trackerCreationAssembly: TrackerCreationAssembly
     
     @ObservedObject private var navigationState: NavigationState
     
     private let content: Content
     
     init(
-        trackerCreationSwiftUIAssembly: TrackerCreationAssembly,
+        trackerCreationAssembly: TrackerCreationAssembly,
         navigationState: NavigationState,
         content: () -> Content
     ) {
-        self.trackerCreationSwiftUIAssembly = trackerCreationSwiftUIAssembly
+        self.trackerCreationAssembly = trackerCreationAssembly
         self.navigationState = navigationState
         self.content = content()
     }
@@ -33,11 +33,11 @@ extension TrackersNavigator: View {
             .sheet(item: $navigationState.route) { route in
                 switch route {
                 case .update(let tracker, let completion):
-                    trackerCreationSwiftUIAssembly.assemble(tracker, onCompletion: completion)
+                    trackerCreationAssembly.assemble(tracker, onCompletion: completion)
                         .interactiveDismissDisabled()
                     
                 case .create(let completion):
-                    trackerCreationSwiftUIAssembly.assemble(nil, onCompletion: completion)
+                    trackerCreationAssembly.assemble(nil, onCompletion: completion)
                         .interactiveDismissDisabled()
                 }
             }

@@ -8,6 +8,7 @@ public protocol TrackerManaging: Sendable {
     // Create
     func addSection(withId id: UUID, toTracker tracker: Tracker) async throws
     func addSections(_ sections: [TrackerSection]) async throws
+    func createTrackerAndAddToSection(with id: UUID, tracker: Tracker) async throws
     
     // Read
     func fetchCompletedSections(params: RequestParameters, isPaginating: Bool) async throws -> ([TrackerSection], [Tracker])
@@ -53,6 +54,10 @@ final class TrackerManager: TrackerManaging {
     
     func addSections(_ sections: [TrackerSection]) async throws {
         try await categoryRepository.createSections(sections)
+    }
+    
+    func createTrackerAndAddToSection(with id: UUID, tracker: Tracker) async throws {
+        try await trackerRepository.createTrackerAndAddToSection(with: id, tracker: tracker)
     }
     
     // MARK: - Read

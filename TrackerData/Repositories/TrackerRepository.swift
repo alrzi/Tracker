@@ -34,6 +34,14 @@ final class TrackerRepository: TrackerRepositoryProtocol {
         try await persistencyService.updateObject(for: requestForTracker, withObjectForRequest: requestForCategory)
     }
     
+    func createTrackerAndAddToSection(with id: UUID, tracker: Tracker) async throws {
+        let requestForCategory = FetchRequestBuilder<CategoryObject>()
+            .setPredicate(.by(id: id))
+            .build()
+        
+        try await persistencyService.createObject(TrackerObject.self, from: tracker, andAddObjectFor: requestForCategory)
+    }
+    
     // MARK: - Read
     
     func getTrackers(for category: UUID, isPinned: Bool, weekDay: WeekDay, query: String) async throws -> [Tracker] {

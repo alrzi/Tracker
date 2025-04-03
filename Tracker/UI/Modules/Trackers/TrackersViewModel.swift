@@ -140,12 +140,17 @@ private extension TrackersViewModel {
     // MARK: - Async
     
     func create(section: TrackerSection) async {
-        
+        do {
+            try await trackerManager.createTrackerAndAddToSection(with: section.id, tracker: section.trackers[.zero])
+        }
+        catch {
+            debugPrint(error)
+        }
     }
     
     func update(section: TrackerSection) async {
         do {
-            try await trackerManager.addSection(withId: section.id, toTracker: section.trackers[0])
+            try await trackerManager.update(tracker: section.trackers[.zero])
         }
         catch {
             debugPrint(error)

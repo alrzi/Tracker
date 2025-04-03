@@ -66,8 +66,7 @@ final class PersistencyService: Sendable {
     // MARK: - Create
     
     func createObject<T, C>(_ type: T.Type, from domain: C) async throws
-    where
-    T: NSManagedObject & CopyableEntity<C>
+    where T: NSManagedObject & CopyableEntity<C>
     {
         try await managedObjectContext.perform {
             let newObject = T(context: self.managedObjectContext)
@@ -136,8 +135,7 @@ final class PersistencyService: Sendable {
     // MARK: - Read
     
     func fetchObjects<T, R>(with fetchRequest: NSFetchRequest<T>) async throws -> [R]
-    where
-    R: Initable<T>
+    where R: Initable<T>
     {
         try await managedObjectContext.perform {
             try self.managedObjectContext.fetch(fetchRequest).map { .init(object: $0) }
@@ -145,8 +143,7 @@ final class PersistencyService: Sendable {
     }
     
     func fetchObject<T, R>(with fetchRequest: NSFetchRequest<T>) async throws -> R?
-    where
-    R: Initable<T>
+    where R: Initable<T>
     {
         try await managedObjectContext.perform {
             try self.managedObjectContext.fetch(fetchRequest).first.map { .init(object: $0) }
@@ -172,8 +169,7 @@ final class PersistencyService: Sendable {
     // MARK: - Update
     
     func updateObject<T, C>(for request: NSFetchRequest<T>, with info: C) async throws
-    where
-    T: CopyableEntity<C>
+    where T: CopyableEntity<C>
     {
         try await managedObjectContext.perform {
             guard let object = try self.managedObjectContext.fetch(request).first else {
@@ -187,8 +183,7 @@ final class PersistencyService: Sendable {
     }
     
     func updateObject<T, A>(for request: NSFetchRequest<T>, withObjectForRequest anotherRequest: NSFetchRequest<A>) async throws
-    where
-    T: ValueAddable<A>
+    where T: ValueAddable<A>
     {
         try await managedObjectContext.perform {
             guard let object = try self.managedObjectContext.fetch(request).first else {

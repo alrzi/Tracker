@@ -17,18 +17,18 @@ final class TrackersAssembly {
     
     private let trackersViewModelsFactory: TrackersViewModelsFactory
     
-    private let trackerCreationSwiftUIAssembly: TrackerCreationAssembly
+    private let trackerCreationAssembly: TrackerCreationAssembly
    
     init(
         trackerManager: some TrackerManaging,
         hapticManager: some VibrationFeedbackManaging,
         trackersViewModelsFactory: TrackersViewModelsFactory,
-        trackerCreationSwiftUIAssembly: TrackerCreationAssembly
+        trackerCreationAssembly: TrackerCreationAssembly
     ) {
         self.trackerManager = trackerManager
         self.hapticManager = hapticManager
         self.trackersViewModelsFactory = trackersViewModelsFactory
-        self.trackerCreationSwiftUIAssembly = trackerCreationSwiftUIAssembly
+        self.trackerCreationAssembly = trackerCreationAssembly
     }
     
     @MainActor
@@ -40,7 +40,7 @@ final class TrackersAssembly {
         )
         
         let viewT = TrackersNavigator(
-            trackerCreationSwiftUIAssembly: trackerCreationSwiftUIAssembly,
+            trackerCreationAssembly: trackerCreationAssembly,
             navigationState: viewModel
         ) {
             TrackersView(viewModel: viewModel)

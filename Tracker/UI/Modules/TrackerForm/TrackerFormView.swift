@@ -12,7 +12,7 @@ import TrackerDomain
 @MainActor
 struct TrackerFormView<ViewModel: TrackerFormViewModelProtocol> {
     @ObservedObject private var viewModel: ViewModel
-       
+    
     init(viewModel: ViewModel) {
         self.viewModel = viewModel
     }
@@ -129,7 +129,7 @@ private struct MainFooterView: View {
             Button(action: onCompleteFrom) {
                 Text(title)
                     .frame(maxWidth: .infinity)
-                    .foregroundStyle(.white)
+                    .foregroundStyle(R.color.cBlack.color)
                     .padding(16)
                     .background(.secondary, in: RoundedRectangle(cornerRadius: 12))
             }
@@ -165,7 +165,7 @@ private struct ButtonView: View {
             HStack {
                 VStack(alignment: .leading) {
                     Text(title)
-                        .foregroundStyle(R.color.myBlack.color)
+                        .foregroundStyle(R.color.cBlack.color)
                     
                     if let subtitle {
                         Text(subtitle)
@@ -178,7 +178,7 @@ private struct ButtonView: View {
                 Spacer()
                 
                 Image(systemName: "chevron.forward")
-                    .foregroundStyle(R.color.myGray.color)
+                    .foregroundStyle(R.color.cGray.color)
             }
             .padding(.horizontal, 16)
             .padding(.vertical, 24)

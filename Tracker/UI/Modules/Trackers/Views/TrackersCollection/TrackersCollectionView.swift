@@ -31,6 +31,7 @@ extension TrackersCollectionView: View {
                 Text(viewModel.title)
                     .font(.system(size: 19, weight: .bold))
                     .padding(.leading)
+                    .padding(.bottom, 12)
                 
                 Spacer()
             }

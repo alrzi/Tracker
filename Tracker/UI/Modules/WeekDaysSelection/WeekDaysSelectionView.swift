@@ -76,7 +76,6 @@ private struct ToggleView: View {
         HStack {
             Text(title)
                 .font(.system(size: 17, weight: .regular))
-                .foregroundColor(.black)
                 .layoutPriority(1)
             
             Spacer()

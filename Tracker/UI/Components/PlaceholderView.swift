@@ -20,7 +20,6 @@ struct PlaceholderView: View {
             
             Text(placeholder.info)
                 .font(.system(size: 13, weight: .regular))
-                .foregroundStyle(.black)
         }
         .multilineTextAlignment(.center)
         .frame(maxWidth: .infinity, maxHeight: .infinity)

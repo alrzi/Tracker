@@ -93,14 +93,14 @@ private struct ButtonView: View {
         Button(action: onTap) {
             HStack {
                 Text(title)
-                    .foregroundStyle(R.color.myBlack.color)
+                    .foregroundStyle(R.color.cBlack.color)
                     .layoutPriority(1)
                 
                 Spacer()
                 
                 if isSelected {
                     Image(systemName: "checkmark")
-                        .foregroundStyle(R.color.myBlue.color)
+                        .foregroundStyle(R.color.cBlue.color)
                 }
             }
             .padding(.horizontal, 16)

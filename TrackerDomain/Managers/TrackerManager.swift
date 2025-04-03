@@ -202,8 +202,8 @@ private extension TrackerManager {
     
     func fetchTrackers<T>(
         for sections: [TrackerSection],
-        fetchTask: @escaping (TrackerSection) async throws -> [T],
-        mapToTrackerSection: @escaping (TrackerSection, [T]) async throws -> TrackerSection?
+        fetchTask: @Sendable @escaping (TrackerSection) async throws -> [T],
+        mapToTrackerSection: @Sendable @escaping (TrackerSection, [T]) async throws -> TrackerSection?
     ) async throws -> [TrackerSection] {
         try await withThrowingTaskGroup(of: TrackerSection?.self, returning: [TrackerSection].self) { group in
             for section in sections {

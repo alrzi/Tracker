@@ -252,11 +252,6 @@ function_parameter_count:
   warning: 8
   error: 10
 
-opening_brace:
-  ignore_multiline_type_headers: true
-  ignore_multiline_statement_conditions: true
-  ignore_multiline_function_signatures: true
-
 attributes: error
 closure_end_indentation: error
 closure_spacing: error

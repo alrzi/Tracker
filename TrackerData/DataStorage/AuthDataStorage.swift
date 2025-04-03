@@ -20,7 +20,7 @@ extension AuthDataStorage where Self: DataStorageProtocol {
     }
 }
 
-extension DataStorage: AuthDataStorage { }
+extension DataStorage: @retroactive AuthDataStorage { }
 
 private enum AuthDataStorageKey: String, DataStorageKey {
     case isUserLoggedIn

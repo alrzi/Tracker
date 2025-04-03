@@ -10,7 +10,7 @@ public enum WeekDay: Int, CaseIterable {
     case thursday
     case friday
     case saturday
-    case sunday       
+    case sunday
     
     public static func getWeekDay(from date: Date) -> Self {
         var calendar = Calendar(identifier: .iso8601)

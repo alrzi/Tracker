@@ -17,7 +17,7 @@ public protocol TrackerRepositoryProtocol: Sendable {
     func createTracker(_ tracker: Tracker) async throws
     func addSection(withId id: UUID, toTracker tracker: Tracker) async throws
     
-    // Read    
+    // Read
     func getTrackers(for category: UUID, isPinned: Bool, weekDay: WeekDay, query: String) async throws -> [Tracker]
     func getTrackers(for category: UUID, isPinned: Bool, weekDay: WeekDay, query: String, date: Date) async throws -> [Tracker]
     func getTrackers(isPinned: Bool, weekDay: WeekDay, query: String, date: Date) async throws -> [Tracker]

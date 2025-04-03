@@ -17,5 +17,5 @@ public protocol RecordRepositoryProtocol: Sendable {
     func fetchRecords(for sectionId: UUID, for date: Date, weekDay: WeekDay, query: String, isPinned: Bool) async throws -> [TrackerRecord]
     func fetchRecords(for date: Date, weekDay: WeekDay, query: String, isPinned: Bool) async throws -> [TrackerRecord]
     func isCompletedFor(selectedDay date: Date, trackerWithId id: UUID) async throws -> Bool
-    func getTrackedDaysFor(id: UUID) async throws -> Int        
+    func getTrackedDaysFor(id: UUID) async throws -> Int
 }

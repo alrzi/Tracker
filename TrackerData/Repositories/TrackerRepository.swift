@@ -9,7 +9,7 @@ import Foundation
 import TrackerDomain
 import CoreData
 
-final class TrackerRepository: TrackerRepositoryProtocol {    
+final class TrackerRepository: TrackerRepositoryProtocol {
     private let persistencyService: PersistencyService
     
     init(persistencyService: PersistencyService) {
@@ -40,8 +40,8 @@ final class TrackerRepository: TrackerRepositoryProtocol {
         let request = FetchRequestBuilder<TrackerObject>()
             .setPredicate(
                 query.isEmpty
-                    ? .by(isPinned: isPinned, weekDay: weekDay, sectionID: category)
-                    : .by(isPinned: isPinned, weekDay: weekDay, sectionID: category, query: query)
+                ? .by(isPinned: isPinned, weekDay: weekDay, sectionID: category)
+                : .by(isPinned: isPinned, weekDay: weekDay, sectionID: category, query: query)
             )
             .setSortDescriptors([.init(keyPath: \.name)])
             .build()
@@ -53,8 +53,8 @@ final class TrackerRepository: TrackerRepositoryProtocol {
         let request = FetchRequestBuilder<TrackerObject>()
             .setPredicate(
                 query.isEmpty
-                    ? .by(isPinned: isPinned, weekDay: weekDay, sectionID: category, interval: date.fullDayInterval())
-                    : .by(isPinned: isPinned, weekDay: weekDay, sectionID: category, query: query, interval: date.fullDayInterval())
+                ? .by(isPinned: isPinned, weekDay: weekDay, sectionID: category, interval: date.fullDayInterval())
+                : .by(isPinned: isPinned, weekDay: weekDay, sectionID: category, query: query, interval: date.fullDayInterval())
             )
             .setSortDescriptors([.init(keyPath: \.name)])
             .build()
@@ -66,8 +66,8 @@ final class TrackerRepository: TrackerRepositoryProtocol {
         let request = FetchRequestBuilder<TrackerObject>()
             .setPredicate(
                 query.isEmpty
-                    ? .by(isPinned: isPinned, weekDay: weekDay)
-                    : .by(isPinned: isPinned, weekDay: weekDay, query: query)
+                ? .by(isPinned: isPinned, weekDay: weekDay)
+                : .by(isPinned: isPinned, weekDay: weekDay, query: query)
             )
             .setSortDescriptors([.init(keyPath: \.name)])
             .build()
@@ -79,8 +79,8 @@ final class TrackerRepository: TrackerRepositoryProtocol {
         let request = FetchRequestBuilder<TrackerObject>()
             .setPredicate(
                 query.isEmpty
-                    ? .by(isPinned: isPinned, weekDay: weekDay, interval: date.fullDayInterval())
-                    : .by(isPinned: isPinned, weekDay: weekDay, query: query, interval: date.fullDayInterval())
+                ? .by(isPinned: isPinned, weekDay: weekDay, interval: date.fullDayInterval())
+                : .by(isPinned: isPinned, weekDay: weekDay, query: query, interval: date.fullDayInterval())
             )
             .setSortDescriptors([.init(keyPath: \.name)])
             .build()
@@ -111,7 +111,7 @@ final class TrackerRepository: TrackerRepositoryProtocol {
             .setPredicate(.by(isPinned: true, query: name))
             .setFetchLimit(1)
             .build()
-                
+        
         return try await persistencyService.fetchCount(with: request) > 0
     }
     

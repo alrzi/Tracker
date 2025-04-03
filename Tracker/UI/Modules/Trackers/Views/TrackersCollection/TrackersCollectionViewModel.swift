@@ -21,7 +21,7 @@ protocol TrackersCollectionViewModelProtocol: ObservableObject, Identifiable {
     func onToggleCompletion(at index: Int)
     func onTogglePin(at index: Int)
     func onEdit(at index: Int)
-    func onDelete(at index: Int)    
+    func onDelete(at index: Int)
 }
 
 final class TrackersCollectionViewModel: TrackersCollectionViewModelProtocol {
@@ -32,14 +32,14 @@ final class TrackersCollectionViewModel: TrackersCollectionViewModelProtocol {
     private let currentDate: Date
     
     private let eventsHandler: (TrackersCollectionOutput) -> Void
-        
+    
     @Published private(set) var trackers: [Tracker]
     @Published private(set) var completionState: LoadingState = .idle
     
     @Published private(set) var deleteTrackerConfirmationAlert: ErrorInfo?
     @Published var isDeleteTrackerConfirmationAlertPresented = false
     @Published var isCompletionConfirmationAlertPresented = false
-        
+    
     let id: UUID
     let title: String
     

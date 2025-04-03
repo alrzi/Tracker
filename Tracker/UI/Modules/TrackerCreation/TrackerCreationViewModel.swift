@@ -20,7 +20,7 @@ protocol TrackerCreationViewModelProtocol: ObservableObject, TrackerCreationNavi
     var invalidComponent: TrackerCreationInvalidComponent? { get }
     
     func onSectionSelection()
-    func onWeekSelection()   
+    func onWeekSelection()
     func onCreate()
 }
 

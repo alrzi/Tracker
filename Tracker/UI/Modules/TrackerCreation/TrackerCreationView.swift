@@ -154,7 +154,7 @@ private struct ButtonView: View {
                 VStack(alignment: .leading) {
                     Text(title)
                         .foregroundStyle(R.color.myBlack.color)
-                       
+                    
                     if let subtitle {
                         Text(subtitle)
                             .lineLimit(1)
@@ -227,9 +227,9 @@ private final class ViewModel: TrackerCreationViewModelProtocol {
     )
     
     let invalidComponent: TrackerCreationInvalidComponent? = nil
-       
+    
     func onSectionSelection() { }
-    func onWeekSelection() { }    
+    func onWeekSelection() { }
     func onCreate() { }
 }
 #endif

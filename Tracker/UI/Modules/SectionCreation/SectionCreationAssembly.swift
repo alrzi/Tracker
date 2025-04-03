@@ -9,7 +9,7 @@ import SwiftUI
 import Foundation
 import TrackerDomain
 
-final class SectionCreationAssembly {    
+final class SectionCreationAssembly {
     @MainActor
     func assemble(section: TrackerSection?, completion: @escaping (TrackerSection) -> Void) -> some View {
         let viewModel = SectionCreationViewModel(

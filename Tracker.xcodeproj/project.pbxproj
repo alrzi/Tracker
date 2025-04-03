@@ -7,17 +7,14 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		F93E19482CAC37840006F56E /* Presentation in Frameworks */ = {isa = PBXBuildFile; productRef = F93E19472CAC37840006F56E /* Presentation */; };
 		F956F0852D8F299B00175338 /* RswiftLibrary in Frameworks */ = {isa = PBXBuildFile; productRef = F956F0842D8F299B00175338 /* RswiftLibrary */; };
-		F957BC372C7BBD9A0047559E /* Presentation in Frameworks */ = {isa = PBXBuildFile; productRef = F957BC362C7BBD9A0047559E /* Presentation */; };
-		F957BC3A2C7BBF630047559E /* Presentation in Frameworks */ = {isa = PBXBuildFile; productRef = F957BC392C7BBF630047559E /* Presentation */; };
 		F96D33262D7F6D82009208B9 /* TrackerDomain.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F96D331E2D7F6D82009208B9 /* TrackerDomain.framework */; };
 		F96D33312D7F6D82009208B9 /* TrackerDomain.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F96D331E2D7F6D82009208B9 /* TrackerDomain.framework */; };
 		F96D33322D7F6D82009208B9 /* TrackerDomain.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = F96D331E2D7F6D82009208B9 /* TrackerDomain.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		F96D33592D7F6F56009208B9 /* TrackerData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F96D33512D7F6F55009208B9 /* TrackerData.framework */; };
 		F96D33642D7F6F56009208B9 /* TrackerData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F96D33512D7F6F55009208B9 /* TrackerData.framework */; };
 		F96D33652D7F6F56009208B9 /* TrackerData.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = F96D33512D7F6F55009208B9 /* TrackerData.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		F97A0F8C2D80D2D600AC67A4 /* AppMetricaCore in Frameworks */ = {isa = PBXBuildFile; productRef = F97A0F8B2D80D2D600AC67A4 /* AppMetricaCore */; };
+		F97A0F8C2D80D2D600AC67A4 /* AppMetricaCore in Frameworks */ = {isa = PBXBuildFile; productRef = F97A0F8B2D80D2D600AC67A4 /* AppMetricaCore */; settings = {ATTRIBUTES = (Weak, ); }; };
 		F97A0F8F2D80D2FD00AC67A4 /* DataStorage in Frameworks */ = {isa = PBXBuildFile; productRef = F97A0F8E2D80D2FD00AC67A4 /* DataStorage */; };
 /* End PBXBuildFile section */
 
@@ -127,10 +124,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				F957BC372C7BBD9A0047559E /* Presentation in Frameworks */,
-				F957BC3A2C7BBF630047559E /* Presentation in Frameworks */,
 				F96D33642D7F6F56009208B9 /* TrackerData.framework in Frameworks */,
-				F93E19482CAC37840006F56E /* Presentation in Frameworks */,
 				F96D33312D7F6D82009208B9 /* TrackerDomain.framework in Frameworks */,
 				F956F0852D8F299B00175338 /* RswiftLibrary in Frameworks */,
 			);
@@ -248,9 +242,6 @@
 			);
 			name = Tracker;
 			packageProductDependencies = (
-				F957BC362C7BBD9A0047559E /* Presentation */,
-				F957BC392C7BBF630047559E /* Presentation */,
-				F93E19472CAC37840006F56E /* Presentation */,
 				F956F0842D8F299B00175338 /* RswiftLibrary */,
 			);
 			productName = Tracker;
@@ -1097,22 +1088,10 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		F93E19472CAC37840006F56E /* Presentation */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = Presentation;
-		};
 		F956F0842D8F299B00175338 /* RswiftLibrary */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = F956F0832D8F299B00175338 /* XCRemoteSwiftPackageReference "R" */;
 			productName = RswiftLibrary;
-		};
-		F957BC362C7BBD9A0047559E /* Presentation */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = Presentation;
-		};
-		F957BC392C7BBF630047559E /* Presentation */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = Presentation;
 		};
 		F961FFE92D95CB3500131277 /* RswiftGenerateInternalResources */ = {
 			isa = XCSwiftPackageProductDependency;

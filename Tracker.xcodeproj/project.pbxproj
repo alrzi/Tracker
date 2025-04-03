@@ -397,7 +397,6 @@
 			mainGroup = F918017929CEECCB00767F16;
 			packageReferences = (
 				F93160B12A2F3A8B003A96EC /* XCRemoteSwiftPackageReference "swift-snapshot-testing" */,
-				F9C512172D7CB3B80093D201 /* XCLocalSwiftPackageReference "../../../../../../Volumes/KINGSTON/MyPackages/Presentation" */,
 				F9C512182D7CB3C80093D201 /* XCLocalSwiftPackageReference "../../../../../../Volumes/KINGSTON/MyPackages/DataStorage" */,
 				F97A0F8A2D80D2D600AC67A4 /* XCRemoteSwiftPackageReference "appmetrica-sdk-ios" */,
 				F956F0832D8F299B00175338 /* XCRemoteSwiftPackageReference "R" */,
@@ -1064,10 +1063,6 @@
 /* End XCConfigurationList section */
 
 /* Begin XCLocalSwiftPackageReference section */
-		F9C512172D7CB3B80093D201 /* XCLocalSwiftPackageReference "../../../../../../Volumes/KINGSTON/MyPackages/Presentation" */ = {
-			isa = XCLocalSwiftPackageReference;
-			relativePath = ../../../../../../Volumes/KINGSTON/MyPackages/Presentation;
-		};
 		F9C512182D7CB3C80093D201 /* XCLocalSwiftPackageReference "../../../../../../Volumes/KINGSTON/MyPackages/DataStorage" */ = {
 			isa = XCLocalSwiftPackageReference;
 			relativePath = ../../../../../../Volumes/KINGSTON/MyPackages/DataStorage;

@@ -6,30 +6,24 @@
 //
 
 import Foundation
-import Presentation
+import UIKit
 
 @MainActor
 final class SplashViewRouter {
     private let tabBarAssembly: TabBarAssembly
     
-    private let presentationContext: WindowPresentationContext
+    private let window: UIWindow
     
     init(
         tabBarAssembly: TabBarAssembly,
-        presentationContext: WindowPresentationContext
+        window: UIWindow
     ) {
         self.tabBarAssembly = tabBarAssembly
-        self.presentationContext = presentationContext
+        self.window = window
     }
         
     func showTabBar() {
-        guard let window = presentationContext.window else {
-            assertionFailure()
-            return
-        }
-        
-        let presenter = DefaultWindowPresenter(tabBarAssembly.assemble())
-        
-        presenter.present(at: window)
+        window.rootViewController = tabBarAssembly.assemble()
+        window.makeKeyAndVisible()
     }
 }

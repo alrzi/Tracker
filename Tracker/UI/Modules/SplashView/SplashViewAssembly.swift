@@ -6,7 +6,6 @@
 //
 
 import UIKit
-import Presentation
 import TrackerDomain
 
 final class SplashViewAssembly {
@@ -30,11 +29,9 @@ final class SplashViewAssembly {
         
     @MainActor
     func assemble(_ context: Context) -> UIViewController {
-        let presentationContext = WindowPresentationContext(window: context)
-        
         let router = SplashViewRouter(
             tabBarAssembly: tabBarAssembly,
-            presentationContext: presentationContext
+            window: context
         )
         
         let viewModel = SplashViewModel(

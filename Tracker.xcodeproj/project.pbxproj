@@ -222,7 +222,6 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = F918019629CEECCC00767F16 /* Build configuration list for PBXNativeTarget "Tracker" */;
 			buildPhases = (
-				F964777B2D7CC13A008F2620 /* ShellScript */,
 				F918017E29CEECCB00767F16 /* Sources */,
 				F918017F29CEECCB00767F16 /* Frameworks */,
 				F918018029CEECCB00767F16 /* Resources */,
@@ -232,7 +231,7 @@
 			buildRules = (
 			);
 			dependencies = (
-				F961FFEA2D95CB3500131277 /* PBXTargetDependency */,
+				F923F3092D9EDCAA008FCDA8 /* PBXTargetDependency */,
 				F96D33302D7F6D82009208B9 /* PBXTargetDependency */,
 				F96D33632D7F6F56009208B9 /* PBXTargetDependency */,
 			);
@@ -444,23 +443,6 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		F964777B2D7CC13A008F2620 /* ShellScript */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-			);
-			outputFileListPaths = (
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\n";
-		};
 		F97774B129D2D4E600959E7C /* SwiftLint */ = {
 			isa = PBXShellScriptBuildPhase;
 			alwaysOutOfDate = 1;
@@ -521,9 +503,9 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		F961FFEA2D95CB3500131277 /* PBXTargetDependency */ = {
+		F923F3092D9EDCAA008FCDA8 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			productRef = F961FFE92D95CB3500131277 /* RswiftGenerateInternalResources */;
+			productRef = F923F3082D9EDCAA008FCDA8 /* RswiftGeneratePublicResources */;
 		};
 		F96D33282D7F6D82009208B9 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -1088,15 +1070,15 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		F923F3082D9EDCAA008FCDA8 /* RswiftGeneratePublicResources */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = F956F0832D8F299B00175338 /* XCRemoteSwiftPackageReference "R" */;
+			productName = "plugin:RswiftGeneratePublicResources";
+		};
 		F956F0842D8F299B00175338 /* RswiftLibrary */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = F956F0832D8F299B00175338 /* XCRemoteSwiftPackageReference "R" */;
 			productName = RswiftLibrary;
-		};
-		F961FFE92D95CB3500131277 /* RswiftGenerateInternalResources */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = F956F0832D8F299B00175338 /* XCRemoteSwiftPackageReference "R" */;
-			productName = "plugin:RswiftGenerateInternalResources";
 		};
 		F97A0F8B2D80D2D600AC67A4 /* AppMetricaCore */ = {
 			isa = XCSwiftPackageProductDependency;

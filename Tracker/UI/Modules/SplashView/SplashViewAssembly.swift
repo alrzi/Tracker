@@ -9,7 +9,7 @@ import UIKit
 import Presentation
 import TrackerDomain
 
-final class SplashViewAssembly: ViewControllerAssembly {
+final class SplashViewAssembly {
     typealias Context = UIWindow
     
     // MARK: - Assembly
@@ -27,7 +27,8 @@ final class SplashViewAssembly: ViewControllerAssembly {
         self.tabBarAssembly = tabBarAssembly
         self.authService = authService
     }
-    
+        
+    @MainActor
     func assemble(_ context: Context) -> UIViewController {
         let presentationContext = WindowPresentationContext(window: context)
         

@@ -1,7 +1,7 @@
 import Foundation
 
-public protocol AuthServiceProtocol {
-    func login(completion: @escaping (Bool) -> Void)
+public protocol AuthServiceProtocol: Sendable {
+    func login() async -> Bool
 }
 
 final class AuthService: AuthServiceProtocol {
@@ -11,11 +11,9 @@ final class AuthService: AuthServiceProtocol {
         self.authDataStorage = authDataStorage
     }
     
-    func login(completion: @escaping (Bool) -> Void) {
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1) { [authDataStorage] in
-            authDataStorage.isUserLoggedIn = true
-            
-            completion(true)
-        }
+    func login() async -> Bool {
+        authDataStorage.isUserLoggedIn = true
+        
+        return authDataStorage.isUserLoggedIn
     }
 }

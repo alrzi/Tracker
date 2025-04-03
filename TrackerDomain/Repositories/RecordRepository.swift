@@ -8,11 +8,11 @@
 import Foundation
 
 public protocol RecordRepositoryProtocol: Sendable {
-    // Create/Delete
-    func createOrDeleteIfPresent(record: TrackerRecord) async throws
-    
     // Read
     var numberOfCompletedTrackers: Int { get async throws }
+    
+    // Create/Delete
+    func createOrDeleteIfPresent(record: TrackerRecord) async throws
     
     func fetchRecords(for sectionId: UUID, for date: Date, weekDay: WeekDay, query: String, isPinned: Bool) async throws -> [TrackerRecord]
     func fetchRecords(for date: Date, weekDay: WeekDay, query: String, isPinned: Bool) async throws -> [TrackerRecord]

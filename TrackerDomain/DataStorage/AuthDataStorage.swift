@@ -7,6 +7,6 @@
 
 import Foundation
 
-public protocol AuthDataStorage: AnyObject {
+public protocol AuthDataStorage: AnyObject, Sendable {
     var isUserLoggedIn: Bool { get set }
 }

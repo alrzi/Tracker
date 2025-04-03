@@ -26,7 +26,7 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // MARK: - Servises
         
         let hapticManager = VibrationFeedbackManager()
-        let analyticsTracker = TrackerDataContainer.analyticsTracker
+//        let analyticsTracker = TrackerDataContainer.analyticsTracker
         let authDataStorage = TrackerDataContainer.authDataStorage
         let recordRepository = TrackerDataContainer.recordRepository
         let trackerRepository = TrackerDataContainer.trackerRepository

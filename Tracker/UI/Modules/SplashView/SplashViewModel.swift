@@ -1,5 +1,6 @@
 import TrackerDomain
 
+@MainActor
 final class SplashViewModel {
     private let authService: AuthServiceProtocol
     private let router: SplashViewRouter
@@ -13,7 +14,9 @@ final class SplashViewModel {
     }
 
     func loginUser() {
-        authService.login { [router] isLoggedIn in
+        Task {
+            let isLoggedIn = await authService.login()
+            
             if isLoggedIn {
                 router.showTabBar()
             }

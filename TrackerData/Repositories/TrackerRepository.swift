@@ -83,6 +83,14 @@ final class TrackerRepository: TrackerRepositoryProtocol {
         return try await persistencyService.fetchObjects(with: request)
     }
     
+    func getTrackers(for weekDay: WeekDay) async throws -> [Tracker] {
+        let request = FetchRequestBuilder<TrackerObject>()
+            .setPredicate(.by(weekDay: weekDay))
+            .build()
+        
+        return try await persistencyService.fetchObjects(with: request)
+    }
+    
     func getTrackers(id: UUID) async throws -> [Tracker] {
         let request = FetchRequestBuilder<TrackerObject>()
             .setPredicate(.by(id: id))
@@ -126,6 +134,11 @@ private extension StaticPredicateBuilder where T: TrackerObject {
     static func by(id: UUID) -> Self {
         .init()
         .filter(by: \.id, value: id, comparison: .equal)
+    }
+    
+    static func by(weekDay: WeekDay) -> Self {
+        .init()
+        .filter(by: \.weekDays, value: weekDay.toNumberString(), comparison: .equal)
     }
     
     static func by(isPinned: Bool, weekDay: WeekDay) -> Self {

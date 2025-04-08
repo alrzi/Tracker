@@ -40,10 +40,11 @@ private extension StatisticsViewModel {
         do {
             let numberOfCompletedTrackers = try await statisticsManager.getCompletedTrackersCount()
             let bestPeriod = try await statisticsManager.getMaxDaysWithoutBreakCount()
+            let idealDays = try await statisticsManager.getDaysCountWhenAllTrackersAreCompleted()
             
             statisticData = [
                 .bestPeriod(.init(count: bestPeriod, title: R.string.localizable.statisticBestPeriod())),
-                .idealDays(.init(count: 0, title: R.string.localizable.statisticIdealDays())),
+                .idealDays(.init(count: idealDays, title: R.string.localizable.statisticIdealDays())),
                 .completedTrackers(.init(count: numberOfCompletedTrackers, title: R.string.localizable.statisticCompleted())),
                 .averageValue(.init(count: 0, title: R.string.localizable.statisticAvarageValue()))
             ]

@@ -10,6 +10,7 @@ import Foundation
 public protocol StatisticsManaging: Sendable {
     func getCompletedTrackersCount() async throws -> Int
     func getMaxDaysWithoutBreakCount() async throws -> Int
+    func getDaysCountWhenAllTrackersAreCompleted() async throws -> Int
 }
 
 struct StatisticsManager: StatisticsManaging {
@@ -59,6 +60,28 @@ struct StatisticsManager: StatisticsManaging {
     }
     
     func getDaysCountWhenAllTrackersAreCompleted() async throws -> Int {
-        .zero
+        let records = try await recordRepository.fetchRecords()
+        
+        var trackersDict: [WeekDay: [Tracker]] = [:]
+        
+        for day in WeekDay.allCases {
+            trackersDict[day] = try await trackerRepository.getTrackers(for: day)
+        }
+        
+        let recordsByDate = Dictionary(grouping: records) { calendar.startOfDay(for: $0.date) }
+        
+        var completionCounts = 0
+        
+        for (date, recordsOnDate) in recordsByDate {
+            let completedTrackers = Set(recordsOnDate.map { $0.id })
+            
+            let weekDate = WeekDay.getWeekDay(from: date)
+            
+            if let trackersForWeekDay = trackersDict[weekDate], trackersForWeekDay.count == completedTrackers.count {
+                completionCounts += 1
+            }
+        }
+        
+        return completionCounts
     }
 }

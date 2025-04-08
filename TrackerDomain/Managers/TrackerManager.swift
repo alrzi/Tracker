@@ -12,7 +12,7 @@ public protocol TrackerManaging: Sendable {
     // Read
     func fetchCompletedSections(params: RequestParameters, isPaginating: Bool) async throws -> ([TrackerSection], [Tracker])
     func fetchUnCompletedSections(params: RequestParameters, isPaginating: Bool) async throws -> ([TrackerSection], [Tracker])
-    func fetchSections(params: RequestParameters, isPaginating: Bool) async throws -> ([TrackerSection], [Tracker])    
+    func fetchSections(params: RequestParameters, isPaginating: Bool) async throws -> ([TrackerSection], [Tracker])
     func daysTracked(for tracker: Tracker) async throws -> Int
     func isCompleted(tracker: Tracker, for date: Date) async throws -> Bool
     

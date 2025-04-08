@@ -26,7 +26,7 @@ final class TabBarViewController: UITabBarController {
         super.viewDidLoad()
         
         viewControllers = [
-            trackersAssembly.assemble(()),
+            trackersAssembly.assemble(),
             statisticAssembly.assemble()
         ]
         

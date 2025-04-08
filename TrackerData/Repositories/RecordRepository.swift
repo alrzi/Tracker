@@ -45,7 +45,7 @@ final class RecordRepository: RecordRepositoryProtocol {
             .setPredicate(
                 query.isEmpty
                     ? .by(sectionId: sectionId, for: date.fullDayInterval(), weekDay: weekDay, isPinned: isPinned)
-                    : .by(sectionId: sectionId, for: date.fullDayInterval(), query: query, weekDay: weekDay, isPinned: isPinned)
+                    : .by(sectionId: sectionId, for: date.fullDayInterval(), weekDay: weekDay, isPinned: isPinned, query: query)
             )
             .build()
         
@@ -115,31 +115,18 @@ private extension StaticPredicateBuilder where T: RecordObject {
     }
     
     static func by(for dateInterval: DateInterval, weekDay: WeekDay, isPinned: Bool, query: String) -> Self {
-        .init()
-        .filter(by: \.tracker.isPinned, value: isPinned, comparison: .equal)
-        .filter(by: \.tracker.weekDays, value: weekDay.toNumberString(), comparison: .contains)
+        .by(for: dateInterval, weekDay: weekDay, isPinned: isPinned)
         .filter(by: \.tracker.name, value: query, comparison: .contains)
-        .filter(by: \.date, value: dateInterval.start, comparison: .greaterThanOrEqual)
-        .filter(by: \.date, value: dateInterval.end, comparison: .lessThan)
     }
     
     static func by(sectionId: UUID, for dateInterval: DateInterval, weekDay: WeekDay, isPinned: Bool) -> Self {
-        .init()
+        .by(for: dateInterval, weekDay: weekDay, isPinned: isPinned)
         .filter(by: \.tracker.category.id, value: sectionId, comparison: .equal)
-        .filter(by: \.tracker.isPinned, value: isPinned, comparison: .equal)
-        .filter(by: \.tracker.weekDays, value: weekDay.toNumberString(), comparison: .contains)
-        .filter(by: \.date, value: dateInterval.start, comparison: .greaterThanOrEqual)
-        .filter(by: \.date, value: dateInterval.end, comparison: .lessThan)
     }
     
-    static func by(sectionId: UUID, for dateInterval: DateInterval, query: String, weekDay: WeekDay, isPinned: Bool) -> Self {
-        .init()
-        .filter(by: \.tracker.category.id, value: sectionId, comparison: .equal)
-        .filter(by: \.tracker.isPinned, value: isPinned, comparison: .equal)
-        .filter(by: \.tracker.weekDays, value: weekDay.toNumberString(), comparison: .contains)
+    static func by(sectionId: UUID, for dateInterval: DateInterval, weekDay: WeekDay, isPinned: Bool, query: String) -> Self {
+        .by(sectionId: sectionId, for: dateInterval, weekDay: weekDay, isPinned: isPinned)
         .filter(by: \.tracker.name, value: query, comparison: .contains)
-        .filter(by: \.date, value: dateInterval.start, comparison: .greaterThanOrEqual)
-        .filter(by: \.date, value: dateInterval.end, comparison: .lessThan)
     }
 }
 

@@ -10,8 +10,6 @@ import Foundation
 import TrackerDomain
 
 final class TrackersAssembly {
-    typealias Context = ()
-    
     private let trackerManager: any TrackerManaging
     private let hapticManager: any VibrationFeedbackManaging
     
@@ -32,21 +30,21 @@ final class TrackersAssembly {
     }
     
     @MainActor
-    func assemble(_ context: Context) -> UIViewController {
+    func assemble() -> UIViewController {
         let viewModel = TrackersViewModel(
             trackerManager: trackerManager,
             hapticManager: hapticManager,
             trackersViewModelsFactory: trackersViewModelsFactory
         )
         
-        let viewT = TrackersNavigator(
+        let view = TrackersNavigator(
             trackerFormAssembly: trackerFormAssembly,
             navigationState: viewModel
         ) {
             TrackersView(viewModel: viewModel)
         }
         
-        let viewController = UIHostingController(rootView: viewT)
+        let viewController = UIHostingController(rootView: view)
         return viewController
     }
 }

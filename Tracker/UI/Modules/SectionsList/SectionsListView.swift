@@ -67,13 +67,13 @@ extension SectionsListView: View {
                             .background(.tertiary.opacity(0.3), in: .rect(cornerRadius: 16))
                             .padding(.top, 24)
                         }
-                        .safeAreaInset(edge: .bottom, spacing: 16) {
-                            Button(R.string.localizable.categoryAddNew(), action: viewModel.onSectionCreation)
-                                .buttonStyle(CommonButtonStyle(backgroundColor: .black))
-                                .padding(.horizontal, 16)
-                                .padding(.bottom, 16)
-                        }
                     }
+                }
+                .safeAreaInset(edge: .bottom, spacing: 16) {
+                    Button(R.string.localizable.categoryAddNew(), action: viewModel.onSectionCreation)
+                        .buttonStyle(CommonButtonStyle(backgroundColor: .black))
+                        .padding(.horizontal, 16)
+                        .padding(.bottom, 16)
                 }
                 .navigationTitle(R.string.localizable.categoryCategory())
             }

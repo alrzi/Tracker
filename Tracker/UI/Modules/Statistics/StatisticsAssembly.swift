@@ -10,23 +10,15 @@ import Foundation
 import TrackerDomain
 
 final class StatisticsAssembly {
-    private let recordRepository: any RecordRepositoryProtocol
-    private let trackerManager: any TrackerManaging
+    private let statisticsManager: any StatisticsManaging
     
-    init(
-        recordRepository: some RecordRepositoryProtocol,
-        trackerManager: some TrackerManaging
-    ) {
-        self.recordRepository = recordRepository
-        self.trackerManager = trackerManager
+    init(statisticsManager: some StatisticsManaging) {
+        self.statisticsManager = statisticsManager
     }
     
     @MainActor
     func assemble() -> UIViewController {
-        let viewModel = StatisticsViewModel(
-            recordRepository: recordRepository,
-            trackerManager: trackerManager
-        )
+        let viewModel = StatisticsViewModel(statisticsManager: statisticsManager)
         
         let view = StatisticsView(viewModel: viewModel)
         let viewController = UIHostingController(rootView: view)

@@ -9,21 +9,21 @@ import Foundation
 
 @MainActor
 protocol StatisticViewModelProtocol: ObservableObject, Identifiable {
-    var completedTrackersCount: Int { get }
+    var count: Int { get }
     var title: String { get }
 }
 
 final class StatisticViewModel: StatisticViewModelProtocol {
-    @Published private(set) var completedTrackersCount: Int
+    @Published private(set) var count: Int
     @Published private(set) var title: String
     
     let id: UUID = .init()
     
     init(
-        completedTrackersCount: Int = 0,
-        title: String = R.string.localizable.statisticCompleted()
+        count: Int = 0,
+        title: String
     ) {
-        self.completedTrackersCount = completedTrackersCount
+        self.count = count
         self.title = title
     }
 }

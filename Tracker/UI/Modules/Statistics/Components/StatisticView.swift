@@ -43,7 +43,7 @@ extension StatisticView: View {
             
             HStack {
                 VStack(alignment: .leading) {
-                    Text(viewModel.completedTrackersCount.formatted(.number))
+                    Text(viewModel.count.formatted(.number))
                         .font(.largeTitle)
                         .padding(.top, 12)
                         .padding(.leading, 12)
@@ -66,5 +66,5 @@ extension StatisticView: View {
 }
 
 #Preview {
-    StatisticView(viewModel: StatisticViewModel())
+    StatisticView(viewModel: StatisticViewModel(title: ""))
 }

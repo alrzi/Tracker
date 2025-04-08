@@ -22,22 +22,24 @@ struct StatisticsView<ViewModel: StatisticsViewModelProtocol> {
 extension StatisticsView: View {
     var body: some View {
         NavigationStack {
-            ScrollableLazyVStack {
-                VStack(spacing: 12) {
-                    if viewModel.statisticData.isEmpty {
-                        PlaceholderView(placeholder: .empty)
-                    }
-                    else {
-                        ForEach(viewModel.statisticData) { data in
-                            StatisticView(viewModel: data.viewModel)
+            Group {
+                if viewModel.statisticData.isEmpty {
+                    PlaceholderView(placeholder: .empty)
+                }
+                else {
+                    ScrollableLazyVStack {
+                        VStack(spacing: 12) {
+                            ForEach(viewModel.statisticData) { data in
+                                StatisticView(viewModel: data.viewModel)
+                            }
                         }
                     }
+                    .padding(.top, 24)
                 }
-                .padding(.top, 24)
             }
-            .onAppear(perform: viewModel.onAppear)
             .navigationTitle(R.string.localizable.statisticTitle())
         }
+        .onAppear(perform: viewModel.onAppear)
     }
 }
 

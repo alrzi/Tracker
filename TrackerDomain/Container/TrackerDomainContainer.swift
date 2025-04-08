@@ -20,6 +20,13 @@ public enum TrackerDomainContainer {
         )
     }
     
+    public static func statisticManager(
+        trackerRepository: some TrackerRepositoryProtocol,
+        recordRepository: some RecordRepositoryProtocol
+    ) -> some StatisticsManaging {
+        StatisticsManager(trackerRepository: trackerRepository, recordRepository: recordRepository)
+    }
+    
     public static func authService(dataStorage: some AuthDataStorage) -> some AuthServiceProtocol {
         AuthService(authDataStorage: dataStorage)
     }

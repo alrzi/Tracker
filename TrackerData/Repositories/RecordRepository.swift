@@ -10,18 +10,17 @@ import TrackerDomain
 
 final class RecordRepository: RecordRepositoryProtocol {
     private let persistencyService: PersistencyService
-    private let calendar: Calendar = .autoupdatingCurrent
-    
-    var numberOfCompletedTrackers: Int {
-        get async throws {
-            let records: [TrackerRecord] = try await persistencyService.fetchObjects(RecordObject.self)
-            return records.count
-        }
-    }
-    
-    init(persistencyService: PersistencyService) {
+    private let calendar: Calendar
+        
+    init(
+        persistencyService: PersistencyService,
+        calendar: Calendar = .autoupdatingCurrent
+    ) {
         self.persistencyService = persistencyService
+        self.calendar = calendar
     }
+    
+    // Create
     
     func createOrDeleteIfPresent(record: TrackerRecord) async throws {
         if try await isCompletedFor(selectedDay: record.date, trackerWithId: record.id) {
@@ -40,6 +39,16 @@ final class RecordRepository: RecordRepositoryProtocol {
         }
     }
     
+    // Read
+    
+    func fetchRecords() async throws -> [TrackerRecord] {
+        let request = FetchRequestBuilder<RecordObject>()
+            .setSortDescriptors([.init(keyPath: \.date)])
+            .build()
+        
+        return try await persistencyService.fetchObjects(with: request)
+    }
+        
     func fetchRecords(for sectionId: UUID, for date: Date, weekDay: WeekDay, query: String, isPinned: Bool) async throws -> [TrackerRecord] {
         let request = FetchRequestBuilder<RecordObject>()
             .setPredicate(
@@ -69,9 +78,14 @@ final class RecordRepository: RecordRepositoryProtocol {
             .setPredicate(.by(id: id))
             .build()
         
-        let record: [TrackerRecord] = try await persistencyService.fetchObjects(with: request)
+        return try await persistencyService.fetchCount(with: request)
+    }
+    
+    func getCompletedTrackersCount() async throws -> Int {
+        let request = FetchRequestBuilder<RecordObject>()
+            .build()
         
-        return record.count
+        return try await persistencyService.fetchCount(with: request)
     }
     
     func isCompletedFor(selectedDay date: Date, trackerWithId id: UUID) async throws -> Bool {
@@ -79,9 +93,7 @@ final class RecordRepository: RecordRepositoryProtocol {
             .setPredicate(.by(id: id, dateInterval: date.fullDayInterval()))
             .build()
         
-        let record: TrackerRecord? = try await persistencyService.fetchObject(with: request)
-        
-        return record != nil
+        return try await persistencyService.fetchCount(with: request) != .zero
     }
 }
 

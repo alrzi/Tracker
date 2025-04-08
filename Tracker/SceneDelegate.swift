@@ -39,13 +39,11 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         )
         
         let authService = TrackerDomainContainer.authService(dataStorage: authDataStorage)
+        let statisticManager = TrackerDomainContainer.statisticManager(trackerRepository: trackerRepository, recordRepository: recordRepository)
         
         // MARK: - Assembly
         
-        let statisticsAssembly = StatisticsAssembly(
-            recordRepository: recordRepository,
-            trackerManager: trackerManager
-        )
+        let statisticsAssembly = StatisticsAssembly(statisticsManager: statisticManager)
         
         let trackersViewModelsFactory = TrackersViewModelsFactory(
             trackerManager: trackerManager,

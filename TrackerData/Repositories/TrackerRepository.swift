@@ -92,6 +92,13 @@ final class TrackerRepository: TrackerRepositoryProtocol {
         return try await persistencyService.fetchObjects(with: request)
     }
     
+    func getTrackers() async throws -> [Tracker] {
+        let request = FetchRequestBuilder<TrackerObject>()
+            .build()
+        
+        return try await persistencyService.fetchObjects(with: request)
+    }
+    
     // MARK: - Update
     
     func updateTracker(_ tracker: Tracker) async throws {

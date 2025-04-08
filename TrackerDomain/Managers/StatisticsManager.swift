@@ -58,7 +58,7 @@ struct StatisticsManager: StatisticsManaging {
         return maxDaysWithoutBreak
     }
     
-    func getDaysCountWhenAllTrackersAreCompleted() async throws -> Int {                
+    func getDaysCountWhenAllTrackersAreCompleted() async throws -> Int {
         .zero
     }
 }

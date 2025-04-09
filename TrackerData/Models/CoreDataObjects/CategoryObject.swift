@@ -26,9 +26,9 @@ extension CategoryObject: SetAddable {
 }
 
 extension CategoryObject: CopyableEntity {
-    func copy(from category: TrackerSection) {
-        self.id = category.id
-        self.title = category.title
+    func copy(from section: TrackerSection) {
+        self.id = section.id
+        self.title = section.title
     }
 }
 

@@ -10,13 +10,13 @@ import Foundation
 import TrackerDomain
 
 final class TrackerFormAssembly {
-    private let sectionRepository: CategoryRepositoryProtocol
+    private let sectionRepository: SectionRepositoryProtocol
     
     private let sectionsListAssembly: SectionsListAssembly
     private let weekDaysSelectionAssembly: WeekDaysSelectionAssembly
         
     init(
-        sectionRepository: CategoryRepositoryProtocol,
+        sectionRepository: SectionRepositoryProtocol,
         sectionsListAssembly: SectionsListAssembly,
         weekDaysSelectionAssembly: WeekDaysSelectionAssembly
     ) {

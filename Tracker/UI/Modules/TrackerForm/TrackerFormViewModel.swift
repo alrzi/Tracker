@@ -28,7 +28,7 @@ protocol TrackerFormViewModelProtocol: ObservableObject, TrackerFormNavigationSt
 final class TrackerFormViewModel: TrackerFormViewModelProtocol {
     typealias InvalidComponent = TrackerFormInvalidComponent
     
-    private let sectionRepository: CategoryRepositoryProtocol
+    private let sectionRepository: SectionRepositoryProtocol
     private let invalidComponentManager: any InvalidComponentManaging<InvalidComponent>
     private let eventsHandler: (TrackerFormOutput) -> Void
     
@@ -54,7 +54,7 @@ final class TrackerFormViewModel: TrackerFormViewModelProtocol {
     let completeFormButtonTitle: String
     
     init(
-        sectionRepository: CategoryRepositoryProtocol,
+        sectionRepository: SectionRepositoryProtocol,
         invalidComponentManager: some InvalidComponentManaging<InvalidComponent> = InvalidComponentManager(),
         mode: TrackerFormMode,
         eventsHandler: @escaping (TrackerFormOutput) -> Void
@@ -129,13 +129,13 @@ private extension TrackerFormViewModel {
         }
         
         Task {
-            await fetchSection(id: tracker.categoryId)
+            await fetchSection(id: tracker.sectionId)
         }
     }
     
     func fetchSection(id: UUID) async {
         do {
-            let selectedSection = try await sectionRepository.getCategory(by: id)
+            let selectedSection = try await sectionRepository.getSection(by: id)
             
             section = selectedSection
         }
@@ -184,7 +184,7 @@ private extension TrackerFormViewModel {
             schedule: Set(weekDays),
             isPinned: mode.isPinned,
             trackedDays: mode.trackedDays,
-            categoryId: section.id,
+            sectionId: section.id,
             isCompleted: mode.isCompleted
         )
         

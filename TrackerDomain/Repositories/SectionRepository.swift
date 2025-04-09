@@ -1,5 +1,5 @@
 //
-//  CategoryRepositoryProtocol.swift
+//  SectionRepositoryProtocol.swift
 //  TrackerDomain
 //
 //  Created by Александр Зиновьев on 10.03.2025.
@@ -7,11 +7,7 @@
 
 import Foundation
 
-public enum CategoryRepositoryError: Error {
-    case noTrackerForId
-}
-
-public protocol CategoryRepositoryProtocol: Sendable {
+public protocol SectionRepositoryProtocol: Sendable {
     // Create
     func createSection(_ section: TrackerSection) async throws
     func createSections(_ sections: [TrackerSection]) async throws
@@ -20,12 +16,12 @@ public protocol CategoryRepositoryProtocol: Sendable {
     func getSections(fetchLimit: Int, fetchOffset: Int) async throws -> [TrackerSection]
     func getSections(params: RequestParameters) async throws -> [TrackerSection]
     func getSections(params: RequestParameters, isCompleted: Bool) async throws -> [TrackerSection]
-    func getCategory(by id: UUID) async throws -> TrackerSection
+    func getSection(by id: UUID) async throws -> TrackerSection
     
     // Update
-    func updateCategory(_ category: TrackerSection) async throws
+    func updateSection(_ section: TrackerSection) async throws
     
     // Delete
-    func deleteCategory(with id: UUID) async throws
+    func deleteSection(with id: UUID) async throws
     func deleteAll() async throws
 }

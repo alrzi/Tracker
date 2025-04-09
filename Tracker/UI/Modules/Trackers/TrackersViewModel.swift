@@ -303,7 +303,7 @@ private extension TrackersViewModel {
         let models = state.models
         
         if let pinnedSection = models.first, pinnedSection.id == pinnedSectionID {
-            uniqueSectionIds.formUnion(pinnedSection.trackers.map { $0.categoryId })
+            uniqueSectionIds.formUnion(pinnedSection.trackers.map { $0.sectionId })
         }
         
         uniqueSectionIds.formUnion(models.map { $0.id })

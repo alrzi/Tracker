@@ -26,20 +26,23 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // MARK: - Servises
         
         let hapticManager = VibrationFeedbackManager()
-//        let analyticsTracker = TrackerDataContainer.analyticsTracker
         let authDataStorage = TrackerDataContainer.authDataStorage
         let recordRepository = TrackerDataContainer.recordRepository
         let trackerRepository = TrackerDataContainer.trackerRepository
-        let categoryRepository = TrackerDataContainer.categoryRepository
+        let sectionRepository = TrackerDataContainer.sectionRepository
         
         let trackerManager = TrackerDomainContainer.trackerManager(
             trackerRepository: trackerRepository,
             recordRepository: recordRepository,
-            category: categoryRepository
+            sectionRepository: sectionRepository
+        )
+        
+        let statisticManager = TrackerDomainContainer.statisticManager(
+            trackerRepository: trackerRepository,
+            recordRepository: recordRepository
         )
         
         let authService = TrackerDomainContainer.authService(dataStorage: authDataStorage)
-        let statisticManager = TrackerDomainContainer.statisticManager(trackerRepository: trackerRepository, recordRepository: recordRepository)
         
         // MARK: - Assembly
         
@@ -57,9 +60,9 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             hapticManager: hapticManager,
             trackersViewModelsFactory: trackersViewModelsFactory,
             trackerFormAssembly: TrackerFormAssembly(
-                sectionRepository: categoryRepository,
+                sectionRepository: sectionRepository,
                 sectionsListAssembly: SectionsListAssembly(
-                    sectionRepository: categoryRepository,
+                    sectionRepository: sectionRepository,
                     sectionCreationAssembly: SectionCreationAssembly()
                 ),
                 weekDaysSelectionAssembly: WeekDaysSelectionAssembly()

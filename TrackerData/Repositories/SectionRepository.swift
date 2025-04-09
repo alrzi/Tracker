@@ -1,5 +1,5 @@
 //
-//  CategoryRepository.swift
+//  SectionRepository.swift
 //  Tracker
 //
 //  Created by Александр Зиновьев on 20.07.2024.
@@ -8,7 +8,11 @@
 import Foundation
 import TrackerDomain
 
-final class CategoryRepository: CategoryRepositoryProtocol {
+private enum SectionRepositoryError: Error {
+    case noTrackerForId
+}
+
+final class SectionRepository: SectionRepositoryProtocol {
     private let persistencyService: PersistencyService
     
     init(persistencyService: PersistencyService) {
@@ -76,31 +80,31 @@ final class CategoryRepository: CategoryRepositoryProtocol {
         return try await persistencyService.fetchObjects(with: request)
     }
     
-    func getCategory(by id: UUID) async throws -> TrackerSection {
+    func getSection(by id: UUID) async throws -> TrackerSection {
         let request = FetchRequestBuilder<CategoryObject>()
             .setPredicate(.by(id: id))
             .build()
         
-        guard let category: TrackerSection = try await persistencyService.fetchObject(with: request) else {
-            throw CategoryRepositoryError.noTrackerForId
+        guard let section: TrackerSection = try await persistencyService.fetchObject(with: request) else {
+            throw SectionRepositoryError.noTrackerForId
         }
         
-        return category
+        return section
     }
     
     // MARK: - Update
     
-    func updateCategory(_ category: TrackerSection) async throws {
+    func updateSection(_ section: TrackerSection) async throws {
         let request = FetchRequestBuilder<CategoryObject>()
-            .setPredicate(.by(id: category.id))
+            .setPredicate(.by(id: section.id))
             .build()
         
-        try await persistencyService.updateObject(for: request, with: category)
+        try await persistencyService.updateObject(for: request, with: section)
     }
     
     // MARK: - Delete
     
-    func deleteCategory(with id: UUID) async throws {
+    func deleteSection(with id: UUID) async throws {
         let request = FetchRequestBuilder<CategoryObject>()
             .setPredicate(.by(id: id))
             .build()

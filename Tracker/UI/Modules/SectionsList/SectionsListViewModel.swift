@@ -20,7 +20,7 @@ protocol SectionsListViewModelProtocol: ObservableObject, SectionListNavigationS
 }
 
 final class SectionsListViewModel: SectionsListViewModelProtocol {
-    private let sectionRepository: any CategoryRepositoryProtocol
+    private let sectionRepository: any SectionRepositoryProtocol
     private let eventsHandler: (TrackerSection) -> Void
     
     @Published private(set) var state: SectionsListState = .loading
@@ -29,7 +29,7 @@ final class SectionsListViewModel: SectionsListViewModelProtocol {
     @Published var route: SectionListRoute?
     
     init(
-        sectionRepository: some CategoryRepositoryProtocol,
+        sectionRepository: some SectionRepositoryProtocol,
         sectionID: UUID?,
         eventsHandler: @escaping (TrackerSection) -> Void
     ) {
@@ -107,7 +107,7 @@ private extension SectionsListViewModel {
     
     func updateSection(_ section: TrackerSection) async {
         do {
-            try await sectionRepository.updateCategory(section)
+            try await sectionRepository.updateSection(section)
         }
         catch {
             debugPrint(error)
@@ -116,7 +116,7 @@ private extension SectionsListViewModel {
     
     func deleteSection(_ sectionID: UUID) async {
         do {
-            try await sectionRepository.deleteCategory(with: sectionID)
+            try await sectionRepository.deleteSection(with: sectionID)
         }
         catch {
             debugPrint(error)
@@ -136,7 +136,7 @@ private extension SectionsListViewModel {
     
     func loadSection(_ sectionID: UUID) async {
         do {
-            let section = try await sectionRepository.getCategory(by: sectionID)
+            let section = try await sectionRepository.getSection(by: sectionID)
             
             selectedSection = section
         }

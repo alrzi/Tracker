@@ -53,7 +53,7 @@ extension Tracker: Initable {
             schedule: WeekDay.fromNumberString(object.weekDays),
             isPinned: object.isPinned,
             trackedDays: object.trackerRecord.count,
-            categoryId: object.category.id
+            sectionId: object.category.id
         )
     }
 }

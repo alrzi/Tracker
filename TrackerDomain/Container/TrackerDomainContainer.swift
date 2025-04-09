@@ -11,12 +11,12 @@ public enum TrackerDomainContainer {
     public static func trackerManager(
         trackerRepository: some TrackerRepositoryProtocol,
         recordRepository: some RecordRepositoryProtocol,
-        category: some CategoryRepositoryProtocol
+        sectionRepository: some SectionRepositoryProtocol
     ) -> some TrackerManaging {
         TrackerManager(
             trackerRepository: trackerRepository,
             recordRepository: recordRepository,
-            categoryRepository: category
+            sectionRepository: sectionRepository
         )
     }
     

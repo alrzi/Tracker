@@ -1,10 +1,6 @@
 import Foundation
 
 public protocol TrackerManaging: Sendable {
-    associatedtype StateSectionSequence: AsyncSequence where StateSectionSequence.Element == [TrackerSection]
-    
-    var sections: StateSectionSequence { get }
-    
     // Create
     func addSections(_ sections: [TrackerSection]) async throws
     func createTrackerAndAddToSection(with id: UUID, tracker: Tracker) async throws
@@ -27,27 +23,22 @@ public protocol TrackerManaging: Sendable {
 final class TrackerManager: TrackerManaging {
     private let trackerRepository: TrackerRepositoryProtocol
     private let recordRepository: RecordRepositoryProtocol
-    private let categoryRepository: CategoryRepositoryProtocol
-    
-    private let mutableSections = ObservableActor<[TrackerSection]>([])
-    let sections: ReadOnlyObservableWrapper<[TrackerSection]>
+    private let sectionRepository: SectionRepositoryProtocol
     
     init(
         trackerRepository: TrackerRepositoryProtocol,
         recordRepository: RecordRepositoryProtocol,
-        categoryRepository: CategoryRepositoryProtocol
+        sectionRepository: SectionRepositoryProtocol
     ) {
         self.trackerRepository = trackerRepository
         self.recordRepository = recordRepository
-        self.categoryRepository = categoryRepository
-        
-        sections = mutableSections.readOnly()
+        self.sectionRepository = sectionRepository
     }
     
     // MARK: - Create
     
     func addSections(_ sections: [TrackerSection]) async throws {
-        try await categoryRepository.createSections(sections)
+        try await sectionRepository.createSections(sections)
     }
     
     func createTrackerAndAddToSection(with id: UUID, tracker: Tracker) async throws {
@@ -57,7 +48,7 @@ final class TrackerManager: TrackerManaging {
     // MARK: - Read
     
     func fetchSections(params: RequestParameters, isPaginating: Bool) async throws -> ([TrackerSection], [Tracker]) {
-        let sections = try await categoryRepository.getSections(params: params)
+        let sections = try await sectionRepository.getSections(params: params)
         
         var tempPinned: [Tracker] = []
         
@@ -80,7 +71,7 @@ final class TrackerManager: TrackerManaging {
     }
     
     func fetchCompletedSections(params: RequestParameters, isPaginating: Bool) async throws -> ([TrackerSection], [Tracker]) {
-        let sections = try await categoryRepository.getSections(params: params, isCompleted: true)
+        let sections = try await sectionRepository.getSections(params: params, isCompleted: true)
         
         var tempPinned: [Tracker] = []
         
@@ -99,7 +90,7 @@ final class TrackerManager: TrackerManaging {
     }
     
     func fetchUnCompletedSections(params: RequestParameters, isPaginating: Bool) async throws -> ([TrackerSection], [Tracker]) {
-        let sections = try await categoryRepository.getSections(params: params, isCompleted: false)
+        let sections = try await sectionRepository.getSections(params: params, isCompleted: false)
         
         var tempPinned: [Tracker] = []
         

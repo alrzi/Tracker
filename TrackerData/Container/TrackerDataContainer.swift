@@ -32,8 +32,8 @@ public enum TrackerDataContainer {
         )
     }
     
-    public static var categoryRepository: CategoryRepositoryProtocol {
-        CategoryRepository(
+    public static var sectionRepository: SectionRepositoryProtocol {
+        SectionRepository(
             persistencyService: persistencyService
         )
     }

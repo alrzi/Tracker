@@ -22,21 +22,21 @@ final class TrackerRepository: TrackerRepositoryProtocol {
     }
     
     func createTrackerAndAddToSection(with id: UUID, tracker: Tracker) async throws {
-        let requestForCategory = FetchRequestBuilder<CategoryObject>()
+        let requestForSection = FetchRequestBuilder<CategoryObject>()
             .setPredicate(.by(id: id))
             .build()
         
-        try await persistencyService.createObject(TrackerObject.self, from: tracker, andAddObjectFor: requestForCategory)
+        try await persistencyService.createObject(TrackerObject.self, from: tracker, andAddObjectFor: requestForSection)
     }
     
     // MARK: - Read
     
-    func getTrackers(for category: UUID, isPinned: Bool, weekDay: WeekDay, query: String) async throws -> [Tracker] {
+    func getTrackers(for sectionID: UUID, isPinned: Bool, weekDay: WeekDay, query: String) async throws -> [Tracker] {
         let request = FetchRequestBuilder<TrackerObject>()
             .setPredicate(
                 query.isEmpty
-                ? .by(isPinned: isPinned, weekDay: weekDay, sectionID: category)
-                : .by(isPinned: isPinned, weekDay: weekDay, sectionID: category, query: query)
+                ? .by(isPinned: isPinned, weekDay: weekDay, sectionID: sectionID)
+                : .by(isPinned: isPinned, weekDay: weekDay, sectionID: sectionID, query: query)
             )
             .setSortDescriptors([.init(keyPath: \.name)])
             .build()
@@ -44,12 +44,12 @@ final class TrackerRepository: TrackerRepositoryProtocol {
         return try await persistencyService.fetchObjects(with: request)
     }
     
-    func getTrackers(for category: UUID, isPinned: Bool, weekDay: WeekDay, query: String, date: Date) async throws -> [Tracker] {
+    func getTrackers(for sectionID: UUID, isPinned: Bool, weekDay: WeekDay, query: String, date: Date) async throws -> [Tracker] {
         let request = FetchRequestBuilder<TrackerObject>()
             .setPredicate(
                 query.isEmpty
-                ? .by(isPinned: isPinned, weekDay: weekDay, sectionID: category, interval: date.fullDayInterval())
-                : .by(isPinned: isPinned, weekDay: weekDay, sectionID: category, interval: date.fullDayInterval(), query: query)
+                ? .by(isPinned: isPinned, weekDay: weekDay, sectionID: sectionID, interval: date.fullDayInterval())
+                : .by(isPinned: isPinned, weekDay: weekDay, sectionID: sectionID, interval: date.fullDayInterval(), query: query)
             )
             .setSortDescriptors([.init(keyPath: \.name)])
             .build()

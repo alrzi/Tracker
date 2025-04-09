@@ -12,12 +12,12 @@ import TrackerDomain
 final class SectionsListAssembly {
     typealias Context = UUID?
         
-    private let sectionRepository: CategoryRepositoryProtocol
+    private let sectionRepository: SectionRepositoryProtocol
     
     private let sectionCreationAssembly: SectionCreationAssembly
     
     init(
-        sectionRepository: CategoryRepositoryProtocol,
+        sectionRepository: SectionRepositoryProtocol,
         sectionCreationAssembly: SectionCreationAssembly
     ) {
         self.sectionRepository = sectionRepository

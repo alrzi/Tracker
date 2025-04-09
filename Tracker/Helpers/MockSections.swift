@@ -27,7 +27,7 @@ func createSectionsWithTrackers(sectionCount: Int, trackerCount: Int) -> [Tracke
                 schedule: schedule,
                 isPinned: false,
                 trackedDays: 0,
-                categoryId: sectionID
+                sectionId: sectionID
             )
             trackers.append(tracker)
             print("trackerID", id)
@@ -53,7 +53,7 @@ let work = [
         schedule: Set(WeekDay.allCases),
         isPinned: false,
         trackedDays: 0,
-        categoryId: .init()
+        sectionId: .init()
     ),
     Tracker(
         name: "Задать вопросы",
@@ -62,7 +62,7 @@ let work = [
         schedule: [.tuesday],
         isPinned: false,
         trackedDays: 0,
-        categoryId: .init()
+        sectionId: .init()
     ),
 ]
 
@@ -74,7 +74,7 @@ let life = [
         schedule: Set(WeekDay.allCases),
         isPinned: false,
         trackedDays: 0,
-        categoryId: .init()
+        sectionId: .init()
     ),
     Tracker(
         name: "Поговорить с девушкой незнакомой",
@@ -83,7 +83,7 @@ let life = [
         schedule: Set(WeekDay.allCases),
         isPinned: true,
         trackedDays: 0,
-        categoryId: .init()
+        sectionId: .init()
     )
 ]
 
@@ -95,7 +95,7 @@ let cooking = [
         schedule: [.friday],
         isPinned: true,
         trackedDays: 0,
-        categoryId: .init()
+        sectionId: .init()
     )
 ]
 
@@ -107,7 +107,7 @@ let movie = [
         schedule: [.wednesday, .friday, .sunday],
         isPinned: true,
         trackedDays: 0,
-        categoryId: .init()
+        sectionId: .init()
     )
 ]
 
@@ -119,7 +119,7 @@ let socialization = [
         schedule: [.sunday],
         isPinned: true,
         trackedDays: 0,
-        categoryId: .init()
+        sectionId: .init()
     )
 ]
 
@@ -131,7 +131,7 @@ let relations = [
         schedule: [.friday],
         isPinned: true,
         trackedDays: 0,
-        categoryId: .init()
+        sectionId: .init()
     )
 ]
 
@@ -143,7 +143,7 @@ let adventure = [
         schedule: [.saturday],
         isPinned: false,
         trackedDays: 0,
-        categoryId: .init()
+        sectionId: .init()
     )
 ]
 
@@ -155,7 +155,7 @@ let books = [
         schedule: Set(WeekDay.allCases),
         isPinned: false,
         trackedDays: 0,
-        categoryId: .init()
+        sectionId: .init()
     )
 ]
 
@@ -167,7 +167,7 @@ let hobbie = [
         schedule: Set(WeekDay.allCases),
         isPinned: false,
         trackedDays: 0,
-        categoryId: .init()
+        sectionId: .init()
     )
 ]
 
@@ -179,7 +179,7 @@ let englishClub = [
         schedule: [.sunday],
         isPinned: true,
         trackedDays: 0,
-        categoryId: .init()
+        sectionId: .init()
     )
 ]
 

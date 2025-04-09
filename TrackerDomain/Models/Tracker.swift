@@ -8,7 +8,7 @@ public struct Tracker: Hashable, Identifiable, Sendable {
     public let weekDays: Set<WeekDay>
     public let isPinned: Bool
     public let trackedDays: Int
-    public let categoryId: UUID
+    public let sectionId: UUID
     public let isCompleted: Bool
     
     public init(
@@ -19,7 +19,7 @@ public struct Tracker: Hashable, Identifiable, Sendable {
         schedule: Set<WeekDay>,
         isPinned: Bool = false,
         trackedDays: Int = .zero,
-        categoryId: UUID,
+        sectionId: UUID,
         isCompleted: Bool = false
     ) {
         self.id = id
@@ -29,7 +29,7 @@ public struct Tracker: Hashable, Identifiable, Sendable {
         self.weekDays = schedule
         self.isPinned = isPinned
         self.trackedDays = trackedDays
-        self.categoryId = categoryId
+        self.sectionId = sectionId
         self.isCompleted = isCompleted
     }
 }
@@ -44,7 +44,7 @@ public extension Tracker {
             schedule: weekDays,
             isPinned: !isPinned,
             trackedDays: trackedDays,
-            categoryId: categoryId
+            sectionId: sectionId
         )
     }
     
@@ -57,7 +57,7 @@ public extension Tracker {
             schedule: weekDays,
             isPinned: isPinned,
             trackedDays: trackedDays,
-            categoryId: categoryId,
+            sectionId: sectionId,
             isCompleted: isCompleted
         )
     }
@@ -71,7 +71,7 @@ public extension Tracker {
             schedule: weekDays,
             isPinned: isPinned,
             trackedDays: trackedDays,
-            categoryId: categoryId,
+            sectionId: sectionId,
             isCompleted: isCompleted
         )
     }

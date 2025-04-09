@@ -40,15 +40,15 @@ struct StatisticsManager: StatisticsManaging {
         }
         
         var previousRecord = firstRecord
-        var daysWithoutBreak = 0
-        var maxDaysWithoutBreak = 0
+        var daysWithoutBreak = 1
+        var maxDaysWithoutBreak = 1
         
         for record in records.dropFirst() {
             if calendar.isDate(record.date, inSameDayAs: previousRecord.date.adjust(.day, offset: 1)) {
                 daysWithoutBreak += 1
             }
             else {
-                daysWithoutBreak = 0
+                daysWithoutBreak = 1
             }
             
             maxDaysWithoutBreak = max(maxDaysWithoutBreak, daysWithoutBreak)

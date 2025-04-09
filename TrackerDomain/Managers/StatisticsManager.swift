@@ -11,6 +11,7 @@ public protocol StatisticsManaging: Sendable {
     func getCompletedTrackersCount() async throws -> Int
     func getMaxDaysWithoutBreakCount() async throws -> Int
     func getDaysCountWhenAllTrackersAreCompleted() async throws -> Int
+    func getAverageCompletedTrackersPerDayCount() async throws -> Int
 }
 
 struct StatisticsManager: StatisticsManaging {
@@ -83,5 +84,21 @@ struct StatisticsManager: StatisticsManaging {
         }
         
         return completionCounts
+    }
+    
+    func getAverageCompletedTrackersPerDayCount() async throws -> Int {
+        let records = try await recordRepository.fetchRecords()
+        
+        let recordsByDate = Dictionary(grouping: records) { calendar.startOfDay(for: $0.date) }
+        
+        var averagePerDate = 0
+        
+        for (_, recordsOnDate) in recordsByDate {
+            let completedTrackers = Set(recordsOnDate.map { $0.id })
+            
+            averagePerDate += completedTrackers.count
+        }
+        
+        return averagePerDate / recordsByDate.keys.count
     }
 }

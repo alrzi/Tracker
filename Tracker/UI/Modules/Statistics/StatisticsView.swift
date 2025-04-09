@@ -27,14 +27,11 @@ extension StatisticsView: View {
                     PlaceholderView(placeholder: .empty)
                 }
                 else {
-                    ScrollableLazyVStack {
-                        VStack(spacing: 12) {
-                            ForEach(viewModel.statisticData) { data in
-                                StatisticView(viewModel: data.viewModel)
-                            }
+                    ScrollableLazyVStack(spacing: 12) {
+                        ForEach(viewModel.statisticData) { data in
+                            StatisticView(viewModel: data.viewModel)
                         }
                     }
-                    .padding(.top, 24)
                 }
             }
             .navigationTitle(R.string.localizable.statisticTitle())

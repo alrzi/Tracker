@@ -10,6 +10,7 @@ import SwiftUI
 
 struct ScrollableLazyVStack<Content: View> {
     private let horizontalPadding: CGFloat
+    private let topPadding: CGFloat
     private let spacing: CGFloat?
     private let showsIndicators: Bool
     private let content: Content
@@ -18,11 +19,13 @@ struct ScrollableLazyVStack<Content: View> {
         showsIndicators: Bool = false,
         spacing: CGFloat? = nil,
         horizontalPadding: CGFloat = 16,
+        topPadding: CGFloat = 16,
         @ViewBuilder contentBuilder: () -> Content
     ) {
         self.showsIndicators = showsIndicators
         self.spacing = spacing
         self.horizontalPadding = horizontalPadding
+        self.topPadding = topPadding
         content = contentBuilder()
     }
 }
@@ -34,6 +37,7 @@ extension ScrollableLazyVStack: View {
                 content
             }
             .padding(.horizontal, horizontalPadding)
+            .padding(.top, topPadding)
         }
     }
 }

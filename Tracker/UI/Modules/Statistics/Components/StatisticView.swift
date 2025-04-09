@@ -20,51 +20,41 @@ struct StatisticView<ViewModel: StatisticViewModelProtocol> {
 
 extension StatisticView: View {
     var body: some View {
-        ZStack {
-            RoundedRectangle(cornerRadius: 16)
-                .fill(
-                    LinearGradient(
-                        gradient: Gradient(
-                            colors: [
-                                Color.green,
-                                Color.red,
-                                Color.blue
-                            ]
-                        ),
-                        startPoint: .leading,
-                        endPoint: .trailing
-                    )
-                )
-                .frame(height: 90)
-                .overlay(
-                    RoundedRectangle(cornerRadius: 16)
-                        .stroke(Color.black, lineWidth: 2)
-                )
-            
-            HStack {
-                VStack(alignment: .leading) {
-                    Text(viewModel.count.formatted(.number))
-                        .font(.largeTitle)
-                        .padding(.top, 12)
-                        .padding(.leading, 12)
-                    
-                    Spacer()
-                    
-                    Text(viewModel.title)
-                        .font(.subheadline)
-                        .padding(.leading, 12)
-                        .padding(.bottom, 12)
-                }
-                .padding(.top, 12)
-                .layoutPriority(1)
+        HStack {
+            VStack(alignment: .leading, spacing: 12) {
+                Text(viewModel.count.formatted(.number))
+                    .font(.largeTitle)
                 
-                Spacer()
+                Text(viewModel.title)
+                    .font(.headline)
+                
+                Text(viewModel.subtitle)
+                    .font(.subheadline)
             }
+            .padding(16)
+            .layoutPriority(1)
+            
+            Spacer(minLength: 0)
         }
-        .padding(.horizontal, 6)
+        .overlay(
+            RoundedRectangle(cornerRadius: 16)
+                .stroke(borderAngularGradient, lineWidth: 1)
+        )
+    }
+    
+    private var borderAngularGradient: AngularGradient {
+        AngularGradient(
+            gradient: Gradient(colors: [.red, .yellow, .green, .blue, .purple, .red]),
+            center: .center
+        )
     }
 }
 
 #Preview {
-    StatisticView(viewModel: StatisticViewModel(title: ""))
+    StatisticView(
+        viewModel: StatisticViewModel(
+            title: "Идеальные дни",
+            subtitle: "Дни, когда были выполнены все запланированные привычки"
+        )
+    )
 }

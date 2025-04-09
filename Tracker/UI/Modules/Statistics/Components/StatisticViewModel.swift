@@ -11,19 +11,23 @@ import Foundation
 protocol StatisticViewModelProtocol: ObservableObject, Identifiable {
     var count: Int { get }
     var title: String { get }
+    var subtitle: String { get  }
 }
 
 final class StatisticViewModel: StatisticViewModelProtocol {
     @Published private(set) var count: Int
     @Published private(set) var title: String
+    @Published private(set) var subtitle: String
     
     let id: UUID = .init()
     
     init(
         count: Int = 0,
-        title: String
+        title: String,
+        subtitle: String
     ) {
         self.count = count
         self.title = title
+        self.subtitle = subtitle
     }
 }

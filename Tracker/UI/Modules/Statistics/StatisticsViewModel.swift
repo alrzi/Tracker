@@ -44,10 +44,34 @@ private extension StatisticsViewModel {
             async let averageDays = statisticsManager.getAverageCompletedTrackersPerDayCount()
             
             statisticData = [
-                .bestPeriod(.init(count: (try? await bestPeriod) ?? .zero, title: R.string.localizable.statisticBestPeriod())),
-                .idealDays(.init(count: (try? await idealDays) ?? .zero, title: R.string.localizable.statisticIdealDays())),
-                .completedTrackers(.init(count: (try? await completedTrackers) ?? .zero, title: R.string.localizable.statisticCompleted())),
-                .averageValue(.init(count: (try? await averageDays) ?? .zero, title: R.string.localizable.statisticAvarageValue()))
+                .bestPeriod(
+                    .init(
+                        count: (try? await bestPeriod) ?? .zero,
+                        title: R.string.localizable.statisticBestPeriod(),
+                        subtitle: R.string.localizable.statisticBestPeriodExplanation()
+                    )
+                ),
+                .idealDays(
+                    .init(
+                        count: (try? await idealDays) ?? .zero,
+                        title: R.string.localizable.statisticIdealDays(),
+                        subtitle: R.string.localizable.statisticIdealDaysExplanation()
+                    )
+                ),
+                .completedTrackers(
+                    .init(
+                        count: (try? await completedTrackers) ?? .zero,
+                        title: R.string.localizable.statisticCompleted(),
+                        subtitle: R.string.localizable.statisticCompletedExplanation()
+                    )
+                ),
+                .averageValue(
+                    .init(
+                        count: (try? await averageDays) ?? .zero,
+                        title: R.string.localizable.statisticAverageValue(),
+                        subtitle: R.string.localizable.statisticAverageValueExplanation()
+                    )
+                )
             ]
         }
         catch {

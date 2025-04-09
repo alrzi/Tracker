@@ -84,8 +84,12 @@ alert.cancel = "Cancel";
 alert.delete = "Delete";
 
 // Statistic
-statistic.title = "Statistics";
-statistic.bestPeriod = "Best period";
-statistic.idealDays = "Ideal days";
-statistic.completed = "Completed trackers";
-statistic.avarageValue = "Avarage value";
+statistic.title = "Статистика";
+statistic.bestPeriod = "Лучший период";
+statistic.bestPeriodExplanation = "Максимальное количество дней без перерыва по всем трекерам";
+statistic.idealDays = "Идеальные дни";
+statistic.idealDaysExplanation = "Дни, когда были выполнены все запланированные привычки";
+statistic.completed = "Трекеров завершено";
+statistic.completedExplanation = "Общее количество выполненных привычек за все время";
+statistic.averageValue = "Среднее значение";
+statistic.averageValueExplanation = "Среднее количество привычек, выполненных за 1 день";

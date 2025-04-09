@@ -45,6 +45,10 @@ struct StatisticsManager: StatisticsManaging {
         var maxDaysWithoutBreak = 1
         
         for record in records.dropFirst() {
+            guard record.date.component(.day) != previousRecord.date.component(.day) else {
+                continue
+            }
+            
             if calendar.isDate(record.date, inSameDayAs: previousRecord.date.adjust(.day, offset: 1)) {
                 daysWithoutBreak += 1
             }

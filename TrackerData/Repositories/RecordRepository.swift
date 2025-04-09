@@ -11,7 +11,7 @@ import TrackerDomain
 final class RecordRepository: RecordRepositoryProtocol {
     private let persistencyService: PersistencyService
     private let calendar: Calendar
-        
+    
     init(
         persistencyService: PersistencyService,
         calendar: Calendar = .autoupdatingCurrent
@@ -48,13 +48,13 @@ final class RecordRepository: RecordRepositoryProtocol {
         
         return try await persistencyService.fetchObjects(with: request)
     }
-        
+    
     func fetchRecords(for sectionId: UUID, for date: Date, weekDay: WeekDay, query: String, isPinned: Bool) async throws -> [TrackerRecord] {
         let request = FetchRequestBuilder<RecordObject>()
             .setPredicate(
                 query.isEmpty
-                    ? .by(sectionId: sectionId, for: date.fullDayInterval(), weekDay: weekDay, isPinned: isPinned)
-                    : .by(sectionId: sectionId, for: date.fullDayInterval(), weekDay: weekDay, isPinned: isPinned, query: query)
+                ? .by(sectionId: sectionId, for: date.fullDayInterval(), weekDay: weekDay, isPinned: isPinned)
+                : .by(sectionId: sectionId, for: date.fullDayInterval(), weekDay: weekDay, isPinned: isPinned, query: query)
             )
             .build()
         
@@ -65,8 +65,8 @@ final class RecordRepository: RecordRepositoryProtocol {
         let request = FetchRequestBuilder<RecordObject>()
             .setPredicate(
                 query.isEmpty
-                    ? .by(for: date.fullDayInterval(), weekDay: weekDay, isPinned: isPinned)
-                    : .by(for: date.fullDayInterval(), weekDay: weekDay, isPinned: isPinned, query: query)
+                ? .by(for: date.fullDayInterval(), weekDay: weekDay, isPinned: isPinned)
+                : .by(for: date.fullDayInterval(), weekDay: weekDay, isPinned: isPinned, query: query)
             )
             .build()
         

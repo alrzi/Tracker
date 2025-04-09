@@ -75,15 +75,6 @@ let life = [
         isPinned: false,
         trackedDays: 0,
         sectionId: .init()
-    ),
-    Tracker(
-        name: "Поговорить с девушкой незнакомой",
-        emoji: RandomEmojiService.emoji,
-        color: RandomHexColorService.randomHexString,
-        schedule: Set(WeekDay.allCases),
-        isPinned: true,
-        trackedDays: 0,
-        sectionId: .init()
     )
 ]
 

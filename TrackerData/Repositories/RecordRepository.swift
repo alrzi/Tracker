@@ -141,12 +141,3 @@ private extension StaticPredicateBuilder where T: RecordObject {
         .filter(by: \.tracker.name, value: query, comparison: .contains)
     }
 }
-
-extension Date {
-    func fullDayInterval(calendar: Calendar = .autoupdatingCurrent) -> DateInterval {
-        let startDate = calendar.startOfDay(for: self)
-        let endDate = calendar.date(byAdding: .day, value: 1, to: startDate) ?? self
-        
-        return DateInterval(start: startDate, end: endDate)
-    }
-}

@@ -11,6 +11,7 @@ internal import DataStorage
 
 public enum TrackerDataContainer {
     static let persistencyService = PersistencyService()
+    
     static let dataStorage = DataStorage(
         jsonDecoder: JSONDecoder(),
         jsonEncoder: JSONEncoder(),

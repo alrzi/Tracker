@@ -15,21 +15,3 @@ public struct TrackerSection: Hashable, Identifiable, Sendable {
         self.trackers = trackers
     }
 }
-
-public extension TrackerSection {
-    func addingTracker(_ tracker: Tracker) -> TrackerSection {
-        var updatedTrackers = self.trackers
-        updatedTrackers.append(tracker)
-        return TrackerSection(id: self.id, title: self.title, trackers: updatedTrackers)
-    }
-}
-
-private extension Array {
-    func elementOrNil(at index: Index) -> Element? {
-        guard indices.contains(index) else {
-            return nil
-        }
-        
-        return self[index]
-    }
-}

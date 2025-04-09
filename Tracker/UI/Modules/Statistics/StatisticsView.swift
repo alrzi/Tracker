@@ -24,7 +24,7 @@ extension StatisticsView: View {
         NavigationStack {
             Group {
                 if viewModel.statisticData.isEmpty {
-                    PlaceholderView(placeholder: .empty)
+                    PlaceholderView(placeholder: .emptyStatistic)
                 }
                 else {
                     ScrollableLazyVStack(spacing: 12) {

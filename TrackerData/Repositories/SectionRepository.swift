@@ -9,7 +9,7 @@ import Foundation
 import TrackerDomain
 
 private enum SectionRepositoryError: Error {
-    case noTrackerForId
+    case noSectionForId
 }
 
 final class SectionRepository: SectionRepositoryProtocol {
@@ -86,7 +86,7 @@ final class SectionRepository: SectionRepositoryProtocol {
             .build()
         
         guard let section: TrackerSection = try await persistencyService.fetchObject(with: request) else {
-            throw SectionRepositoryError.noTrackerForId
+            throw SectionRepositoryError.noSectionForId
         }
         
         return section

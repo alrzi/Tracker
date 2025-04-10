@@ -5,62 +5,17 @@ enum PersistencyError: Error {
     case failedToSave
 }
 
-final class PersistencyService: Sendable {
-    private let modelName: String = "Tracker"
+public protocol PersistentContainerProviding: AnyObject, Sendable {
+    var persistentContainer: NSPersistentContainer { get }
+}
+
+struct PersistencyService: Sendable {
     private let persistentContainer: NSPersistentContainer
     nonisolated(unsafe) private let managedObjectContext: NSManagedObjectContext
     
-    init() {
-        let bundle = Bundle(for: type(of: self))
-        
-        guard
-            let modelURL = bundle.url(forResource: modelName, withExtension: ".momd"),
-            let model = NSManagedObjectModel(contentsOf: modelURL)
-        else {
-            fatalError("[Error]: Unable to load model.")
-        }
-        
-        let sqliteURL = try? FileManager.default.url(
-            for: .documentDirectory,
-            in: .userDomainMask,
-            appropriateFor: nil,
-            create: true
-        )
-            .appendingPathComponent("Tracker.sqlite")
-        
-        guard let sqliteURL else {
-            fatalError("[Error]: Unable to load model.")
-        }
-        
-        let persistentStore = NSPersistentStoreDescription()
-        persistentStore.shouldMigrateStoreAutomatically = true
-        persistentStore.shouldInferMappingModelAutomatically = true
-        
-        let container = NSPersistentContainer(name: modelName, managedObjectModel: model)
-        
-        do {
-            let coordinator = container.persistentStoreCoordinator
-            
-            if let oldStore = coordinator.persistentStores.first {
-                try coordinator.remove(oldStore)
-            }
-            
-            _ = try coordinator.addPersistentStore(type: .sqlite, at: sqliteURL)
-        }
-        catch {
-            fatalError("[Error]: \(error.localizedDescription)")
-        }
-        
-        container.persistentStoreDescriptions = [persistentStore]
-        
-        container.loadPersistentStores { _, error in
-            if let error {
-                fatalError("[Error]: \(error.localizedDescription)")
-            }
-        }
-        
-        persistentContainer = container
-        managedObjectContext = container.newBackgroundContext()
+    init(provider: PersistentContainerProviding) {
+        self.persistentContainer = provider.persistentContainer
+        self.managedObjectContext = persistentContainer.newBackgroundContext()
     }
     
     // MARK: - Create

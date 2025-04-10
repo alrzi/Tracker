@@ -10,7 +10,7 @@ import TrackerDomain
 internal import DataStorage
 
 public enum TrackerDataContainer {
-    static let persistencyService = PersistencyService()
+    static let persistentContainerProvider = PersistentContainerProvider(modelName: "Tracker")
     
     static let dataStorage = DataStorage(
         jsonDecoder: JSONDecoder(),
@@ -18,6 +18,10 @@ public enum TrackerDataContainer {
         userDefaults: .standard,
         sharedUserDefaults: UserDefaults(suiteName: "shared") ?? .standard
     )
+    
+    static var persistencyService: PersistencyService {
+        PersistencyService(provider: persistentContainerProvider)
+    }
     
     public static var authDataStorage: AuthDataStorage {
         dataStorage

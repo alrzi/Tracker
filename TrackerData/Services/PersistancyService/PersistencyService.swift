@@ -1,14 +1,5 @@
 import CoreData
 
-enum PersistencyError: Error {
-    case noObjectFound
-    case failedToSave
-}
-
-public protocol PersistentContainerProviding: AnyObject, Sendable {
-    var persistentContainer: NSPersistentContainer { get }
-}
-
 struct PersistencyService: Sendable {
     private let persistentContainer: NSPersistentContainer
     nonisolated(unsafe) private let managedObjectContext: NSManagedObjectContext
@@ -194,4 +185,9 @@ private extension PersistencyService {
             throw PersistencyError.failedToSave
         }
     }
+}
+
+private enum PersistencyError: Error {
+    case noObjectFound
+    case failedToSave
 }

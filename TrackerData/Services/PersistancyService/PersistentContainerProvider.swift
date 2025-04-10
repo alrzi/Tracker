@@ -8,6 +8,10 @@
 import Foundation
 import CoreData
 
+protocol PersistentContainerProviding: AnyObject, Sendable {
+    var persistentContainer: NSPersistentContainer { get }
+}
+
 final class PersistentContainerProvider: PersistentContainerProviding {
     let persistentContainer: NSPersistentContainer
     

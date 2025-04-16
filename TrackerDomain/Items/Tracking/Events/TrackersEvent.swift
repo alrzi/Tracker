@@ -6,15 +6,12 @@
 //
 
 import Foundation
-import TrackerDomain
 
-enum TrackersEvent {
+public enum TrackersEvent {
     case onAppear
     case action(Action)
-}
-
-extension TrackersEvent {
-    enum Action {
+    
+    public enum Action {
         case onAddTracker
         case onDateChange
         case onChooseFilter
@@ -25,29 +22,29 @@ extension TrackersEvent {
     }
 }
 
-extension TrackersEvent: TrackingEvent {
-    var name: String {
+extension TrackersEvent: TrackableEvent {
+    public var name: String {
         switch self {
         case .action: "Trackers Screen Actions"
         case .onAppear: "Trackers Screen Appear"
         }
     }
     
-    var parameters: [String: Any]? {
+    public var properties: [AnyHashable: Any]? {
         switch self {
         case .onAppear:
-            nil
+            return nil
             
         case .action(let action):
-            [
-                "action": action.trackTitle
+            return [
+                "action": action.trackValue
             ]
         }
     }
 }
 
 extension TrackersEvent.Action: TrackableType {
-    var trackTitle: String {
+    public var trackValue: String {
         switch self {
         case .onAddTracker: "add tracker button tap"
         case .onDateChange: "date changed"

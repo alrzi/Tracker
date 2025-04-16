@@ -6,8 +6,7 @@
 //
 
 import Foundation
-import TrackerDomain
 
-enum TrackType: TrackableEvent {
+public enum TrackType {
     case trackers(event: TrackersEvent)
 }

@@ -14,7 +14,7 @@ extension TrackType: TrackableEvent {
         }
     }
     
-    public var properties: [AnyHashable : Any]? {
+    public var properties: [AnyHashable: Any]? {
         switch self {
         case .trackers(let event): event.properties
         }

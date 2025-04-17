@@ -23,6 +23,10 @@ public enum TrackerDataContainer {
         PersistencyService(provider: persistentContainerProvider)
     }
     
+    public static var analyticTracker: AnalyticsProtocol {
+        YandexMetricaAnaliticsTracker()
+    }
+    
     public static var authDataStorage: AuthDataStorage {
         dataStorage
     }

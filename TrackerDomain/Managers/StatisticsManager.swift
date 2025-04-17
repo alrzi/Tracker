@@ -104,7 +104,7 @@ struct StatisticsManager: StatisticsManaging {
         }
         
         guard !recordsByDate.keys.isEmpty else {
-            throw .zero
+            return .zero
         }
         
         return averagePerDate / recordsByDate.keys.count

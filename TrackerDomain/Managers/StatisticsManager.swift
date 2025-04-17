@@ -103,6 +103,10 @@ struct StatisticsManager: StatisticsManaging {
             averagePerDate += completedTrackers.count
         }
         
+        guard !recordsByDate.keys.isEmpty else {
+            throw .zero
+        }
+        
         return averagePerDate / recordsByDate.keys.count
     }
 }

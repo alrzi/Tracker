@@ -110,7 +110,7 @@ private struct MainFooterView: View {
     private var dismiss
     
     let title: String
-    let onCompleteFrom: () -> Void
+    let onCompleteFrom: () async -> Void
     
     var body: some View {
         HStack {
@@ -126,7 +126,7 @@ private struct MainFooterView: View {
                     )
             }
             
-            Button(action: onCompleteFrom) {
+            Button(action: { Task { await onCompleteFrom() } }) {
                 Text(title)
                     .frame(maxWidth: .infinity)
                     .foregroundStyle(R.color.cBlack.color)

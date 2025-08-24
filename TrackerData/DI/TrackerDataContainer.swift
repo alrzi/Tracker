@@ -10,7 +10,15 @@ import TrackerDomain
 internal import DataStorage
 
 public enum TrackerDataContainer {
-    static let persistentContainerProvider = PersistentContainerProvider(modelName: "Tracker")
+    static let persistentContainerProvider = PersistentContainerProvider(
+        modelName: "Tracker"
+    )
+    
+    static var persistencyService: PersistencyService {
+        PersistencyService(
+            provider: persistentContainerProvider
+        )
+    }
     
     static let dataStorage = DataStorage(
         jsonDecoder: JSONDecoder(),
@@ -18,10 +26,6 @@ public enum TrackerDataContainer {
         userDefaults: .standard,
         sharedUserDefaults: UserDefaults(suiteName: "shared") ?? .standard
     )
-    
-    static var persistencyService: PersistencyService {
-        PersistencyService(provider: persistentContainerProvider)
-    }
     
     public static var analyticTracker: AnalyticsProtocol {
         YandexMetricaAnaliticsTracker()

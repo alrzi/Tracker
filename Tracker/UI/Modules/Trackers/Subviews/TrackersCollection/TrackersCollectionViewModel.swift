@@ -124,8 +124,6 @@ private extension TrackersCollectionViewModel {
             
             try await trackerRepository.updateTracker(updated)
             
-            trackers[index] = updated
-            
             hapticManager.makeVibration(for: .selection)
             
             completionState = .idle

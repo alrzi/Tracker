@@ -22,12 +22,13 @@ protocol TrackerFormViewModelProtocol: ObservableObject, TrackerFormNavigationSt
     
     func onSectionSelection()
     func onWeekSelection()
-    func onCompleteFrom()
+    func onCompleteFrom() async
 }
 
 final class TrackerFormViewModel: TrackerFormViewModelProtocol {
     typealias InvalidComponent = TrackerFormInvalidComponent
     
+    private let trackerManager: any TrackerManaging
     private let sectionRepository: SectionRepositoryProtocol
     private let invalidComponentManager: any InvalidComponentManaging<InvalidComponent>
     private let eventsHandler: (TrackerFormOutput) -> Void
@@ -37,9 +38,9 @@ final class TrackerFormViewModel: TrackerFormViewModelProtocol {
     private var section: TrackerSection? {
         didSet { sectionTitle = section?.title }
     }
-    
-    private var cancellables: Set<AnyCancellable> = []
         
+    private var cancellables: Set<AnyCancellable> = []
+    
     @Published private(set) var sectionTitle: String?
     @Published private(set) var weekDays: WeekDays = []
     @Published private(set) var invalidComponent: InvalidComponent?
@@ -54,11 +55,13 @@ final class TrackerFormViewModel: TrackerFormViewModelProtocol {
     let completeFormButtonTitle: String
     
     init(
+        trackerManager: any TrackerManaging,
         sectionRepository: SectionRepositoryProtocol,
         invalidComponentManager: some InvalidComponentManaging<InvalidComponent> = InvalidComponentManager(),
         mode: TrackerFormMode,
         eventsHandler: @escaping (TrackerFormOutput) -> Void
     ) {
+        self.trackerManager = trackerManager
         self.sectionRepository = sectionRepository
         self.invalidComponentManager = invalidComponentManager
         self.mode = mode
@@ -84,7 +87,7 @@ final class TrackerFormViewModel: TrackerFormViewModelProtocol {
         route = .weekDay(weekDays, onCompletion: { [weak self] in self?.onWeekDays($0) })
     }
     
-    func onCompleteFrom() {
+    func onCompleteFrom() async {
         do {
             let (tracker, section) = try Self.validate(
                 name: tackerTitle,
@@ -95,10 +98,21 @@ final class TrackerFormViewModel: TrackerFormViewModelProtocol {
                 mode: mode
             )
             
+            switch mode {
+            case .createTracker:
+                try await trackerManager.createTrackerAndAddToSection(with: section.id, tracker: tracker)
+                
+            case .editTracker:
+                try await trackerManager.update(tracker: tracker)
+            }
+            
             eventsHandler(.init(tracker: tracker, section: section))
         }
-        catch {
+        catch let error as TrackerFormInvalidComponent {
             invalidComponentManager.markComponentInvalid(error)
+        }
+        catch {
+            debugPrint(error)
         }
     }
 }
@@ -175,7 +189,7 @@ private extension TrackerFormViewModel {
         guard let color else {
             throw .color
         }
-                
+        
         let tracker = Tracker(
             id: mode.trackerId,
             name: name,

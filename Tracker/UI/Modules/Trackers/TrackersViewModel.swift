@@ -30,6 +30,7 @@ final class TrackersViewModel: TrackersViewModelProtocol {
     private let hapticManager: any VibrationFeedbackManaging
     private let calendar: Calendar = .autoupdatingCurrent
     
+    private var observationTask: Task<(), Never>?
     private var cancellables: Set<AnyCancellable> = []
     private var fetchParameters: FetchParameters = .init(fetchLimit: 5, fetchOffset: 0)
     private var pinnedSectionID: UUID?
@@ -68,9 +69,31 @@ final class TrackersViewModel: TrackersViewModelProtocol {
             .sink { [weak self] _, _ in self?.onFilterOrDateTrigger() }
             .store(in: &cancellables)
         
-        //                Task { @MainActor in
-        //                    try await trackerManager.addSections(mockTrackerSections)
-        //                }
+//        Task { @MainActor in
+//            try await trackerManager.addSections(mockTrackerSections)
+//        }
+        
+        observationTask = Task { @MainActor in
+            for await changes in trackerManager.observe(changes: [.deleted, .inserted, .updated]) {
+                do {
+                    let sections = try await fetchSections(isPaginating: false, params: amountSensitiveParamsPin)
+                    
+                    hapticManager.makeVibration(for: .success)
+                    
+                    if !sections.isEmpty {
+                        state = .loaded(createModels(from: sections))
+                    }
+                    else {
+                        state = .empty(.empty)
+                    }
+                    
+                    debugPrint(changes)
+                }
+                catch {
+                    debugPrint(error)
+                }
+            }
+        }
     }
     
     func onToday() {
@@ -79,13 +102,18 @@ final class TrackersViewModel: TrackersViewModelProtocol {
     
     func onAdd() {
         hapticManager.makeVibration(for: .selection)
-        route = .create(onCompletion: { [weak self] in self?.onCreated(tracker: $0.tracker, section: $0.section) })
+        route = .create(onCompletion: { [weak self] _ in self?.route = nil })
     }
     
     func onSectionAppear(at index: Int) {
         Task.detached { [weak self] in
             await self?.paginateMoreSectionsIfNeeded(index: index)
         }
+    }
+    
+    deinit {
+        observationTask?.cancel()
+        observationTask = nil
     }
 }
 
@@ -116,68 +144,16 @@ private extension TrackersViewModel {
                 await delete(tracker: tracker)
                 
             case .edit(let tracker):
-                route = .update(tracker, onCompletion: { [weak self] in self?.onEdit(tracker: $0.tracker, section: $0.section) })
+                route = .update(tracker, onCompletion: { [weak self] _ in self?.route = nil })
             }
-        }
-    }
-    
-    func onCreated(tracker: Tracker, section: TrackerSection) {
-        route = nil
-        
-        Task {
-            await create(tracker: tracker, section: section)
-        }
-    }
-    
-    func onEdit(tracker: Tracker, section: TrackerSection) {
-        route = nil
-        
-        Task {
-            await update(tracker: tracker, section: section)
         }
     }
     
     // MARK: - Async
     
-    func create(tracker: Tracker, section: TrackerSection) async {
-        do {
-            try await trackerManager.createTrackerAndAddToSection(with: section.id, tracker: tracker)
-            
-            let sections = try await fetchSections(isPaginating: false, params: tracker.isPinned ? amountSensitiveParamsUnPin : amountSensitiveParamsPin)
-            
-            state = .loaded(createModels(from: sections))
-            
-            hapticManager.makeVibration(for: .success)
-        }
-        catch {
-            debugPrint(error)
-        }
-    }
-    
-    func update(tracker: Tracker, section: TrackerSection) async {
-        do {
-            try await trackerManager.update(tracker: tracker)
-            
-            let sections = try await fetchSections(isPaginating: false, params: tracker.isPinned ? amountSensitiveParamsUnPin : amountSensitiveParamsPin)
-            
-            state = .loaded(createModels(from: sections))
-            
-            hapticManager.makeVibration(for: .success)
-        }
-        catch {
-            debugPrint(error)
-        }
-    }
-    
     func togglePin(for tracker: Tracker) async {
         do {
             try await trackerManager.update(tracker: tracker.toggleIsPinned())
-            
-            let sections = try await fetchSections(isPaginating: false, params: tracker.isPinned ? amountSensitiveParamsUnPin : amountSensitiveParamsPin)
-            
-            state = .loaded(createModels(from: sections))
-            
-            hapticManager.makeVibration(for: .success)
         }
         catch {
             debugPrint(error)
@@ -187,15 +163,6 @@ private extension TrackersViewModel {
     func delete(tracker: Tracker) async {
         do {
             try await trackerManager.delete(tracker: tracker)
-            
-            let sections = try await fetchSections(isPaginating: false, params: amountSensitiveParamsUnPin)
-            
-            if !sections.isEmpty {
-                state = .loaded(createModels(from: sections))
-            }
-            else {
-                state = .empty(.empty)
-            }
         }
         catch {
             debugPrint(error)
@@ -321,7 +288,7 @@ private extension TrackersViewModel {
         .init(
             currentDate: currentDate,
             weekDay: .getWeekDay(from: currentDate),
-            fetchLimit: state.count,
+            fetchLimit: state.count + 1,
             fetchOffset: .zero,
             query: queryString
         )

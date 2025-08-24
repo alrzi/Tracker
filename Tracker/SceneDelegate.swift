@@ -60,6 +60,7 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             hapticManager: hapticManager,
             trackersViewModelsFactory: trackersViewModelsFactory,
             trackerFormAssembly: TrackerFormAssembly(
+                trackerManager: trackerManager,
                 sectionRepository: sectionRepository,
                 sectionsListAssembly: SectionsListAssembly(
                     sectionRepository: sectionRepository,

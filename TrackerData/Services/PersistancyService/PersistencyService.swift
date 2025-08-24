@@ -1,4 +1,6 @@
 import CoreData
+import Combine
+import TrackerDomain
 
 struct PersistencyService: Sendable {
     private let persistentContainer: NSPersistentContainer
@@ -7,13 +9,34 @@ struct PersistencyService: Sendable {
     init(provider: PersistentContainerProviding) {
         self.persistentContainer = provider.persistentContainer
         self.managedObjectContext = persistentContainer.newBackgroundContext()
+        managedObjectContext.mergePolicy = NSMergePolicy(merge: .mergeByPropertyStoreTrumpMergePolicyType)
+        managedObjectContext.automaticallyMergesChangesFromParent = true
+    }
+    
+    func observe(_ changeTypes: Set<ChangeType>) -> AsyncPublisher<Publishers.CompactMap<NotificationCenter.Publisher, Set<ChangeType>>> {
+        NotificationCenter.default.publisher(
+            for: NSManagedObjectContext.didSaveObjectIDsNotification,
+            object: managedObjectContext
+        )
+        .compactMap { notification in
+            Set(
+                changeTypes
+                    .compactMap { type in
+                        guard (notification.userInfo?[type.userInfoKey] as? Set<NSManagedObjectID>) != nil else {
+                            return nil
+                        }
+                        
+                        return type
+                    }
+            )
+        }
+        .values
     }
     
     // MARK: - Create
     
     func createObject<T, C>(_ type: T.Type, from domain: C) async throws
-    where T: NSManagedObject & CopyableEntity<C>
-    {
+    where T: NSManagedObject & CopyableEntity<C> {
         try await managedObjectContext.perform {
             let newObject = T(context: self.managedObjectContext)
             newObject.copy(from: domain)
@@ -63,8 +86,7 @@ struct PersistencyService: Sendable {
     
     func createObject<T, C, D>(_ type: T.Type, from domain: C, andAddObjectFor request: NSFetchRequest<D>) async throws
     where
-    T: NSManagedObject & ValueAddable<D> & CopyableEntity<C>
-    {
+    T: NSManagedObject & ValueAddable<D> & CopyableEntity<C> {
         try await managedObjectContext.perform {
             guard let objectToAdd = try self.managedObjectContext.fetch(request).first else {
                 throw PersistencyError.noObjectFound
@@ -81,8 +103,7 @@ struct PersistencyService: Sendable {
     // MARK: - Read
     
     func fetchObjects<T, R>(with fetchRequest: NSFetchRequest<T>) async throws -> [R]
-    where R: Initable<T>
-    {
+    where R: Initable<T> {
         try await managedObjectContext.perform {
             try self.managedObjectContext.fetch(fetchRequest).map { .init(object: $0) }
         }
@@ -115,8 +136,7 @@ struct PersistencyService: Sendable {
     // MARK: - Update
     
     func updateObject<T, C>(for request: NSFetchRequest<T>, with info: C) async throws
-    where T: CopyableEntity<C>
-    {
+    where T: CopyableEntity<C> {
         try await managedObjectContext.perform {
             guard let object = try self.managedObjectContext.fetch(request).first else {
                 throw PersistencyError.noObjectFound
@@ -128,9 +148,26 @@ struct PersistencyService: Sendable {
         }
     }
     
+    func updateObject<T, A, C>(for request: NSFetchRequest<T>, with info: C, addEntityForRequest anotherRequest: NSFetchRequest<A>) async throws
+    where T: ValueAddable<A>, T: CopyableEntity<C> {
+        try await managedObjectContext.perform {
+            guard let object = try self.managedObjectContext.fetch(request).first else {
+                throw PersistencyError.noObjectFound
+            }
+            
+            guard let anotherObject = try self.managedObjectContext.fetch(anotherRequest).first else {
+                throw PersistencyError.noObjectFound
+            }
+            
+            object.copy(from: info)
+            object.addValue(anotherObject)
+            
+            try self.saveContext()
+        }
+    }
+    
     func updateObject<T, A>(for request: NSFetchRequest<T>, withObjectForRequest anotherRequest: NSFetchRequest<A>) async throws
-    where T: ValueAddable<A>
-    {
+    where T: ValueAddable<A> {
         try await managedObjectContext.perform {
             guard let object = try self.managedObjectContext.fetch(request).first else {
                 throw PersistencyError.noObjectFound
@@ -181,7 +218,7 @@ private extension PersistencyService {
         }
         catch {
             self.managedObjectContext.rollback()
-            
+            debugPrint(error)
             throw PersistencyError.failedToSave
         }
     }
@@ -190,4 +227,14 @@ private extension PersistencyService {
 private enum PersistencyError: Error {
     case noObjectFound
     case failedToSave
+}
+
+private extension ChangeType {
+    var userInfoKey: String {
+        switch self {
+        case .inserted: NSInsertedObjectIDsKey
+        case .deleted: NSDeletedObjectIDsKey
+        case .updated: NSUpdatedObjectIDsKey
+        }
+    }
 }

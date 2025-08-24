@@ -7,12 +7,17 @@
 
 import Foundation
 import TrackerDomain
+import Combine
 
 final class TrackerRepository: TrackerRepositoryProtocol {
     private let persistencyService: PersistencyService
     
     init(persistencyService: PersistencyService) {
         self.persistencyService = persistencyService
+    }
+    
+    func observe(changes: Set<ChangeType>) -> AsyncPublisher<Publishers.CompactMap<NotificationCenter.Publisher, Set<ChangeType>>> {
+        persistencyService.observe(changes)
     }
     
     // MARK: - Create
@@ -114,7 +119,11 @@ final class TrackerRepository: TrackerRepositoryProtocol {
             .setPredicate(.by(id: tracker.id))
             .build()
         
-        try await persistencyService.updateObject(for: request, with: tracker)
+        let sectionRequest = FetchRequestBuilder<CategoryObject>()
+            .setPredicate(.by(id: tracker.sectionId))
+            .build()
+        
+        try await persistencyService.updateObject(for: request, with: tracker, addEntityForRequest: sectionRequest)
     }
     
     // MARK: - Delete

@@ -1,6 +1,8 @@
 import Foundation
+import Combine
 
 public protocol TrackerManaging: Sendable {
+    func observe(changes: Set<ChangeType>) -> AsyncPublisher<Publishers.CompactMap<NotificationCenter.Publisher, Set<ChangeType>>>
     // Create
     func addSections(_ sections: [TrackerSection]) async throws
     func createTrackerAndAddToSection(with id: UUID, tracker: Tracker) async throws
@@ -33,6 +35,10 @@ final class TrackerManager: TrackerManaging {
         self.trackerRepository = trackerRepository
         self.recordRepository = recordRepository
         self.sectionRepository = sectionRepository
+    }
+    
+    func observe(changes: Set<ChangeType>) -> AsyncPublisher<Publishers.CompactMap<NotificationCenter.Publisher, Set<ChangeType>>> {
+        trackerRepository.observe(changes: changes)
     }
     
     // MARK: - Create

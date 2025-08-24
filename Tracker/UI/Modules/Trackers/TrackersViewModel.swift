@@ -19,7 +19,7 @@ protocol TrackersViewModelProtocol: ObservableObject, TrackersNavigationState {
     var filter: TrackerFilter { get set }
     var isToday: Bool { get }
     
-    func onSectionAppear(at index: Int)
+    func onSectionAppear(at index: Int) async
     func onToday()
     func onAdd()
 }
@@ -70,7 +70,7 @@ final class TrackersViewModel: TrackersViewModelProtocol {
             .store(in: &cancellables)
         
 //        Task { @MainActor in
-//            try await trackerManager.addSections(mockTrackerSections)
+//            try await trackerManager.addSections(createSectionsWithTrackers())
 //        }
         
         observationTask = Task { @MainActor in
@@ -105,10 +105,8 @@ final class TrackersViewModel: TrackersViewModelProtocol {
         route = .create(onCompletion: { [weak self] _ in self?.route = nil })
     }
     
-    func onSectionAppear(at index: Int) {
-        Task.detached { [weak self] in
-            await self?.paginateMoreSectionsIfNeeded(index: index)
-        }
+    func onSectionAppear(at index: Int) async {
+        await paginateMoreSectionsIfNeeded(index: index)
     }
     
     deinit {

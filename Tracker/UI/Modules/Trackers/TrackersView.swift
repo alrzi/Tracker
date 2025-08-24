@@ -45,7 +45,7 @@ extension TrackersView: View, KeyboardReadable {
                             ForEach(Array(models.enumerated()), id: \.element.id) { index, collection in
                                 TrackersCollectionView(viewModel: collection)
                                     .padding(.horizontal, 12)
-                                    .onAppear { viewModel.onSectionAppear(at: index) }
+                                    .task { await viewModel.onSectionAppear(at: index) }
                             }
                             .id(topID)
                         }
@@ -138,7 +138,7 @@ private final class ViewModel: TrackersViewModelProtocol {
     let isToday = false
     let state: TrackersState<CollectionViewModel> = .idle
     
-    func onSectionAppear(at index: Int) { }
+    func onSectionAppear(at index: Int) async { }
     func onToday() { }
     func onAdd() { }
 }

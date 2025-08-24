@@ -8,181 +8,60 @@
 import Foundation
 import TrackerDomain
 
-func createSectionsWithTrackers(sectionCount: Int, trackerCount: Int) -> [TrackerSection] {
+#if DEBUG
+func createSectionsWithTrackers() -> [TrackerSection] {
+    createMultipleTrackerSections(numSections: 20, numTrackersPerSection: 10)
+}
+#endif
+
+func createMultipleTrackerSections(
+    numSections: Int,
+    numTrackersPerSection: Int
+) -> [TrackerSection] {
     var sections: [TrackerSection] = []
-        
-    for sectionIndex in 0..<sectionCount {
+    
+    for sectionIndex in 1...numSections {
+        let sectionId = UUID()
         var trackers: [Tracker] = []
         
-        let sectionID: UUID = .init()
-        let schedule: Set<WeekDay> = [.friday]
-        
-        for trackerIndex in 0..<trackerCount {
-            let id = UUID()
+        for trackerIndex in 1...numTrackersPerSection {
             let tracker = Tracker(
-                id: id,
-                name: "Section \(sectionIndex) - Item \(trackerIndex)",
-                emoji: RandomEmojiService.emoji,
-                color: RandomHexColorService.randomHexString,
-                schedule: schedule,
-                isPinned: false,
-                trackedDays: 0,
-                sectionId: sectionID
+                name: "Tracker \(trackerIndex) in Section \(sectionIndex)",
+                emoji: getRandomEmoji(),
+                color: getRandomHexColor(),
+                schedule: getRandomSchedule(),
+                sectionId: sectionId
             )
             trackers.append(tracker)
-            print("trackerID", id)
         }
         
         let section = TrackerSection(
-            id: sectionID,
+            id: sectionId,
             title: "Section \(sectionIndex)",
             trackers: trackers
         )
+        
         sections.append(section)
-        print("sectionID", sectionID)
     }
     
     return sections
 }
 
-let work = [
-    Tracker(
-        name: "Проверить пулРеквесты",
-        emoji: RandomEmojiService.emoji,
-        color: RandomHexColorService.randomHexString,
-        schedule: Set(WeekDay.allCases),
-        isPinned: false,
-        trackedDays: 0,
-        sectionId: .init()
-    ),
-    Tracker(
-        name: "Задать вопросы",
-        emoji: RandomEmojiService.emoji,
-        color: RandomHexColorService.randomHexString,
-        schedule: [.tuesday],
-        isPinned: false,
-        trackedDays: 0,
-        sectionId: .init()
-    ),
-]
+// Helper functions
+func getRandomEmoji() -> String {
+    let emojis = ["🏋️‍♀️", "📖", "🎨", "🏃‍♂️", "🤸‍♀️"]
+    return emojis.randomElement() ?? "😊"
+}
 
-let life = [
-    Tracker(
-        name: "Погулять в пакре",
-        emoji: RandomEmojiService.emoji,
-        color: RandomHexColorService.randomHexString,
-        schedule: Set(WeekDay.allCases),
-        isPinned: false,
-        trackedDays: 0,
-        sectionId: .init()
-    )
-]
+func getRandomHexColor() -> String {
+    let hexChars = "0123456789abcdef"
+    var hexColor = "#"
+    for _ in 1...6 {
+        hexColor += String(hexChars.randomElement()!)
+    }
+    return hexColor
+}
 
-let cooking = [
-    Tracker(
-        name: "Приготовить что то вкусненькое",
-        emoji: RandomEmojiService.emoji,
-        color: RandomHexColorService.randomHexString,
-        schedule: [.friday],
-        isPinned: true,
-        trackedDays: 0,
-        sectionId: .init()
-    )
-]
-
-let movie = [
-    Tracker(
-        name: "Посмотреть фильм или мультик",
-        emoji: RandomEmojiService.emoji,
-        color: RandomHexColorService.randomHexString,
-        schedule: [.wednesday, .friday, .sunday],
-        isPinned: true,
-        trackedDays: 0,
-        sectionId: .init()
-    )
-]
-
-let socialization = [
-    Tracker(
-        name: "Сходить в антикафе",
-        emoji: RandomEmojiService.emoji,
-        color: RandomHexColorService.randomHexString,
-        schedule: [.sunday],
-        isPinned: true,
-        trackedDays: 0,
-        sectionId: .init()
-    )
-]
-
-let relations = [
-    Tracker(
-        name: "Позвонить родственникам",
-        emoji: RandomEmojiService.emoji,
-        color: RandomHexColorService.randomHexString,
-        schedule: [.friday],
-        isPinned: true,
-        trackedDays: 0,
-        sectionId: .init()
-    )
-]
-
-let adventure = [
-    Tracker(
-        name: "Погулять в новом месте",
-        emoji: RandomEmojiService.emoji,
-        color: RandomHexColorService.randomHexString,
-        schedule: [.saturday],
-        isPinned: false,
-        trackedDays: 0,
-        sectionId: .init()
-    )
-]
-
-let books = [
-    Tracker(
-        name: "Почитать книгу",
-        emoji: RandomEmojiService.emoji,
-        color: RandomHexColorService.randomHexString,
-        schedule: Set(WeekDay.allCases),
-        isPinned: false,
-        trackedDays: 0,
-        sectionId: .init()
-    )
-]
-
-let hobbie = [
-    Tracker(
-        name: "Порефакторить проект",
-        emoji: RandomEmojiService.emoji,
-        color: RandomHexColorService.randomHexString,
-        schedule: Set(WeekDay.allCases),
-        isPinned: false,
-        trackedDays: 0,
-        sectionId: .init()
-    )
-]
-
-let englishClub = [
-    Tracker(
-        name: "Сходить на английский",
-        emoji: RandomEmojiService.emoji,
-        color: RandomHexColorService.randomHexString,
-        schedule: [.sunday],
-        isPinned: true,
-        trackedDays: 0,
-        sectionId: .init()
-    )
-]
-
-let mockTrackerSections = [
-    TrackerSection(title: "Работа", trackers: work),
-    TrackerSection(title: "Жизнь", trackers: life),
-    TrackerSection(title: "Вкусная еда", trackers: cooking),
-    TrackerSection(title: "Кинематограф", trackers: movie),
-    TrackerSection(title: "Общение", trackers: socialization),
-    TrackerSection(title: "Родственники", trackers: relations),
-    TrackerSection(title: "Приключения", trackers: adventure),
-    TrackerSection(title: "Книги", trackers: books),
-    TrackerSection(title: "Хобби", trackers: hobbie),
-    TrackerSection(title: "Английский клуб", trackers: englishClub),
-]
+func getRandomSchedule() -> Set<WeekDay> {
+    .init([WeekDay.allCases.randomElement()!])
+}

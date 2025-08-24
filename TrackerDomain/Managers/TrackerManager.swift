@@ -2,7 +2,9 @@ import Foundation
 import Combine
 
 public protocol TrackerManaging: Sendable {
+    // Observe
     func observe(changes: Set<ChangeType>) -> AsyncPublisher<Publishers.CompactMap<NotificationCenter.Publisher, Set<ChangeType>>>
+    
     // Create
     func addSections(_ sections: [TrackerSection]) async throws
     func createTrackerAndAddToSection(with id: UUID, tracker: Tracker) async throws
@@ -208,6 +210,8 @@ private extension TrackerManager {
                     
                     return try await mapToTrackerSection(section, items)
                 }
+                
+                await Task.yield()
             }
             
             return try await group.reduce(into: []) { accumulatedSections, section in

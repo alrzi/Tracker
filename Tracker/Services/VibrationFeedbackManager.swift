@@ -8,40 +8,39 @@
 import UIKit
 import AudioToolbox
 
-@MainActor
 protocol VibrationFeedbackManaging {
+    @MainActor
     func makeVibration(for type: NotificationFeedbackType)
 }
 
 final class VibrationFeedbackManager: VibrationFeedbackManaging {
+    @MainActor
     private let generator: UINotificationFeedbackGenerator
+    
+    @MainActor
     private let selectionGenerator: UISelectionFeedbackGenerator
     
-    init() {
-        generator = UINotificationFeedbackGenerator()
-        selectionGenerator = UISelectionFeedbackGenerator()
+    init(
+        generator: UINotificationFeedbackGenerator,
+        selectionGenerator: UISelectionFeedbackGenerator
+    ) {
+        self.generator = generator
+        self.selectionGenerator = selectionGenerator
     }
     
     func makeVibration(for type: NotificationFeedbackType) {
         if case .selection = type {
-            makeSelectionVibration()
+            selectionGenerator.prepare()
+            selectionGenerator.selectionChanged()
         }
         else {
-            makeTapticEngineVibration(for: type)
+            guard let feedbackType = type.feedbackType else {
+                return
+            }
+            
+            generator.prepare()
+            generator.notificationOccurred(feedbackType)
         }
-    }
-    
-    private func makeSelectionVibration() {
-        selectionGenerator.prepare()
-        selectionGenerator.selectionChanged()
-    }
-    
-    private func makeTapticEngineVibration(for type: NotificationFeedbackType) {
-        guard let feedbackType = type.feedbackType else {
-            return
-        }
-        generator.prepare()
-        generator.notificationOccurred(feedbackType)
     }
 }
 

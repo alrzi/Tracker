@@ -31,12 +31,7 @@ enum TrackersState<Collection> {
     }
     
     var count: Int {
-        if case .loaded(let collection) = self {
-            collection.count
-        }
-        else {
-            0
-        }
+        models.count
     }
     
     var models: [Collection] {

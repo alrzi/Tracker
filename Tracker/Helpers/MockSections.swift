@@ -12,7 +12,6 @@ import TrackerDomain
 func createSectionsWithTrackers() -> [TrackerSection] {
     createMultipleTrackerSections(numSections: 20, numTrackersPerSection: 10)
 }
-#endif
 
 func createMultipleTrackerSections(
     numSections: Int,
@@ -47,7 +46,6 @@ func createMultipleTrackerSections(
     return sections
 }
 
-// Helper functions
 func getRandomEmoji() -> String {
     let emojis = ["🏋️‍♀️", "📖", "🎨", "🏃‍♂️", "🤸‍♀️"]
     return emojis.randomElement() ?? "😊"
@@ -65,3 +63,4 @@ func getRandomHexColor() -> String {
 func getRandomSchedule() -> Set<WeekDay> {
     .init([WeekDay.allCases.randomElement()!])
 }
+#endif

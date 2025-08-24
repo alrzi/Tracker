@@ -33,7 +33,7 @@ final class TrackersViewModel: TrackersViewModelProtocol {
     private var observationTask: Task<(), Never>?
     private var cancellables: Set<AnyCancellable> = []
     private var fetchParameters: FetchParameters = .init(fetchLimit: 5, fetchOffset: 0)
-    private var pinnedSectionID: UUID?
+    private let pinnedSectionID: UUID = .init()
     private var paginationState: LoadingState = .idle
     
     @Published private(set) var state: TrackersState<TrackersCollectionViewModel> = .idle
@@ -74,9 +74,9 @@ final class TrackersViewModel: TrackersViewModelProtocol {
 //        }
         
         observationTask = Task { @MainActor in
-            for await changes in trackerManager.observe(changes: [.deleted, .inserted, .updated]) {
+            for await _ in trackerManager.observe(changes: [.deleted, .inserted, .updated]) {
                 do {
-                    let sections = try await fetchSections(isPaginating: false, params: amountSensitiveParamsPin)
+                    let sections = try await fetchSections(isPaginating: false, params: updateParams)
                     
                     hapticManager.makeVibration(for: .success)
                     
@@ -86,11 +86,10 @@ final class TrackersViewModel: TrackersViewModelProtocol {
                     else {
                         state = .empty(.empty)
                     }
-                    
-                    debugPrint(changes)
                 }
                 catch {
                     debugPrint(error)
+                    state = .error
                 }
             }
         }
@@ -181,11 +180,12 @@ private extension TrackersViewModel {
         }
         catch {
             debugPrint(error)
+            state = .error
         }
     }
     
     func paginateMoreSectionsIfNeeded(index: Int) async {
-        guard index + 1 == state.lastElementIndex else {
+        guard index == state.lastElementIndex else {
             return
         }
         
@@ -201,8 +201,9 @@ private extension TrackersViewModel {
             if !sections.isEmpty {
                 state = .loaded(currentModels + createModels(from: sections))
                 fetchParameters.nextPage()
-                paginationState = .idle
             }
+            
+            paginationState = .idle
         }
         catch {
             debugPrint(error)
@@ -246,9 +247,7 @@ private extension TrackersViewModel {
     }
     
     func createPinnedModel(from trackers: [Tracker]) -> TrackerSection? {
-        let uuid = UUID()
-        pinnedSectionID = uuid
-        return trackers.isEmpty ? nil : .init(id: uuid, title: R.string.localizable.mainPinned(), trackers: trackers)
+        trackers.isEmpty ? nil : .init(id: pinnedSectionID, title: R.string.localizable.mainPinned(), trackers: trackers)
     }
 }
 
@@ -263,30 +262,11 @@ private extension TrackersViewModel {
         )
     }
     
-    var amountSensitiveParamsUnPin: RequestParameters {
-        var uniqueSectionIds = Set<UUID>()
-        let models = state.models
-        
-        if let pinnedSection = models.first, pinnedSection.id == pinnedSectionID {
-            uniqueSectionIds.formUnion(pinnedSection.trackers.map { $0.sectionId })
-        }
-        
-        uniqueSectionIds.formUnion(models.map { $0.id })
-        
-        return .init(
-            currentDate: currentDate,
-            weekDay: .getWeekDay(from: currentDate),
-            fetchLimit: uniqueSectionIds.count,
-            fetchOffset: .zero,
-            query: queryString
-        )
-    }
-    
-    var amountSensitiveParamsPin: RequestParameters {
+    var updateParams: RequestParameters {
         .init(
             currentDate: currentDate,
             weekDay: .getWeekDay(from: currentDate),
-            fetchLimit: state.count + 1,
+            fetchLimit: fetchParameters.fetchOffset,
             fetchOffset: .zero,
             query: queryString
         )

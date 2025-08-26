@@ -44,13 +44,6 @@ final class VibrationFeedbackManager: VibrationFeedbackManaging {
     }
 }
 
-enum NotificationFeedbackType {
-    case error
-    case success
-    case warning
-    case selection
-}
-
 private extension NotificationFeedbackType {
     var feedbackType: UINotificationFeedbackGenerator.FeedbackType? {
         switch self {

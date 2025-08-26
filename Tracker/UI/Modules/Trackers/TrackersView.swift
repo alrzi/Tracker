@@ -109,6 +109,14 @@ extension TrackersView: View, KeyboardReadable {
                                 .resizable()
                                 .scaledToFit()
                                 .frame(width: 24, height: 24)
+                                .overlay(alignment: .topTrailing) {
+                                    if viewModel.filter != .forCurrentWeekDay {
+                                        Circle()
+                                            .frame(width: 8)
+                                            .tint(.red)
+                                            .offset(x: 6, y: -6)
+                                    }
+                                }
                                 .padding(16)
                                 .background(Color.clear)
                                 .contentShape(Rectangle())

@@ -8,10 +8,6 @@
 import Foundation
 import Combine
 
-public enum ChangeType: Sendable {
-    case inserted, deleted, updated
-}
-
 public protocol TrackerRepositoryProtocol: Sendable {
     func observe(changes: Set<ChangeType>) -> AsyncPublisher<Publishers.CompactMap<NotificationCenter.Publisher, Set<ChangeType>>>
     // Create

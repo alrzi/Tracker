@@ -23,16 +23,23 @@ final class RecordRepository: RecordRepositoryProtocol {
     // Create
     
     func createOrDeleteIfPresent(record: TrackerRecord) async throws {
+        let interval = record.date.fullDayInterval()
+        
         if try await isCompletedFor(selectedDay: record.date, trackerWithId: record.id) {
             let request = FetchRequestBuilder<RecordObject>()
-                .setPredicate(.by(id: record.id, dateInterval: record.date.fullDayInterval()))
+                .setPredicates(
+                    [
+                        Query(key: \.date, that: .between(interval.start, interval.end)),
+                        Query(key: \.id, that: .equal(to: record.id))
+                    ]
+                )
                 .build()
             
             try await persistencyService.removeObject(for: request)
         }
         else {
             let request = FetchRequestBuilder<TrackerObject>()
-                .setPredicate(.by(id: record.id))
+                .setPredicates([Query(key: \.id, that: .equal(to: record.id))])
                 .build()
             
             try await persistencyService.createObject(RecordObject.self, from: record, andAddObjectFor: request)
@@ -50,11 +57,17 @@ final class RecordRepository: RecordRepositoryProtocol {
     }
     
     func fetchRecords(for sectionId: UUID, for date: Date, weekDay: WeekDay, query: String, isPinned: Bool) async throws -> [TrackerRecord] {
+        let interval = date.fullDayInterval()
+        
         let request = FetchRequestBuilder<RecordObject>()
-            .setPredicate(
-                query.isEmpty
-                ? .by(sectionId: sectionId, for: date.fullDayInterval(), weekDay: weekDay, isPinned: isPinned)
-                : .by(sectionId: sectionId, for: date.fullDayInterval(), weekDay: weekDay, isPinned: isPinned, query: query)
+            .setPredicates(
+                [
+                    Query(key: \.date, that: .between(interval.start, interval.end)),
+                    Query(key: \.tracker.isPinned, that: .equal(to: isPinned)),
+                    Query(key: \.tracker.weekDays, that: .contains(weekDay.toNumberString())),
+                    Query(key: \.tracker.category.id, that: .equal(to: sectionId)),
+                ]
+                + (!query.isEmpty ? [Query(key: \.tracker.name, that: .contains(query))] : [])
             )
             .build()
         
@@ -62,11 +75,16 @@ final class RecordRepository: RecordRepositoryProtocol {
     }
     
     func fetchRecords(for date: Date, weekDay: WeekDay, query: String, isPinned: Bool) async throws -> [TrackerRecord] {
+        let interval = date.fullDayInterval()
+        
         let request = FetchRequestBuilder<RecordObject>()
-            .setPredicate(
-                query.isEmpty
-                ? .by(for: date.fullDayInterval(), weekDay: weekDay, isPinned: isPinned)
-                : .by(for: date.fullDayInterval(), weekDay: weekDay, isPinned: isPinned, query: query)
+            .setPredicates(
+                [
+                    Query(key: \.date, that: .between(interval.start, interval.end)),
+                    Query(key: \.tracker.isPinned, that: .equal(to: isPinned)),
+                    Query(key: \.tracker.weekDays, that: .contains(weekDay.toNumberString())),
+                ]
+                + (!query.isEmpty ? [Query(key: \.tracker.name, that: .contains(query))] : [])
             )
             .build()
         
@@ -75,7 +93,7 @@ final class RecordRepository: RecordRepositoryProtocol {
     
     func getTrackedDaysFor(id: UUID) async throws -> Int {
         let request = FetchRequestBuilder<RecordObject>()
-            .setPredicate(.by(id: id))
+            .setPredicates([Query(key: \.id, that: .equal(to: id))])
             .build()
         
         return try await persistencyService.fetchCount(with: request)
@@ -89,55 +107,17 @@ final class RecordRepository: RecordRepositoryProtocol {
     }
     
     func isCompletedFor(selectedDay date: Date, trackerWithId id: UUID) async throws -> Bool {
+        let interval = date.fullDayInterval()
+        
         let request = FetchRequestBuilder<RecordObject>()
-            .setPredicate(.by(id: id, dateInterval: date.fullDayInterval()))
+            .setPredicates(
+                [
+                    Query(key: \.id, that: .equal(to: id)),
+                    Query(key: \.date, that: .between(interval.start, interval.end)),
+                ]
+            )
             .build()
         
         return try await persistencyService.fetchCount(with: request) != .zero
-    }
-}
-
-// MARK: - Predicates
-
-private extension StaticPredicateBuilder where T: TrackerObject {
-    static func by(id: UUID) -> Self {
-        .init()
-        .filter(by: \.id, value: id, comparison: .equal)
-    }
-}
-
-private extension StaticPredicateBuilder where T: RecordObject {
-    static func by(id: UUID) -> Self {
-        .init()
-        .filter(by: \.tracker.id, value: id, comparison: .equal)
-    }
-    
-    static func by(id: UUID, dateInterval: DateInterval) -> Self {
-        .by(id: id)
-        .filter(by: \.date, value: dateInterval.start, comparison: .greaterThanOrEqual)
-        .filter(by: \.date, value: dateInterval.end, comparison: .lessThan)
-    }
-    
-    static func by(for dateInterval: DateInterval, weekDay: WeekDay, isPinned: Bool) -> Self {
-        .init()
-        .filter(by: \.tracker.isPinned, value: isPinned, comparison: .equal)
-        .filter(by: \.tracker.weekDays, value: weekDay.toNumberString(), comparison: .contains)
-        .filter(by: \.date, value: dateInterval.start, comparison: .greaterThanOrEqual)
-        .filter(by: \.date, value: dateInterval.end, comparison: .lessThan)
-    }
-    
-    static func by(for dateInterval: DateInterval, weekDay: WeekDay, isPinned: Bool, query: String) -> Self {
-        .by(for: dateInterval, weekDay: weekDay, isPinned: isPinned)
-        .filter(by: \.tracker.name, value: query, comparison: .contains)
-    }
-    
-    static func by(sectionId: UUID, for dateInterval: DateInterval, weekDay: WeekDay, isPinned: Bool) -> Self {
-        .by(for: dateInterval, weekDay: weekDay, isPinned: isPinned)
-        .filter(by: \.tracker.category.id, value: sectionId, comparison: .equal)
-    }
-    
-    static func by(sectionId: UUID, for dateInterval: DateInterval, weekDay: WeekDay, isPinned: Bool, query: String) -> Self {
-        .by(sectionId: sectionId, for: dateInterval, weekDay: weekDay, isPinned: isPinned)
-        .filter(by: \.tracker.name, value: query, comparison: .contains)
     }
 }

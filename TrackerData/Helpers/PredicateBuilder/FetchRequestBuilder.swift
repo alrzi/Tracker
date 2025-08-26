@@ -15,15 +15,9 @@ struct FetchRequestBuilder<T: NSManagedObject & Entity> {
         self.fetchRequest = NSFetchRequest<T>(entityName: T.entityName)
     }
     
-    func setPredicate(_ predicate: StaticPredicateBuilder<T>) -> FetchRequestBuilder {
+    func setPredicates(_ predicates: [any PredicateProviding<T>]) -> FetchRequestBuilder {
         let newBuilder = self
-        newBuilder.fetchRequest.predicate = predicate.build()
-        return newBuilder
-    }
-    
-    func setPredicateAny<A>(_ predicate: StaticPredicateBuilder<A>) -> FetchRequestBuilder {
-        let newBuilder = self
-        newBuilder.fetchRequest.predicate = predicate.build()
+        newBuilder.fetchRequest.predicate = NSCompoundPredicate(type: .and, subpredicates: predicates.map({ $0.predicate }))
         return newBuilder
     }
     

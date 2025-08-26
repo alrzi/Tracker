@@ -48,8 +48,7 @@ struct PersistencyService: Sendable {
     func createObjectAddObjectToIt<T, C, E, R>(_ type: T.Type, from domain: C, _ subType: E.Type, entityToAddTo: R) async throws
     where
     T: NSManagedObject & CopyableEntity<C> & ValueAddable<E>,
-    E: NSManagedObject & CopyableEntity<R>
-    {
+    E: NSManagedObject & CopyableEntity<R> {
         try await managedObjectContext.perform {
             let newObject = T(context: self.managedObjectContext)
             newObject.copy(from: domain)
@@ -66,8 +65,7 @@ struct PersistencyService: Sendable {
     func createObjectAndAddToEntity<T, C, E, R>(_ type: T.Type, from domain: [C], _ subType: E.Type, entityToAddTo: R) async throws
     where
     T: NSManagedObject & CopyableEntity<C>,
-    E: NSManagedObject & CopyableEntity<R> & SetAddable<T>
-    {
+    E: NSManagedObject & CopyableEntity<R> & SetAddable<T> {
         try await managedObjectContext.perform {
             var objects: Set<T> = []
             for i in domain {
@@ -110,8 +108,7 @@ struct PersistencyService: Sendable {
     }
     
     func fetchObject<T, R>(with fetchRequest: NSFetchRequest<T>) async throws -> R?
-    where R: Initable<T>
-    {
+    where R: Initable<T> {
         try await managedObjectContext.perform {
             try self.managedObjectContext.fetch(fetchRequest).first.map { .init(object: $0) }
         }
@@ -120,8 +117,7 @@ struct PersistencyService: Sendable {
     func fetchObjects<T: NSManagedObject, R>(_ type: T.Type) async throws -> [R]
     where
     T: Entity,
-    R: Initable<T>
-    {
+    R: Initable<T> {
         try await managedObjectContext.perform {
             try self.managedObjectContext.fetch(NSFetchRequest<T>(entityName: type.entityName)).map { .init(object: $0) }
         }

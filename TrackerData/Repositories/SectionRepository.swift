@@ -50,10 +50,11 @@ final class SectionRepository: SectionRepositoryProtocol {
     
     func getSections(params: RequestParameters) async throws -> [TrackerSection] {
         let request = FetchRequestBuilder<CategoryObject>()
-            .setPredicate(
-                params.query.isEmpty
-                ? .by(weekDay: params.weekDay)
-                : .by(weekDay: params.weekDay, query: params.query)
+            .setPredicates(
+                [
+                    SubQuery(key: \.trackers, subKey: \.weekDays, that: .contains(params.weekDay.toNumberString())),
+                ]
+                + (!params.query.isEmpty ? [SubQuery(key: \.trackers, subKey: \.name, that: .contains(params.query))] : [])
             )
             .setSortDescriptors([.init(keyPath: \.title)])
             .setFetchLimit(params.fetchLimit)
@@ -67,10 +68,12 @@ final class SectionRepository: SectionRepositoryProtocol {
         let interval = params.currentDate.fullDayInterval()
         
         let request = FetchRequestBuilder<CategoryObject>()
-            .setPredicate(
-                params.query.isEmpty
-                ? .byComp(weekDay: params.weekDay, interval: interval, isCompleted: isCompleted)
-                : .byComp(weekDay: params.weekDay, interval: interval, isCompleted: isCompleted, query: params.query)
+            .setPredicates(
+                [
+                    SubQuery(key: \.trackers, subKey: \.weekDays, that: .contains(params.weekDay.toNumberString())),
+                    SubSubQuery(key: \.trackers, subKey: \.trackerRecord, terKey: \.date, that: .between(interval.start, interval.end), isMore: isCompleted)
+                ]
+                + (!params.query.isEmpty ? [SubQuery(key: \.trackers, subKey: \.name, that: .contains(params.query))] : [])
             )
             .setSortDescriptors([.init(keyPath: \.title)])
             .setFetchLimit(params.fetchLimit)
@@ -82,7 +85,7 @@ final class SectionRepository: SectionRepositoryProtocol {
     
     func getSection(by id: UUID) async throws -> TrackerSection {
         let request = FetchRequestBuilder<CategoryObject>()
-            .setPredicate(.by(id: id))
+            .setPredicates([Query(key: \.id, that: .equal(to: id))])
             .build()
         
         guard let section: TrackerSection = try await persistencyService.fetchObject(with: request) else {
@@ -96,7 +99,7 @@ final class SectionRepository: SectionRepositoryProtocol {
     
     func updateSection(_ section: TrackerSection) async throws {
         let request = FetchRequestBuilder<CategoryObject>()
-            .setPredicate(.by(id: section.id))
+            .setPredicates([Query(key: \.id, that: .equal(to: section.id))])
             .build()
         
         try await persistencyService.updateObject(for: request, with: section)
@@ -106,7 +109,7 @@ final class SectionRepository: SectionRepositoryProtocol {
     
     func deleteSection(with id: UUID) async throws {
         let request = FetchRequestBuilder<CategoryObject>()
-            .setPredicate(.by(id: id))
+            .setPredicates([Query(key: \.id, that: .equal(to: id))])
             .build()
         
         try await persistencyService.removeObject(for: request)
@@ -114,36 +117,5 @@ final class SectionRepository: SectionRepositoryProtocol {
     
     func deleteAll() async throws {
         try await persistencyService.deleteAllObjects(CategoryObject.self)
-    }
-}
-
-// MARK: - Predicates
-
-private extension StaticPredicateBuilder where T: CategoryObject {
-    static func by(id: UUID) -> Self {
-        .init()
-        .filter(by: \.id, value: id, comparison: .equal)
-    }
-    
-    static func by(weekDay: WeekDay) -> Self {
-        .init()
-        .subpredicate(by: \.trackers, subKeyPath: \.weekDays, subValue: weekDay.toNumberString(), comparison: .contains)
-    }
-    
-    static func by(weekDay: WeekDay, query: String) -> Self {
-        .by(weekDay: weekDay)
-        .subpredicate(by: \.trackers, subKeyPath: \.name, subValue: query, comparison: .contains)
-    }
-    
-    static func byComp(weekDay: WeekDay, interval: DateInterval, isCompleted: Bool) -> Self {
-        .init()
-        .subpredicate(by: \.trackers, subKeyPath: \.weekDays, subValue: weekDay.toNumberString(), comparison: .contains)
-        .subpredicateInSubpredicate(by: \.trackers, subKeyPath: \.trackerRecord, terKeyPath: \.date, subValue1: interval.start, subValue2: interval.end, isMore: isCompleted)
-    }
-    
-    static func byComp(weekDay: WeekDay, interval: DateInterval, isCompleted: Bool, query: String) -> Self {
-        .by(weekDay: weekDay)
-        .subpredicate(by: \.trackers, subKeyPath: \.name, subValue: query, comparison: .contains)
-        .subpredicateInSubpredicate(by: \.trackers, subKeyPath: \.trackerRecord, terKeyPath: \.date, subValue1: interval.start, subValue2: interval.end, isMore: isCompleted)
     }
 }

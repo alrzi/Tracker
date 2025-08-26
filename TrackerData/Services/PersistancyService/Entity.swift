@@ -10,6 +10,12 @@ protocol CopyableEntity<CopyableValue> {
     func copy(from: CopyableValue)
 }
 
+protocol Initable<Object> {
+    associatedtype Object
+    
+    init(object: Object)
+}
+
 protocol SetAddable<ElementType> {
     associatedtype ElementType: NSManagedObject
     
@@ -20,10 +26,4 @@ protocol ValueAddable<AddableValue> {
     associatedtype AddableValue: NSManagedObject
     
     func addValue(_ value: AddableValue)
-}
-
-protocol Initable<Object> {
-    associatedtype Object
-    
-    init(object: Object)
 }

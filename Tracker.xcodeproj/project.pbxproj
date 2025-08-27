@@ -16,6 +16,9 @@
 		F98857922DB1127E0054DE44 /* TrackerData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F96D33512D7F6F55009208B9 /* TrackerData.framework */; };
 		F98857932DB1127E0054DE44 /* TrackerData.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = F96D33512D7F6F55009208B9 /* TrackerData.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		F98863002DB119A50054DE44 /* AppMetricaCore in Frameworks */ = {isa = PBXBuildFile; productRef = F98862FF2DB119A50054DE44 /* AppMetricaCore */; };
+		F9C4AD082E5F730900AA6BD8 /* Swinject in Frameworks */ = {isa = PBXBuildFile; productRef = F9C4AD072E5F730900AA6BD8 /* Swinject */; };
+		F9C4B73B2E5F752A00AA6BD8 /* Swinject in Frameworks */ = {isa = PBXBuildFile; productRef = F9C4B73A2E5F752A00AA6BD8 /* Swinject */; };
+		F9C4B73F2E5F76E400AA6BD8 /* Swinject in Frameworks */ = {isa = PBXBuildFile; productRef = F9C4B73E2E5F76E400AA6BD8 /* Swinject */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -127,6 +130,7 @@
 				F98857922DB1127E0054DE44 /* TrackerData.framework in Frameworks */,
 				F988578F2DB112770054DE44 /* TrackerDomain.framework in Frameworks */,
 				F956F0852D8F299B00175338 /* RswiftLibrary in Frameworks */,
+				F9C4AD082E5F730900AA6BD8 /* Swinject in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -134,6 +138,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F9C4B73B2E5F752A00AA6BD8 /* Swinject in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -151,6 +156,7 @@
 			files = (
 				F97A0F8F2D80D2FD00AC67A4 /* DataStorage in Frameworks */,
 				F98863002DB119A50054DE44 /* AppMetricaCore in Frameworks */,
+				F9C4B73F2E5F76E400AA6BD8 /* Swinject in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -242,6 +248,7 @@
 			name = Tracker;
 			packageProductDependencies = (
 				F956F0842D8F299B00175338 /* RswiftLibrary */,
+				F9C4AD072E5F730900AA6BD8 /* Swinject */,
 			);
 			productName = Tracker;
 			productReference = F918018229CEECCB00767F16 /* Tracker.app */;
@@ -265,6 +272,7 @@
 			);
 			name = TrackerDomain;
 			packageProductDependencies = (
+				F9C4B73A2E5F752A00AA6BD8 /* Swinject */,
 			);
 			productName = TrackerDomain;
 			productReference = F96D331E2D7F6D82009208B9 /* TrackerDomain.framework */;
@@ -314,6 +322,7 @@
 			packageProductDependencies = (
 				F97A0F8E2D80D2FD00AC67A4 /* DataStorage */,
 				F98862FF2DB119A50054DE44 /* AppMetricaCore */,
+				F9C4B73E2E5F76E400AA6BD8 /* Swinject */,
 			);
 			productName = TrackerData;
 			productReference = F96D33512D7F6F55009208B9 /* TrackerData.framework */;
@@ -390,6 +399,7 @@
 				F9C512182D7CB3C80093D201 /* XCLocalSwiftPackageReference "../../../../../../Volumes/KINGSTON/MyPackages/DataStorage" */,
 				F956F0832D8F299B00175338 /* XCRemoteSwiftPackageReference "R" */,
 				F98862FE2DB119A50054DE44 /* XCRemoteSwiftPackageReference "appmetrica-sdk-ios" */,
+				F9C4AD062E5F730900AA6BD8 /* XCRemoteSwiftPackageReference "Swinject" */,
 			);
 			productRefGroup = F918018329CEECCB00767F16 /* Products */;
 			projectDirPath = "";
@@ -1091,6 +1101,14 @@
 				minimumVersion = 5.9.0;
 			};
 		};
+		F9C4AD062E5F730900AA6BD8 /* XCRemoteSwiftPackageReference "Swinject" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Swinject/Swinject.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.9.1;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -1113,6 +1131,21 @@
 			isa = XCSwiftPackageProductDependency;
 			package = F98862FE2DB119A50054DE44 /* XCRemoteSwiftPackageReference "appmetrica-sdk-ios" */;
 			productName = AppMetricaCore;
+		};
+		F9C4AD072E5F730900AA6BD8 /* Swinject */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = F9C4AD062E5F730900AA6BD8 /* XCRemoteSwiftPackageReference "Swinject" */;
+			productName = Swinject;
+		};
+		F9C4B73A2E5F752A00AA6BD8 /* Swinject */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = F9C4AD062E5F730900AA6BD8 /* XCRemoteSwiftPackageReference "Swinject" */;
+			productName = Swinject;
+		};
+		F9C4B73E2E5F76E400AA6BD8 /* Swinject */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = F9C4AD062E5F730900AA6BD8 /* XCRemoteSwiftPackageReference "Swinject" */;
+			productName = Swinject;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

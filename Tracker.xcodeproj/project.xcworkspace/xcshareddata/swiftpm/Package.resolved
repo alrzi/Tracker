@@ -1,5 +1,5 @@
 {
-  "originHash" : "472153c33221eb051ad3de4756b566578525f03ea1020bb20eed09c8772cf100",
+  "originHash" : "d6b4e72bc382f43c9a8ee2511082da1127d7a12639b51dbed90b8bca949fd1f0",
   "pins" : [
     {
       "identity" : "appmetrica-sdk-ios",
@@ -53,6 +53,15 @@
       "state" : {
         "revision" : "4c6cc0a3b9e8f14b3ae2307c5ccae4de6167ac2c",
         "version" : "600.0.0-prerelease-2024-06-12"
+      }
+    },
+    {
+      "identity" : "swinject",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/Swinject/Swinject.git",
+      "state" : {
+        "revision" : "be9dbcc7b86811bc131539a20c6f9c2d3e56919f",
+        "version" : "2.9.1"
       }
     },
     {

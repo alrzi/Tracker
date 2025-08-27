@@ -6,10 +6,14 @@
 //
 
 import UIKit
+import Swinject
 import TrackerData
 import TrackerDomain
 
 final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
+    private let assembler = Assembler()
+    private var resolver: Resolver { assembler.resolver }
+    
     var window: UIWindow?
     
     func scene(
@@ -21,71 +25,22 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             return
         }
         
-        let windowFromScene = UIWindow(windowScene: windowScene)
-        
-        // MARK: - Servises
-        
-        let hapticManager = VibrationFeedbackManager(
-            generator: UINotificationFeedbackGenerator(),
-            selectionGenerator: UISelectionFeedbackGenerator()
+        assembler.apply(
+            assemblies: [
+                TrackerDataAssembly(),
+                TrackerDomainAssembly(),
+                ServicesAssembly(),
+                FactoriesAssembly(),
+                ModulesAssembly(),
+            ]
         )
         
-        let authDataStorage = TrackerDataContainer.authDataStorage
-        let recordRepository = TrackerDataContainer.recordRepository
-        let trackerRepository = TrackerDataContainer.trackerRepository
-        let sectionRepository = TrackerDataContainer.sectionRepository
+        let window = UIWindow(windowScene: windowScene)
+        self.window = window
         
-        let trackerManager = TrackerDomainContainer.trackerManager(
-            trackerRepository: trackerRepository,
-            recordRepository: recordRepository,
-            sectionRepository: sectionRepository
-        )
-        
-        let statisticManager = TrackerDomainContainer.statisticManager(
-            trackerRepository: trackerRepository,
-            recordRepository: recordRepository
-        )
-        
-        let authService = TrackerDomainContainer.authService(dataStorage: authDataStorage)
-        
-        // MARK: - Assembly
-        
-        let statisticsAssembly = StatisticsAssembly(statisticsManager: statisticManager)
-        
-        let trackersViewModelsFactory = TrackersViewModelsFactory(
-            trackerManager: trackerManager,
-            trackerRepository: trackerRepository,
-            recordRepository: recordRepository,
-            hapticManager: hapticManager
-        )
-        
-        let trackersAssembly = TrackersAssembly(
-            trackerManager: trackerManager,
-            hapticManager: hapticManager,
-            trackersViewModelsFactory: trackersViewModelsFactory,
-            trackerFormAssembly: TrackerFormAssembly(
-                trackerManager: trackerManager,
-                sectionRepository: sectionRepository,
-                sectionsListAssembly: SectionsListAssembly(
-                    sectionRepository: sectionRepository,
-                    sectionCreationAssembly: SectionCreationAssembly()
-                ),
-                weekDaysSelectionAssembly: WeekDaysSelectionAssembly()
-            )
-        )
-        
-        let tabBarAssembly = TabBarAssembly(
-            trackersAssembly: trackersAssembly,
-            statisticAssembly: statisticsAssembly
-        )
-        
-        let splash = SplashViewAssembly(tabBarAssembly: tabBarAssembly, authService: authService)
-        
-        let viewController = splash.assemble(windowFromScene)
-        windowFromScene.rootViewController = viewController
-        
-        self.window = windowFromScene
-        windowFromScene.makeKeyAndVisible()
+        let rootViewController = resolver.resolve(SplashViewAssembly.self)!.assemble(window)
+        window.rootViewController = rootViewController
+        window.makeKeyAndVisible()
     }
     
     func sceneDidDisconnect(_ scene: UIScene) {

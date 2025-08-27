@@ -6,28 +6,31 @@
 //
 
 import Foundation
+import Swinject
 
-public enum TrackerDomainContainer {
-    public static func trackerManager(
-        trackerRepository: some TrackerRepositoryProtocol,
-        recordRepository: some RecordRepositoryProtocol,
-        sectionRepository: some SectionRepositoryProtocol
-    ) -> some TrackerManaging {
-        TrackerManager(
-            trackerRepository: trackerRepository,
-            recordRepository: recordRepository,
-            sectionRepository: sectionRepository
-        )
-    }
+public final class TrackerDomainAssembly: Assembly {
+    public init() { }
     
-    public static func statisticManager(
-        trackerRepository: some TrackerRepositoryProtocol,
-        recordRepository: some RecordRepositoryProtocol
-    ) -> some StatisticsManaging {
-        StatisticsManager(trackerRepository: trackerRepository, recordRepository: recordRepository)
-    }
-    
-    public static func authService(dataStorage: some AuthDataStorage) -> some AuthServiceProtocol {
-        AuthService(authDataStorage: dataStorage)
+    public func assemble(container: Container) {
+        container.register(TrackerManaging.self) { r in
+            TrackerManager(
+                trackerRepository: r.resolve(TrackerRepositoryProtocol.self)!,
+                recordRepository: r.resolve(RecordRepositoryProtocol.self)!,
+                sectionRepository: r.resolve(SectionRepositoryProtocol.self)!
+            )
+        }
+        
+        container.register(StatisticsManaging.self) { r in
+            StatisticsManager(
+                trackerRepository: r.resolve(TrackerRepositoryProtocol.self)!,
+                recordRepository: r.resolve(RecordRepositoryProtocol.self)!
+            )
+        }
+        
+        container.register(AuthServiceProtocol.self) { r in
+            AuthService(
+                authDataStorage: r.resolve(AuthDataStorage.self)!
+            )
+        }
     }
 }

@@ -14,22 +14,21 @@ protocol VibrationFeedbackManaging {
 }
 
 final class VibrationFeedbackManager: VibrationFeedbackManaging {
-    @MainActor
-    private let generator: UINotificationFeedbackGenerator
-    
-    @MainActor
-    private let selectionGenerator: UISelectionFeedbackGenerator
+    private let generatorProvider: @Sendable @MainActor () -> UINotificationFeedbackGenerator
+    private let selectionGenerator: @Sendable @MainActor () -> UISelectionFeedbackGenerator
     
     init(
-        generator: UINotificationFeedbackGenerator,
-        selectionGenerator: UISelectionFeedbackGenerator
+        generatorProvider: @escaping @Sendable @MainActor () -> UINotificationFeedbackGenerator,
+        selectionGenerator: @escaping @Sendable @MainActor () -> UISelectionFeedbackGenerator
     ) {
-        self.generator = generator
+        self.generatorProvider = generatorProvider
         self.selectionGenerator = selectionGenerator
     }
     
     func makeVibration(for type: NotificationFeedbackType) {
         if case .selection = type {
+            let selectionGenerator = selectionGenerator()
+            
             selectionGenerator.prepare()
             selectionGenerator.selectionChanged()
         }
@@ -37,6 +36,8 @@ final class VibrationFeedbackManager: VibrationFeedbackManaging {
             guard let feedbackType = type.feedbackType else {
                 return
             }
+            
+            let generator = generatorProvider()
             
             generator.prepare()
             generator.notificationOccurred(feedbackType)

@@ -13,13 +13,11 @@ final class SplashViewModel {
         self.router = router
     }
 
-    func loginUser() {
-        Task {
-            let isLoggedIn = await authService.login()
-            
-            if isLoggedIn {
-                router.showTabBar()
-            }
+    func loginUser() async {
+        let isLoggedIn = await authService.login()
+        
+        if isLoggedIn {
+            router.showTabBar()
         }
     }
 }

@@ -14,7 +14,6 @@ struct TrackersView<ViewModel: TrackersViewModelProtocol> {
     @ObservedObject private var viewModel: ViewModel
     
     @Namespace private var topID
-    @State private var keyboardShown = false
     
     init(viewModel: ViewModel) {
         self.viewModel = viewModel
@@ -23,22 +22,14 @@ struct TrackersView<ViewModel: TrackersViewModelProtocol> {
 
 // MARK: - View
 
-extension TrackersView: View, KeyboardReadable {
+extension TrackersView: View {
     var body: some View {
-        // swiftlint:disable closure_body_length
         NavigationStack {
             ScrollViewReader { proxy in
                 Group {
                     switch viewModel.state {
                     case .idle, .loading:
-                        VStack {
-                            Spacer()
-                            Text("Loading")
-                            Spacer()
-                            HStack {
-                                Spacer()
-                            }
-                        }
+                        LoadingView()
                         
                     case .loaded(let models):
                         ScrollableLazyVStack(horizontalPadding: 0) {
@@ -58,74 +49,91 @@ extension TrackersView: View, KeyboardReadable {
                     }
                 }
                 .safeAreaInset(edge: .bottom, alignment: .trailing) {
-                    HStack(spacing: 20) {
-                        if !viewModel.isToday && !keyboardShown {
-                            Button(action: {
-                                viewModel.onToday()
-                                
-                                withAnimation {
-                                    proxy.scrollTo(topID, anchor: .top)
-                                }
-                            }) {
-                                Text("Today")
-                                    .font(.system(size: 24, weight: .semibold))
-                                    .foregroundStyle(.white)
-                                    .padding(.horizontal, 20)
-                            }
-                            .frame(height: 60)
-                            .background(.blue, in: .rect(cornerRadius: 12))
-                            .transition(.opacity)
+                    SafeAreaBottomView(
+                        isToday: viewModel.isToday,
+                        onCreate: viewModel.onAdd,
+                        onToday: {
+                            withAnimation { proxy.scrollTo(topID, anchor: .top) }
+                            viewModel.onToday()
                         }
-                        
-                        Button(action: viewModel.onAdd) {
-                            Image(systemName: "plus")
-                                .resizable()
-                                .symbolVariant(.circle.fill)
-                                .symbolRenderingMode(.palette)
-                                .foregroundStyle(.white, .blue)
-                        }
-                        .frame(width: 60, height: 60)
-                    }
-                    .animation(.easeIn, value: viewModel.isToday)
-                    .padding(20)
+                    )
                 }
                 .toolbar {
-                    ToolbarItem(placement: .topBarTrailing) {
+                    ToolbarItemGroup(placement: .topBarTrailing) {
                         DatePicker("", selection: $viewModel.currentDate, displayedComponents: .date)
-                    }
-                    
-                    ToolbarItem(placement: .topBarTrailing) {
-                        Menu {
-                            Picker(R.string.localizable.filtersTitle(), selection: $viewModel.filter) {
-                                ForEach(TrackerFilter.allCases) { option in
-                                    Label(option.name, systemImage: option.systemImageName)
-                                        .tag(option)
-                                }
-                            }
-                            .backDeployedLabelsVisibility(.visible)
-                        }
-                        label: {
-                            Image(systemName: "line.3.horizontal.decrease")
-                                .resizable()
-                                .scaledToFit()
-                                .frame(width: 24, height: 24)
-                                .overlay(alignment: .topTrailing) {
-                                    if viewModel.filter != .forCurrentWeekDay {
-                                        Circle()
-                                            .frame(width: 8)
-                                            .tint(.red)
-                                            .offset(x: 6, y: -6)
-                                    }
-                                }
-                                .padding(16)
-                                .background(Color.clear)
-                                .contentShape(Rectangle())
-                        }
+                        FilterMenuView(filter: $viewModel.filter)
                     }
                 }
             }
         }
         .searchable(text: $viewModel.queryString) { }
+    }
+}
+
+private struct FilterMenuView: View {
+    @Binding var filter: TrackerFilter
+    
+    var body: some View {
+        Menu {
+            Picker("Filters", selection: $filter) {
+                ForEach(TrackerFilter.allCases) { option in
+                    Label(option.name, systemImage: option.systemImageName)
+                        .tag(option)
+                }
+            }
+            .backDeployedLabelsVisibility(.visible)
+        } label: {
+            Image(systemName: "line.3.horizontal.decrease")
+                .resizable()
+                .scaledToFit()
+                .frame(width: 24, height: 24)
+                .overlay(alignment: .topTrailing) {
+                    if filter != .forCurrentWeekDay {
+                        Circle()
+                            .frame(width: 8)
+                            .tint(.red)
+                            .offset(x: 6, y: -6)
+                    }
+                }
+                .padding(16)
+                .background(Color.clear)
+                .contentShape(Rectangle())
+        }
+    }
+}
+
+private struct SafeAreaBottomView: View, KeyboardReadable {
+    let isToday: Bool
+    let onCreate: () -> Void
+    let onToday: () -> Void
+    
+    @State private var keyboardShown = false
+    
+    var body: some View {
+        HStack(spacing: 20) {
+            if !isToday && !keyboardShown {
+                Button(action: onToday) {
+                    Text("Today")
+                        .font(.system(size: 24, weight: .semibold))
+                        .foregroundStyle(.white)
+                        .padding(.horizontal, 20)
+                }
+                .frame(height: 60)
+                .background(.blue, in: .rect(cornerRadius: 12))
+                .transition(.opacity)
+            }
+            
+            Button(action: onCreate) {
+                Image(systemName: "plus")
+                    .resizable()
+                    .symbolVariant(.circle.fill)
+                    .symbolRenderingMode(.palette)
+                    .foregroundStyle(.white, .blue)
+            }
+            .frame(width: 60, height: 60)
+        }
+        .animation(.easeIn, value: isToday)
+        .padding(20)
         .onReceive(keyboardPublisher) { newIsKeyboardVisible in
             keyboardShown = newIsKeyboardVisible
         }

@@ -22,10 +22,8 @@ final class SplashViewController: UIViewController {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         
-        start()
-    }
-    
-    private func start() {
-        viewModel.loginUser()
+        Task {
+            await viewModel.loginUser()
+        }
     }
 }

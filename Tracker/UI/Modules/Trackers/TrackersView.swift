@@ -67,6 +67,7 @@ extension TrackersView: View {
             }
         }
         .searchable(text: $viewModel.queryString) { }
+        .onAppear(perform: viewModel.onAppear)
     }
 }
 
@@ -107,11 +108,11 @@ private struct SafeAreaBottomView: View, KeyboardReadable {
     let onCreate: () -> Void
     let onToday: () -> Void
     
-    @State private var keyboardShown = false
+    @State private var isKeyboardShown = false
     
     var body: some View {
         HStack(spacing: 20) {
-            if !isToday && !keyboardShown {
+            if !isToday && !isKeyboardShown {
                 Button(action: onToday) {
                     Text("Today")
                         .font(.system(size: 24, weight: .semibold))
@@ -135,7 +136,7 @@ private struct SafeAreaBottomView: View, KeyboardReadable {
         .animation(.easeIn, value: isToday)
         .padding(20)
         .onReceive(keyboardPublisher) { newIsKeyboardVisible in
-            keyboardShown = newIsKeyboardVisible
+            isKeyboardShown = newIsKeyboardVisible
         }
     }
 }
@@ -154,6 +155,7 @@ private final class ViewModel: TrackersViewModelProtocol {
     let isToday = false
     let state: TrackersState<CollectionViewModel> = .idle
     
+    func onAppear() { }
     func onSectionAppear(at index: Int) async { }
     func onToday() { }
     func onAdd() { }

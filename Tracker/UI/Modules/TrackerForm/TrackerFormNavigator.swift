@@ -12,10 +12,9 @@ import SwiftUI
 struct TrackerFormNavigator<Content: View, NavigationState: TrackerFormNavigationState> {
     private let sectionsListAssembly: SectionsListAssembly
     private let weekDaysSelectionAssembly: WeekDaysSelectionAssembly
+    private let content: Content
     
     @ObservedObject private var navigationState: NavigationState
-    
-    private let content: Content
     
     init(
         sectionsListAssembly: SectionsListAssembly,

@@ -9,18 +9,9 @@ import Foundation
 import UIKit
 
 @MainActor
-final class SplashViewRouter {
-    private let tabBarAssembly: TabBarAssembly
-    
-    private let window: UIWindow
-    
-    init(
-        tabBarAssembly: TabBarAssembly,
-        window: UIWindow
-    ) {
-        self.tabBarAssembly = tabBarAssembly
-        self.window = window
-    }
+struct SplashViewRouter {
+    let tabBarAssembly: TabBarAssembly
+    let window: UIWindow
         
     func showTabBar() {
         window.rootViewController = tabBarAssembly.assemble()

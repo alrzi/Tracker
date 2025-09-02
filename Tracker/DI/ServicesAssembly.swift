@@ -18,5 +18,22 @@ final class ServicesAssembly: Assembly {
                 selectionGenerator: { UISelectionFeedbackGenerator() }
             )
         }
+        
+        container.register(NotificationDeepLinkServiceProtocol.self) { r in
+            NotificationDeepLinkService(
+                deepLinkService: r.resolve(DeepLinkServiceFactory.self)!.create()
+            )
+        }
+        .inObjectScope(.container)
+        
+        container.register(DeepLinkServiceFactory.self) { _ in
+            DeepLinkServiceFactory()
+        }
+        
+        container.register(UNUserNotificationCenterDelegate.self) { r in
+            NotificationCenterDelegate(
+                notificationDeepLinkService: r.resolve(NotificationDeepLinkServiceProtocol.self)!
+            )
+        }
     }
 }

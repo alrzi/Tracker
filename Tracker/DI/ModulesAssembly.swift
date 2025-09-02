@@ -46,6 +46,7 @@ final class ModulesAssembly: Assembly {
             TrackersAssembly(
                 trackerManager: r.resolve(TrackerManaging.self)!,
                 hapticManager: r.resolve(VibrationFeedbackManaging.self)!,
+                notificationDeepLinkService: r.resolve(NotificationDeepLinkServiceProtocol.self)!,
                 trackersViewModelsFactory: r.resolve(TrackersViewModelsFactory.self)!,
                 trackerFormAssembly: r.resolve(TrackerFormAssembly.self)!
             )

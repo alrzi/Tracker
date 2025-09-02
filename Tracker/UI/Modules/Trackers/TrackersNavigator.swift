@@ -11,10 +11,9 @@ import SwiftUI
 @MainActor
 struct TrackersNavigator<Content: View, NavigationState: TrackersNavigationState> {
     private let trackerFormAssembly: TrackerFormAssembly
+    private let content: Content
     
     @ObservedObject private var navigationState: NavigationState
-    
-    private let content: Content
     
     init(
         trackerFormAssembly: TrackerFormAssembly,

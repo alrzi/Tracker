@@ -11,10 +11,9 @@ import SwiftUI
 @MainActor
 struct SectionListNavigator<Content: View, NavigationState: SectionListNavigationState> {
     private let sectionCreationAssembly: SectionCreationAssembly
+    private let content: Content
     
     @ObservedObject private var navigationState: NavigationState
-    
-    private let content: Content
     
     init(
         sectionCreationAssembly: SectionCreationAssembly,

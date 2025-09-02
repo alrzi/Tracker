@@ -12,19 +12,22 @@ import TrackerDomain
 final class TrackersAssembly {
     private let trackerManager: any TrackerManaging
     private let hapticManager: any VibrationFeedbackManaging
+    private let notificationDeepLinkService: any NotificationDeepLinkServiceProtocol
     
     private let trackersViewModelsFactory: TrackersViewModelsFactory
     
     private let trackerFormAssembly: TrackerFormAssembly
    
     init(
-        trackerManager: some TrackerManaging,
-        hapticManager: some VibrationFeedbackManaging,
+        trackerManager: any TrackerManaging,
+        hapticManager: any VibrationFeedbackManaging,
+        notificationDeepLinkService: any NotificationDeepLinkServiceProtocol,
         trackersViewModelsFactory: TrackersViewModelsFactory,
         trackerFormAssembly: TrackerFormAssembly
     ) {
         self.trackerManager = trackerManager
         self.hapticManager = hapticManager
+        self.notificationDeepLinkService = notificationDeepLinkService
         self.trackersViewModelsFactory = trackersViewModelsFactory
         self.trackerFormAssembly = trackerFormAssembly
     }
@@ -34,6 +37,7 @@ final class TrackersAssembly {
         let viewModel = TrackersViewModel(
             trackerManager: trackerManager,
             hapticManager: hapticManager,
+            notificationDeepLinkService: notificationDeepLinkService,
             trackersViewModelsFactory: trackersViewModelsFactory
         )
         
@@ -46,5 +50,24 @@ final class TrackersAssembly {
         
         let viewController = UIHostingController(rootView: view)
         return viewController
+    }
+    
+    @MainActor
+    func assembleView() -> some View {
+        let viewModel = TrackersViewModel(
+            trackerManager: trackerManager,
+            hapticManager: hapticManager,
+            notificationDeepLinkService: notificationDeepLinkService,
+            trackersViewModelsFactory: trackersViewModelsFactory
+        )
+        
+        let view = TrackersNavigator(
+            trackerFormAssembly: trackerFormAssembly,
+            navigationState: viewModel
+        ) {
+            TrackersView(viewModel: viewModel)
+        }
+                
+        return view
     }
 }

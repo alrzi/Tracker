@@ -19,6 +19,7 @@ protocol TrackersViewModelProtocol: ObservableObject, TrackersNavigationState {
     var filter: TrackerFilter { get set }
     var isToday: Bool { get }
     
+    func onAppear()
     func onSectionAppear(at index: Int) async
     func onToday()
     func onAdd()
@@ -28,7 +29,10 @@ final class TrackersViewModel: TrackersViewModelProtocol {
     private let trackerManager: any TrackerManaging
     private let trackersViewModelsFactory: TrackersViewModelsFactory
     private let hapticManager: any VibrationFeedbackManaging
+    private let notificationDeepLinkService: any NotificationDeepLinkServiceProtocol
+    private let trackersDeepLinksController: TrackersDeepLinksController
     private let calendar: Calendar = .autoupdatingCurrent
+    private let notificationsManager = NotificationsManager()
     
     private var observationTask: Task<(), Never>?
     private var cancellables: Set<AnyCancellable> = []
@@ -49,11 +53,14 @@ final class TrackersViewModel: TrackersViewModelProtocol {
     init(
         trackerManager: some TrackerManaging,
         hapticManager: some VibrationFeedbackManaging,
+        notificationDeepLinkService: any NotificationDeepLinkServiceProtocol,
         trackersViewModelsFactory: TrackersViewModelsFactory
     ) {
         self.trackerManager = trackerManager
         self.hapticManager = hapticManager
+        self.notificationDeepLinkService = notificationDeepLinkService
         self.trackersViewModelsFactory = trackersViewModelsFactory
+        self.trackersDeepLinksController = .init(notificationDeepLinkService: notificationDeepLinkService)
         
         $queryString
             .dropFirst()
@@ -69,30 +76,23 @@ final class TrackersViewModel: TrackersViewModelProtocol {
             .sink { [weak self] _, _ in self?.onFilterOrDateTrigger() }
             .store(in: &cancellables)
         
-//        Task { @MainActor in
-//            try await trackerManager.addSections(createSectionsWithTrackers())
-//        }
+        trackersDeepLinksController.deepLink
+            .sink { [weak self] in self?.handle(destination: $0) }
+            .store(in: &cancellables)
         
         observationTask = Task { @MainActor in
             for await _ in trackerManager.observe(changes: [.deleted, .inserted, .updated]) {
-                do {
-                    let sections = try await fetchSections(isPaginating: false, params: updateParams)
-                    
-                    hapticManager.makeVibration(for: .success)
-                    
-                    if !sections.isEmpty {
-                        state = .loaded(createModels(from: sections))
-                    }
-                    else {
-                        state = .empty(.empty)
-                    }
-                }
-                catch {
-                    debugPrint(error)
-                    state = .error
-                }
+                await updateState()
             }
         }
+        
+        Task {
+            _ = try? await notificationsManager.updatePermissionState(requestIfUndefined: true)
+        }
+    }
+    
+    func onAppear() {
+        trackersDeepLinksController.didAppear()
     }
     
     func onToday() {
@@ -147,6 +147,25 @@ private extension TrackersViewModel {
     }
     
     // MARK: - Async
+    
+    func updateState() async {
+        do {
+            let sections = try await fetchSections(isPaginating: false, params: updateParams)
+            
+            hapticManager.makeVibration(for: .success)
+            
+            if !sections.isEmpty {
+                state = .loaded(createModels(from: sections))
+            }
+            else {
+                state = .empty(.empty)
+            }
+        }
+        catch {
+            debugPrint(error)
+            state = .error
+        }
+    }
     
     func togglePin(for tracker: Tracker) async {
         do {
@@ -235,6 +254,13 @@ private extension TrackersViewModel {
     }
     
     // MARK: - Sync
+    
+    func handle(destination: TrackersDeepLinkDestination?) {
+        switch destination {
+        case .createTracker: route = .create(onCompletion: { [weak self] _ in self?.route = nil })
+        case .none: break
+        }
+    }
     
     func createModels(from sections: [TrackerSection]) -> [TrackersCollectionViewModel] {
         sections.map {

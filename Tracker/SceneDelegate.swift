@@ -14,6 +14,8 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     private let assembler = Assembler()
     private var resolver: Resolver { assembler.resolver }
     
+    private var notificationCenterDelegate: UNUserNotificationCenterDelegate?
+    
     var window: UIWindow?
     
     func scene(
@@ -37,6 +39,9 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         
         let window = UIWindow(windowScene: windowScene)
         self.window = window
+        
+        notificationCenterDelegate = resolver.resolve(UNUserNotificationCenterDelegate.self)!
+        UNUserNotificationCenter.current().delegate = notificationCenterDelegate
         
         let rootViewController = resolver.resolve(SplashViewAssembly.self)!.assemble(window)
         window.rootViewController = rootViewController

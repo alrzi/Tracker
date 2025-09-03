@@ -81,7 +81,7 @@ private extension NotificationsManager {
     
     func requestPermission() async throws(NotificationsError) -> Bool {
         do {
-            let isGranted = try await notificationCenter.requestAuthorization(options: [.alert, .sound, .badge, .provisional])
+            let isGranted = try await notificationCenter.requestAuthorization(options: [.alert, .sound, .badge])
             
             return isGranted
         }

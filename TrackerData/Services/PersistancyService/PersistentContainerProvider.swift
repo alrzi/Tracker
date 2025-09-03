@@ -29,14 +29,9 @@ final class PersistentContainerProvider: PersistentContainerProviding {
         }
         
         let container = NSPersistentContainer(name: modelName, managedObjectModel: model)
-        
-        let persistentStore = NSPersistentStoreDescription()
-        persistentStore.shouldMigrateStoreAutomatically = true
-        persistentStore.shouldInferMappingModelAutomatically = true
+        let coordinator = container.persistentStoreCoordinator
         
         do {
-            let coordinator = container.persistentStoreCoordinator
-            
             if let oldStore = coordinator.persistentStores.first {
                 try coordinator.remove(oldStore)
             }
@@ -45,17 +40,20 @@ final class PersistentContainerProvider: PersistentContainerProviding {
                 .url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: true)
                 .appendingPathComponent("\(modelName).sqlite")
             
-            _ = try coordinator.addPersistentStore(type: .sqlite, at: sqliteURL)
+            let options = [
+                NSMigratePersistentStoresAutomaticallyOption: true,
+                NSInferMappingModelAutomaticallyOption: true
+            ]
+            
+            _ = try coordinator.addPersistentStore(type: .sqlite, at: sqliteURL, options: options)
         }
         catch {
             fatalError("[Error]: \(error.localizedDescription)")
         }
         
-        container.persistentStoreDescriptions = [persistentStore]
-        
-        container.loadPersistentStores { _, error in
+        container.loadPersistentStores { description, error in
             if let error {
-                fatalError("[Error]: \(error.localizedDescription)")
+                fatalError("[Error]: \(error.localizedDescription) [Description]: \(description)")
             }
         }
         

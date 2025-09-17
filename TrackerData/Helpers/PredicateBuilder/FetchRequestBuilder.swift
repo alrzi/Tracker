@@ -15,25 +15,25 @@ struct FetchRequestBuilder<T: NSManagedObject & Entity> {
         self.fetchRequest = NSFetchRequest<T>(entityName: T.entityName)
     }
     
-    func setPredicates(_ predicates: [any PredicateProviding<T>]) -> FetchRequestBuilder {
+    func setPredicates(_ predicates: [any PredicateProviding<T>]) -> Self {
         let newBuilder = self
         newBuilder.fetchRequest.predicate = NSCompoundPredicate(type: .and, subpredicates: predicates.map({ $0.predicate }))
         return newBuilder
     }
     
-    func setSortDescriptors<V>(_ sortDescriptors: [SortDescriptor<V>]) -> FetchRequestBuilder {
+    func setSortDescriptors<V>(_ sortDescriptors: [SortDescriptor<V>]) -> Self {
         let newBuilder = self
         newBuilder.fetchRequest.sortDescriptors = sortDescriptors.map { .init(keyPath: $0.keyPath, ascending: $0.ascending) }
         return newBuilder
     }
     
-    func setFetchLimit(_ limit: Int) -> FetchRequestBuilder {
+    func setFetchLimit(_ limit: Int) -> Self {
         let newBuilder = self
         newBuilder.fetchRequest.fetchLimit = limit
         return newBuilder
     }
     
-    func setFetchOffset(_ offset: Int) -> FetchRequestBuilder {
+    func setFetchOffset(_ offset: Int) -> Self {
         let newBuilder = self
         newBuilder.fetchRequest.fetchOffset = offset
         return newBuilder

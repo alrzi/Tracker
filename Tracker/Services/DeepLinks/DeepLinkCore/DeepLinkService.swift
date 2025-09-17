@@ -32,8 +32,7 @@ final class DeepLinkService<RawValue>: DeepLinkServiceProtocol where RawValue: H
             case .notHandled(let error):
                 if
                     let handlerBoxError = error as? Errors,
-                    case .handlerDisposed = handlerBoxError
-                {
+                    case .handlerDisposed = handlerBoxError {
                     disposedHandlerIndices.append(index)
                 }
 

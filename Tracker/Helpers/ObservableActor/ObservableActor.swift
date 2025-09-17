@@ -8,7 +8,7 @@
 import Foundation
 
 /// Актор, предоставляющий историю своих изменений в виде асинхронной последовательности
-public actor ObservableActor<Value: Sendable>: Sendable {
+public actor ObservableActor<Value: Sendable> {
     public private(set) var value: Value {
         didSet { observations.notifyAll(value: value) }
     }

@@ -23,6 +23,5 @@ final class NotificationsCreationViewModel: NotificationsCreationViewModelProtoc
     init() { }
     
     func onNotificationCreated() {
-        
     }
 }

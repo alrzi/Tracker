@@ -34,8 +34,7 @@ final class NotificationCenterDelegate: NSObject, UNUserNotificationCenterDelega
         
         if
             let type = request.content.userInfo["type"] as? String,
-            let notificationType = NotificationType(rawValue: type)
-        {
+            let notificationType = NotificationType(rawValue: type) {
             notificationDeepLinkService.handle(context: NotificationDeepLinkContext(type: notificationType))
         }
     }

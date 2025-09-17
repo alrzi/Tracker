@@ -110,7 +110,6 @@ final class TrackersViewModel: TrackersViewModelProtocol {
     
     deinit {
         observationTask?.cancel()
-        observationTask = nil
     }
 }
 

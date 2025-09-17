@@ -35,7 +35,7 @@ final class NotificationsManager: NotificationsManaging, Sendable {
         if requestIfUndefined, case .unknown = status {
             let isGranted = try await requestPermission()
             
-            newStatus = isGranted ? .granted: .denied
+            newStatus = isGranted ? .granted : .denied
         }
         else {
             newStatus = status

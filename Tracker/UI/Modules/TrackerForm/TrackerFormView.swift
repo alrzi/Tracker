@@ -22,17 +22,9 @@ struct TrackerFormView<ViewModel: TrackerFormViewModelProtocol> {
 
 extension TrackerFormView: View {
     var body: some View {
-        // swiftlint: disable next closure_body_length
         NavigationStack {
             ScrollableLazyVStack(spacing: 24) {
-                TextField(R.string.localizable.createEnterName(), text: $viewModel.tackerTitle)
-                    .textContentType(.name)
-                    .keyboardType(.default)
-                    .foregroundStyle(.primary)
-                    .padding(.horizontal, 16)
-                    .padding(.vertical, 27)
-                    .background(.tertiary.opacity(0.3), in: .rect(cornerRadius: 16))
-                    .padding(.top, 24)
+                TextFieldView(text: $viewModel.tackerTitle)
                     .shake(if: viewModel.invalidComponent == .title)
                 
                 VStack(spacing: 0) {
@@ -43,8 +35,7 @@ extension TrackerFormView: View {
                     )
                     .shake(if: viewModel.invalidComponent == .section)
                     
-                    Divider()
-                        .padding(.horizontal, 16)
+                    Divider().padding(.horizontal, 16)
                     
                     ButtonView(
                         title: R.string.localizable.schedule(),
@@ -60,38 +51,20 @@ extension TrackerFormView: View {
                         viewModel: viewModel.emojiViewModel,
                         columns: 6,
                         spacing: 5,
-                        content: { item, isSelected in
-                            Text(item.value)
-                                .padding(16)
-                                .aspectRatio(1, contentMode: .fit)
-                                .background(isSelected ? .gray.opacity(0.3) : Color.clear, in: RoundedRectangle(cornerRadius: 16))
-                        }
+                        content: { item, isSelected in EmojiItemView(item: item.value, isSelected: isSelected) }
                     )
                     .shake(if: viewModel.invalidComponent == .color)
-                } header: {
-                    SectionHeaderView(text: R.string.localizable.createEmoji())
-                }
+                } header: { SectionHeaderView(text: R.string.localizable.createEmoji()) }
                 
                 Section {
                     GridView(
                         viewModel: viewModel.colorsViewModel,
                         columns: 6,
                         spacing: 5,
-                        content: { item, isSelected in
-                            Color(hexString: item.value)
-                                .aspectRatio(1, contentMode: .fit)
-                                .clipShape(RoundedRectangle(cornerRadius: 8))
-                                .padding(4)
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: 8)
-                                        .stroke(isSelected ? Color(hexString: item.value)?.opacity(0.4) ?? .blue : Color.clear, lineWidth: 4)
-                                )
-                        }
+                        content: { item, isSelected in ColorItemView(item: item.value, isSelected: isSelected) }
                     )
                     .shake(if: viewModel.invalidComponent == .emoji)
-                } header: {
-                    SectionHeaderView(text: R.string.localizable.createColor())
-                }
+                } header: { SectionHeaderView(text: R.string.localizable.createColor()) }
             }
             .safeAreaInset(edge: .bottom, spacing: 16) {
                 MainFooterView(
@@ -102,6 +75,34 @@ extension TrackerFormView: View {
             .ignoresSafeArea(.keyboard, edges: .bottom)
             .navigationTitle(viewModel.title)
         }
+    }
+}
+
+private struct EmojiItemView: View {
+    let item: String
+    let isSelected: Bool
+    
+    var body: some View {
+        Text(item)
+            .padding(16)
+            .aspectRatio(1, contentMode: .fit)
+            .background(isSelected ? .gray.opacity(0.3) : Color.clear, in: RoundedRectangle(cornerRadius: 16))
+    }
+}
+
+private struct ColorItemView: View {
+    let item: String
+    let isSelected: Bool
+    
+    var body: some View {
+        Color(hexString: item)
+            .aspectRatio(1, contentMode: .fit)
+            .clipShape(RoundedRectangle(cornerRadius: 8))
+            .padding(4)
+            .overlay(
+                RoundedRectangle(cornerRadius: 8)
+                    .stroke(isSelected ? Color(hexString: item)?.opacity(0.4) ?? .blue : Color.clear, lineWidth: 4)
+            )
     }
 }
 
@@ -137,6 +138,21 @@ private struct MainFooterView: View {
         }
         .padding(16)
         .background(Color(uiColor: .systemBackground))
+    }
+}
+
+private struct TextFieldView: View {
+    @Binding var text: String
+    
+    var body: some View {
+        TextField(R.string.localizable.createEnterName(), text: $text)
+            .textContentType(.name)
+            .keyboardType(.default)
+            .foregroundStyle(.primary)
+            .padding(.horizontal, 16)
+            .padding(.vertical, 27)
+            .background(.tertiary.opacity(0.3), in: .rect(cornerRadius: 16))
+            .padding(.top, 24)
     }
 }
 

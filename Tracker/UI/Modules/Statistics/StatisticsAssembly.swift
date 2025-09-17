@@ -30,7 +30,7 @@ final class StatisticsAssembly {
     func assembleView() -> some View {
         let viewModel = StatisticsViewModel(statisticsManager: statisticsManager)
         
-        let view = StatisticsView(viewModel: viewModel)        
+        let view = StatisticsView(viewModel: viewModel)
         
         return view
     }

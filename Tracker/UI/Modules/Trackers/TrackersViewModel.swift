@@ -12,12 +12,12 @@ import Combine
 @MainActor
 protocol TrackersViewModelProtocol: ObservableObject, TrackersNavigationState {
     associatedtype TrackersCollectionModel: TrackersCollectionViewModelProtocol
-    
+
+    var isToday: Bool { get }
     var state: TrackersState<TrackersCollectionModel> { get }
     var queryString: String { get set }
     var currentDate: Date { get set }
     var filter: TrackerFilter { get set }
-    var isToday: Bool { get }
     
     func onAppear()
     func onSectionAppear(at index: Int) async

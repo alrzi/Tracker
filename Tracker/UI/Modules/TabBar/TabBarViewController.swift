@@ -1,21 +1,19 @@
 import UIKit
+import Combine
 
-final class TabBarViewController: UITabBarController {
-    private let trackersAssembly: TrackersAssembly
-    private let statisticAssembly: StatisticsAssembly
-    
+final class TabBarController: UITabBarController {
     private let viewModel: TabBarViewModel
+        
+    private var indexCancelable: Cancellable?
     
     init(
-        trackersAssembly: TrackersAssembly,
-        statisticAssembly: StatisticsAssembly,
         viewModel: TabBarViewModel
     ) {
         self.viewModel = viewModel
-        self.trackersAssembly = trackersAssembly
-        self.statisticAssembly = statisticAssembly
         
         super.init(nibName: nil, bundle: nil)
+        
+        delegate = self
     }
     
     required init?(coder: NSCoder) {
@@ -25,28 +23,60 @@ final class TabBarViewController: UITabBarController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        viewControllers = [
-            trackersAssembly.assemble(),
-            statisticAssembly.assemble()
-        ]
+        updateTabBar()
         
-        TabItem.allCases.enumerated().forEach { index, item in
-            viewControllers?.elementOrNil(at: index)?.tabBarItem = .init(tabItem: item)
-        }
+        indexCancelable = viewModel.$tabIndex
+            .receive(on: DispatchQueue.main)
+            .filter { [weak self] in self?.selectedIndex != $0 }
+            .sink { [weak self] in self?.selectedIndex = $0 }
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
         
-        let standardAppearance = UITabBarAppearance()
+        viewModel.viewWillAppear()
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
         
-        UITabBar.appearance().standardAppearance = standardAppearance
-        UITabBar.appearance().scrollEdgeAppearance = standardAppearance
+        viewModel.viewDidAppear()
     }
 }
 
-private extension UITabBarItem {
-    convenience init(tabItem: TabItem) {
-        self.init(title: tabItem.title, image: tabItem.image, selectedImage: tabItem.selectedImage)
+private extension TabBarController {
+    func updateTabBar() {
+        let appearance = tabBar.standardAppearance
+        let layoutAppearance = appearance.stackedLayoutAppearance
         
-        tag = tabItem.rawValue
-        imageInsets = .zero
-        accessibilityIdentifier = "Tab_\(tabItem)"
+        layoutAppearance.normal.iconColor = .gray
+        layoutAppearance.normal.titleTextAttributes = [
+            .paragraphStyle: NSParagraphStyle.default,
+            .foregroundColor: UIColor.gray
+        ]
+        
+        layoutAppearance.selected.iconColor = UIColor(resource: .cBlue)
+        layoutAppearance.selected.titleTextAttributes = [
+            .paragraphStyle: NSParagraphStyle.default,
+            .foregroundColor: UIColor(resource: .cBlue)
+        ]
+        
+        appearance.stackedLayoutAppearance = layoutAppearance
+        appearance.stackedItemPositioning = .automatic
+        appearance.inlineLayoutAppearance = layoutAppearance
+        appearance.compactInlineLayoutAppearance = layoutAppearance
+        
+        tabBar.standardAppearance = appearance
+        tabBar.scrollEdgeAppearance = appearance
+        
+        view.tintColor = UIColor(resource: .cBlue)
+    }
+}
+
+// MARK: - Делегат
+
+extension TabBarController: UITabBarControllerDelegate {
+    func tabBarController(_ tabBarController: UITabBarController, didSelect viewController: UIViewController) {
+        viewModel.onTabIndexSelected(tabBarController.selectedIndex)
     }
 }

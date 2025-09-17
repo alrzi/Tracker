@@ -21,16 +21,29 @@ final class TabBarAssembly {
     
     @MainActor
     func assemble() -> UIViewController {
-        let router = TabBarViewRouter(trackersAssembly: trackersAssembly)
+        let tabBarPresentationContext = TabBarPresentationContext()
         
-        let viewModel = TabBarViewModel(router: router)
-        
-        let viewController = TabBarViewController(
+        let router = TabBarViewRouter(
             trackersAssembly: trackersAssembly,
             statisticAssembly: statisticAssembly,
-            viewModel: viewModel
+            tabBarPresentationContext: tabBarPresentationContext
         )
         
-        return viewController
+        let viewModel = TabBarViewModel(router: router)
+        let tabBarController = TabBarController(viewModel: viewModel)
+        
+        tabBarPresentationContext.tabBarController = tabBarController
+        
+        return tabBarController
+    }
+}
+
+final class TabBarPresentationContext {
+    weak var tabBarController: UITabBarController?
+    
+    var viewController: UIViewController? { tabBarController }
+    
+    init(tabBarController: UITabBarController? = nil) {
+        self.tabBarController = tabBarController
     }
 }

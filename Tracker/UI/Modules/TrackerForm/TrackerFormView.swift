@@ -130,7 +130,7 @@ private struct MainFooterView: View {
             Button(action: { Task { await onCompleteFrom() } }) {
                 Text(title)
                     .frame(maxWidth: .infinity)
-                    .foregroundStyle(R.color.cBlack.color)
+                    .foregroundStyle(Color(.cBlack))
                     .padding(16)
                     .background(.secondary, in: RoundedRectangle(cornerRadius: 12))
             }
@@ -181,7 +181,7 @@ private struct ButtonView: View {
             HStack {
                 VStack(alignment: .leading) {
                     Text(title)
-                        .foregroundStyle(R.color.cBlack.color)
+                        .foregroundStyle(Color(.cBlack))
                     
                     if let subtitle {
                         Text(subtitle)
@@ -194,7 +194,7 @@ private struct ButtonView: View {
                 Spacer()
                 
                 Image(systemName: "chevron.forward")
-                    .foregroundStyle(R.color.cGray.color)
+                    .foregroundStyle(Color(.cGray))
             }
             .padding(.horizontal, 16)
             .padding(.vertical, 24)

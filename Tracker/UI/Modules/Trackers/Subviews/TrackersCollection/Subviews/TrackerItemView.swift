@@ -17,7 +17,7 @@ struct TrackerItemView: View {
     let onDelete: () -> Void
     
     var pinLabel: String {
-        tracker.isPinned ? R.string.localizable.contextUnpin() : R.string.localizable.contextPin()
+        tracker.isPinned ? String(localized: .contextUnpin) : String(localized: .contextPin)
     }
     
     var pinImageName: String {
@@ -34,14 +34,14 @@ struct TrackerItemView: View {
                             Label(pinLabel, systemImage: pinImageName)
                         }
                         Button(action: onEdit) {
-                            Label(R.string.localizable.contextUpdate(), systemImage: "repeat.circle")
+                            Label(String(localized: .contextUpdate), systemImage: "repeat.circle")
                         }
                     }
                     
                     Divider()
                     
                     Button(role: .destructive, action: onDelete) {
-                        Label(R.string.localizable.contextDelete(), systemImage: "xmark.bin")
+                        Label(String(localized: .contextDelete), systemImage: "xmark.bin")
                     }
                 }
             
@@ -110,7 +110,7 @@ private struct RecordView: View {
     
     var body: some View {
         HStack {
-            Text(R.string.localizable.days(number: trackedDays))
+            Text(.days(Int32(trackedDays)))
                 .font(.system(size: 12))
                 .multilineTextAlignment(.leading)
                 .lineLimit(1)

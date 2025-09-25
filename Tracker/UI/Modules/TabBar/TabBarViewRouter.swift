@@ -52,8 +52,8 @@ private extension UITabBarItem {
 private extension TabBarSection {
     var title: String {
         switch self {
-        case .trackers: R.string.localizable.tabBarTrackers()
-        case .statistics: R.string.localizable.tabBarStatistics()
+        case .trackers: String(localized: .tabBarTrackers)
+        case .statistics: String(localized: .tabBarStatistics)
         }
     }
     

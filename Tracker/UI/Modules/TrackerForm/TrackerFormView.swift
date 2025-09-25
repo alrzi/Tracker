@@ -29,7 +29,7 @@ extension TrackerFormView: View {
                 
                 VStack(spacing: 0) {
                     ButtonView(
-                        title: R.string.localizable.categoryCategory(),
+                        title: String(localized: .categoryCategory),
                         subtitle: viewModel.sectionTitle,
                         onTap: viewModel.onSectionSelection
                     )
@@ -38,7 +38,7 @@ extension TrackerFormView: View {
                     Divider().padding(.horizontal, 16)
                     
                     ButtonView(
-                        title: R.string.localizable.schedule(),
+                        title: String(localized: .schedule),
                         subtitle: viewModel.weekDays.formatted(),
                         onTap: viewModel.onWeekSelection
                     )
@@ -54,7 +54,7 @@ extension TrackerFormView: View {
                         content: { item, isSelected in EmojiItemView(item: item.value, isSelected: isSelected) }
                     )
                     .shake(if: viewModel.invalidComponent == .color)
-                } header: { SectionHeaderView(text: R.string.localizable.createEmoji()) }
+                } header: { SectionHeaderView(text: String(localized: .createEmoji)) }
                 
                 Section {
                     GridView(
@@ -64,7 +64,7 @@ extension TrackerFormView: View {
                         content: { item, isSelected in ColorItemView(item: item.value, isSelected: isSelected) }
                     )
                     .shake(if: viewModel.invalidComponent == .emoji)
-                } header: { SectionHeaderView(text: R.string.localizable.createColor()) }
+                } header: { SectionHeaderView(text: String(localized: .createColor)) }
             }
             .safeAreaInset(edge: .bottom, spacing: 16) {
                 MainFooterView(
@@ -116,7 +116,7 @@ private struct MainFooterView: View {
     var body: some View {
         HStack {
             Button(action: { dismiss() }) {
-                Text(R.string.localizable.createCancel())
+                Text(String(localized: .createCancel))
                     .frame(maxWidth: .infinity)
                     .padding(16)
                     .foregroundStyle(.red)
@@ -145,7 +145,7 @@ private struct TextFieldView: View {
     @Binding var text: String
     
     var body: some View {
-        TextField(R.string.localizable.createEnterName(), text: $text)
+        TextField(String(localized: .createEnterName), text: $text)
             .textContentType(.name)
             .keyboardType(.default)
             .foregroundStyle(.primary)

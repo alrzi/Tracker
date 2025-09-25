@@ -47,14 +47,14 @@ extension SectionsListView: View {
                                     .contextMenu {
                                         Section("Modifications") {
                                             Button(action: { viewModel.onSectionUpdate(section) }) {
-                                                Label(R.string.localizable.contextUpdate(), systemImage: "repeat.circle")
+                                                Label(String(localized: .contextUpdate), systemImage: "repeat.circle")
                                             }
                                         }
                                         
                                         Divider()
                                         
                                         Button(role: .destructive, action: { viewModel.onSectionDelete(section) }) {
-                                            Label(R.string.localizable.contextDelete(), systemImage: "xmark.bin")
+                                            Label(String(localized: .contextDelete), systemImage: "xmark.bin")
                                         }
                                     }
                                     
@@ -70,12 +70,12 @@ extension SectionsListView: View {
                     }
                 }
                 .safeAreaInset(edge: .bottom, spacing: 16) {
-                    Button(R.string.localizable.categoryAddNew(), action: viewModel.onSectionCreation)
+                    Button(String(localized: .categoryAddNew), action: viewModel.onSectionCreation)
                         .buttonStyle(CommonButtonStyle(backgroundColor: .black))
                         .padding(.horizontal, 16)
                         .padding(.bottom, 16)
                 }
-                .navigationTitle(R.string.localizable.categoryCategory())
+                .navigationTitle(String(localized: .categoryCategory))
             }
             
         case .error:

@@ -209,14 +209,14 @@ private extension TrackerFormViewModel {
 private extension TrackerFormMode {
     var screenTitle: String {
         switch self {
-        case .createTracker: R.string.localizable.createNewHabit()
+        case .createTracker: String(localized: .createNewHabit)
         case .editTracker: "Редактировние"
         }
     }
     
     var completeFormButtonTitle: String {
         switch self {
-        case .createTracker: R.string.localizable.createCreateNew()
+        case .createTracker: String(localized: .createCreateNew)
         case .editTracker: "Обновить"
         }
     }

@@ -34,7 +34,7 @@ extension StatisticsView: View {
                     }
                 }
             }
-            .navigationTitle(R.string.localizable.statisticTitle())
+            .navigationTitle(String(localized: .statisticTitle))
         }
         .onAppear(perform: viewModel.onAppear)
     }

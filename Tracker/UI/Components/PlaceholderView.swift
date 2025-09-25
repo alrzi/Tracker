@@ -35,22 +35,22 @@ struct Placeholder {
 extension Placeholder {
     static let empty: Placeholder = .init(
         imageResource: ._05PlaceholderTracker,
-        info: R.string.localizable.placeholderQuestion()
+        info: String(localized: .placeholderQuestion)
     )
     
     static let emptySearch: Placeholder = .init(
         imageResource: ._13PlaceholderNoResult,
-        info: R.string.localizable.placeholderNoResults()
+        info: String(localized: .placeholderNoResults)
     )
     
     static let emptySections: Placeholder = .init(
         imageResource: ._05PlaceholderTracker,
-        info: R.string.localizable.placeholderRecomendation()
+        info: String(localized: .placeholderRecomendation)
     )
     
     static let emptyStatistic: Placeholder = .init(
         imageResource: ._12PlaceholderNoStatistic,
-        info: R.string.localizable.placeholderNoStatistic()
+        info: String(localized: .placeholderNoStatistic)
     )
 }
 

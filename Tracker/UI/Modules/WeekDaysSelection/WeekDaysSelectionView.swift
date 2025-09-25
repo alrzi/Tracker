@@ -57,12 +57,12 @@ extension WeekDaysSelectionView: View {
                 .padding(.top, 24)
             }
             .safeAreaInset(edge: .bottom, spacing: 16) {
-                Button(R.string.localizable.scheduleReady(), action: { onNext(selectedTags) })
+                Button(String(localized: .scheduleReady), action: { onNext(selectedTags) })
                     .buttonStyle(CommonButtonStyle(backgroundColor: .black))
                     .padding(.horizontal, 16)
                     .padding(.bottom, 16)
             }
-            .navigationTitle(R.string.localizable.schedule())
+            .navigationTitle(String(localized: .schedule))
         }
     }
 }

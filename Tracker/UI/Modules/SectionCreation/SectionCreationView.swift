@@ -23,7 +23,7 @@ extension SectionCreationView: View {
     var body: some View {
         NavigationStack {
             ScrollableLazyVStack {
-                TextField(R.string.localizable.createEnterName(), text: $viewModel.sectionTitle)
+                TextField(String(localized: .createEnterName), text: $viewModel.sectionTitle)
                     .textContentType(.name)
                     .keyboardType(.default)
                     .foregroundStyle(.primary)
@@ -32,10 +32,10 @@ extension SectionCreationView: View {
                     .background(.tertiary.opacity(0.3), in: .rect(cornerRadius: 16))
                     .padding(.top, 24)
                     .shake(if: viewModel.invalidComponent == .title)
-                    .navigationTitle(R.string.localizable.categoryAddNew())
+                    .navigationTitle(String(localized: .categoryAddNew))
             }
             .safeAreaInset(edge: .bottom) {
-                Button(R.string.localizable.scheduleReady(), action: viewModel.onPrimary)
+                Button(String(localized: .scheduleReady), action: viewModel.onPrimary)
                     .buttonStyle(CommonButtonStyle(backgroundColor: .black))
                     .padding(.horizontal, 16)
                     .padding(.bottom, 16)

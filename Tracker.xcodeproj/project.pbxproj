@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		F956F0852D8F299B00175338 /* RswiftLibrary in Frameworks */ = {isa = PBXBuildFile; productRef = F956F0842D8F299B00175338 /* RswiftLibrary */; };
 		F96D33262D7F6D82009208B9 /* TrackerDomain.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F96D331E2D7F6D82009208B9 /* TrackerDomain.framework */; };
 		F96D33592D7F6F56009208B9 /* TrackerData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F96D33512D7F6F55009208B9 /* TrackerData.framework */; };
 		F97A0F8F2D80D2FD00AC67A4 /* DataStorage in Frameworks */ = {isa = PBXBuildFile; productRef = F97A0F8E2D80D2FD00AC67A4 /* DataStorage */; };
@@ -129,7 +128,6 @@
 			files = (
 				F98857922DB1127E0054DE44 /* TrackerData.framework in Frameworks */,
 				F988578F2DB112770054DE44 /* TrackerDomain.framework in Frameworks */,
-				F956F0852D8F299B00175338 /* RswiftLibrary in Frameworks */,
 				F9C4AD082E5F730900AA6BD8 /* Swinject in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -237,7 +235,6 @@
 			buildRules = (
 			);
 			dependencies = (
-				F923F3092D9EDCAA008FCDA8 /* PBXTargetDependency */,
 				F96D33302D7F6D82009208B9 /* PBXTargetDependency */,
 				F96D33632D7F6F56009208B9 /* PBXTargetDependency */,
 			);
@@ -247,7 +244,6 @@
 			);
 			name = Tracker;
 			packageProductDependencies = (
-				F956F0842D8F299B00175338 /* RswiftLibrary */,
 				F9C4AD072E5F730900AA6BD8 /* Swinject */,
 			);
 			productName = Tracker;
@@ -391,13 +387,11 @@
 				en,
 				Base,
 				ru,
-				ar,
 			);
 			mainGroup = F918017929CEECCB00767F16;
 			packageReferences = (
 				F93160B12A2F3A8B003A96EC /* XCRemoteSwiftPackageReference "swift-snapshot-testing" */,
 				F9C512182D7CB3C80093D201 /* XCLocalSwiftPackageReference "../../../../../../Volumes/KINGSTON/MyPackages/DataStorage" */,
-				F956F0832D8F299B00175338 /* XCRemoteSwiftPackageReference "R" */,
 				F98862FE2DB119A50054DE44 /* XCRemoteSwiftPackageReference "appmetrica-sdk-ios" */,
 				F9C4AD062E5F730900AA6BD8 /* XCRemoteSwiftPackageReference "Swinject" */,
 			);
@@ -513,10 +507,6 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		F923F3092D9EDCAA008FCDA8 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			productRef = F923F3082D9EDCAA008FCDA8 /* RswiftGeneratePublicResources */;
-		};
 		F96D33282D7F6D82009208B9 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = F96D331D2D7F6D82009208B9 /* TrackerDomain */;
@@ -602,11 +592,14 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
 			name = Debug;
@@ -657,10 +650,13 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				VALIDATE_PRODUCT = YES;
 			};
@@ -1085,14 +1081,6 @@
 				minimumVersion = 1.0.0;
 			};
 		};
-		F956F0832D8F299B00175338 /* XCRemoteSwiftPackageReference "R" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/mac-cain13/R.swift";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 7.8.0;
-			};
-		};
 		F98862FE2DB119A50054DE44 /* XCRemoteSwiftPackageReference "appmetrica-sdk-ios" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/appmetrica/appmetrica-sdk-ios.git";
@@ -1112,16 +1100,6 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		F923F3082D9EDCAA008FCDA8 /* RswiftGeneratePublicResources */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = F956F0832D8F299B00175338 /* XCRemoteSwiftPackageReference "R" */;
-			productName = "plugin:RswiftGeneratePublicResources";
-		};
-		F956F0842D8F299B00175338 /* RswiftLibrary */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = F956F0832D8F299B00175338 /* XCRemoteSwiftPackageReference "R" */;
-			productName = RswiftLibrary;
-		};
 		F97A0F8E2D80D2FD00AC67A4 /* DataStorage */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = F9C512182D7CB3C80093D201 /* XCLocalSwiftPackageReference "../../../../../../Volumes/KINGSTON/MyPackages/DataStorage" */;

@@ -47,29 +47,29 @@ private extension StatisticsViewModel {
                 .bestPeriod(
                     .init(
                         count: (try? await bestPeriod) ?? .zero,
-                        title: R.string.localizable.statisticBestPeriod(),
-                        subtitle: R.string.localizable.statisticBestPeriodExplanation()
+                        title: String(localized: .statisticBestPeriod),
+                        subtitle: String(localized: .statisticBestPeriodExplanation)
                     )
                 ),
                 .idealDays(
                     .init(
                         count: (try? await idealDays) ?? .zero,
-                        title: R.string.localizable.statisticIdealDays(),
-                        subtitle: R.string.localizable.statisticIdealDaysExplanation()
+                        title: String(localized: .statisticIdealDays),
+                        subtitle: String(localized: .statisticIdealDaysExplanation)
                     )
                 ),
                 .completedTrackers(
                     .init(
                         count: (try? await completedTrackers) ?? .zero,
-                        title: R.string.localizable.statisticCompleted(),
-                        subtitle: R.string.localizable.statisticCompletedExplanation()
+                        title: String(localized: .statisticCompleted),
+                        subtitle: String(localized: .statisticCompletedExplanation)
                     )
                 ),
                 .averageValue(
                     .init(
                         count: (try? await averageDays) ?? .zero,
-                        title: R.string.localizable.statisticAverageValue(),
-                        subtitle: R.string.localizable.statisticAverageValueExplanation()
+                        title: String(localized: .statisticAverageValue),
+                        subtitle: String(localized: .statisticAverageValueExplanation)
                     )
                 )
             ]

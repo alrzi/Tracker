@@ -7,9 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		29395D132EA3DE4E00469352 /* DataStorage in Frameworks */ = {isa = PBXBuildFile; productRef = 29395D122EA3DE4E00469352 /* DataStorage */; };
+		29395D152EA3DE7700469352 /* DataStorage in Frameworks */ = {isa = PBXBuildFile; productRef = 29395D142EA3DE7700469352 /* DataStorage */; };
 		F96D33262D7F6D82009208B9 /* TrackerDomain.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F96D331E2D7F6D82009208B9 /* TrackerDomain.framework */; };
 		F96D33592D7F6F56009208B9 /* TrackerData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F96D33512D7F6F55009208B9 /* TrackerData.framework */; };
-		F97A0F8F2D80D2FD00AC67A4 /* DataStorage in Frameworks */ = {isa = PBXBuildFile; productRef = F97A0F8E2D80D2FD00AC67A4 /* DataStorage */; };
 		F988578F2DB112770054DE44 /* TrackerDomain.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F96D331E2D7F6D82009208B9 /* TrackerDomain.framework */; };
 		F98857902DB112770054DE44 /* TrackerDomain.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = F96D331E2D7F6D82009208B9 /* TrackerDomain.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		F98857922DB1127E0054DE44 /* TrackerData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F96D33512D7F6F55009208B9 /* TrackerData.framework */; };
@@ -128,6 +129,7 @@
 			files = (
 				F98857922DB1127E0054DE44 /* TrackerData.framework in Frameworks */,
 				F988578F2DB112770054DE44 /* TrackerDomain.framework in Frameworks */,
+				29395D132EA3DE4E00469352 /* DataStorage in Frameworks */,
 				F9C4AD082E5F730900AA6BD8 /* Swinject in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -152,9 +154,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				F97A0F8F2D80D2FD00AC67A4 /* DataStorage in Frameworks */,
 				F98863002DB119A50054DE44 /* AppMetricaCore in Frameworks */,
 				F9C4B73F2E5F76E400AA6BD8 /* Swinject in Frameworks */,
+				29395D152EA3DE7700469352 /* DataStorage in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -245,6 +247,7 @@
 			name = Tracker;
 			packageProductDependencies = (
 				F9C4AD072E5F730900AA6BD8 /* Swinject */,
+				29395D122EA3DE4E00469352 /* DataStorage */,
 			);
 			productName = Tracker;
 			productReference = F918018229CEECCB00767F16 /* Tracker.app */;
@@ -316,9 +319,9 @@
 			);
 			name = TrackerData;
 			packageProductDependencies = (
-				F97A0F8E2D80D2FD00AC67A4 /* DataStorage */,
 				F98862FF2DB119A50054DE44 /* AppMetricaCore */,
 				F9C4B73E2E5F76E400AA6BD8 /* Swinject */,
+				29395D142EA3DE7700469352 /* DataStorage */,
 			);
 			productName = TrackerData;
 			productReference = F96D33512D7F6F55009208B9 /* TrackerData.framework */;
@@ -391,9 +394,9 @@
 			mainGroup = F918017929CEECCB00767F16;
 			packageReferences = (
 				F93160B12A2F3A8B003A96EC /* XCRemoteSwiftPackageReference "swift-snapshot-testing" */,
-				F9C512182D7CB3C80093D201 /* XCLocalSwiftPackageReference "../../../../../../Volumes/KINGSTON/MyPackages/DataStorage" */,
 				F98862FE2DB119A50054DE44 /* XCRemoteSwiftPackageReference "appmetrica-sdk-ios" */,
 				F9C4AD062E5F730900AA6BD8 /* XCRemoteSwiftPackageReference "Swinject" */,
+				29395D112EA3DE4E00469352 /* XCLocalSwiftPackageReference "../../../MyPackages/DataStorage" */,
 			);
 			productRefGroup = F918018329CEECCB00767F16 /* Products */;
 			projectDirPath = "";
@@ -683,7 +686,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = qwe.Tracker;
+				PRODUCT_BUNDLE_IDENTIFIER = alrzi.Tracker;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
@@ -716,7 +719,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = qwe.Tracker;
+				PRODUCT_BUNDLE_IDENTIFIER = alrzi.Tracker;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
@@ -1066,9 +1069,9 @@
 /* End XCConfigurationList section */
 
 /* Begin XCLocalSwiftPackageReference section */
-		F9C512182D7CB3C80093D201 /* XCLocalSwiftPackageReference "../../../../../../Volumes/KINGSTON/MyPackages/DataStorage" */ = {
+		29395D112EA3DE4E00469352 /* XCLocalSwiftPackageReference "../../../MyPackages/DataStorage" */ = {
 			isa = XCLocalSwiftPackageReference;
-			relativePath = ../../../../../../Volumes/KINGSTON/MyPackages/DataStorage;
+			relativePath = ../../../MyPackages/DataStorage;
 		};
 /* End XCLocalSwiftPackageReference section */
 
@@ -1100,9 +1103,13 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		F97A0F8E2D80D2FD00AC67A4 /* DataStorage */ = {
+		29395D122EA3DE4E00469352 /* DataStorage */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = F9C512182D7CB3C80093D201 /* XCLocalSwiftPackageReference "../../../../../../Volumes/KINGSTON/MyPackages/DataStorage" */;
+			productName = DataStorage;
+		};
+		29395D142EA3DE7700469352 /* DataStorage */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 29395D112EA3DE4E00469352 /* XCLocalSwiftPackageReference "../../../MyPackages/DataStorage" */;
 			productName = DataStorage;
 		};
 		F98862FF2DB119A50054DE44 /* AppMetricaCore */ = {

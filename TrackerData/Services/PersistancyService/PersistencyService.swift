@@ -4,7 +4,7 @@ import TrackerDomain
 
 struct PersistencyService: Sendable {
     private let persistentContainer: NSPersistentContainer
-    nonisolated(unsafe) private let managedObjectContext: NSManagedObjectContext
+    private let managedObjectContext: NSManagedObjectContext
     
     init(provider: PersistentContainerProviding) {
         self.persistentContainer = provider.persistentContainer

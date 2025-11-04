@@ -25,12 +25,15 @@ public final class TrackerDataAssembly: Assembly {
             )
         }
         
-        container.register(DataStorage.self) { _ in
+        container.register(DataStorage<DataStorageType>.self) { _ in
             DataStorage(
                 jsonDecoder: JSONDecoder(),
                 jsonEncoder: JSONEncoder(),
-                userDefaults: .standard,
-                sharedUserDefaults: UserDefaults(suiteName: "shared") ?? .standard
+                userDefaultsProvider: {
+                    switch $0 {
+                    case .base: .standard
+                    }
+                }
             )
         }
         .inObjectScope(.container)

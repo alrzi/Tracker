@@ -39,10 +39,10 @@ final class TabBarAssembly {
 }
 
 final class TabBarPresentationContext {
-    weak var tabBarController: UITabBarController?
-    
-    var viewController: UIViewController? { tabBarController }
-    
+    @MainActor weak var tabBarController: UITabBarController?
+
+    @MainActor var viewController: UIViewController? { tabBarController }
+
     init(tabBarController: UITabBarController? = nil) {
         self.tabBarController = tabBarController
     }

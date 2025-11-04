@@ -12,16 +12,16 @@ internal import DataStorage
 extension AuthDataStorage where Self: DataStorageProtocol {
     var isUserLoggedIn: Bool {
         get {
-            getValue(key: AuthDataStorageKey.isUserLoggedIn, storage: .standard) ?? false
+            getValue(key: Key.isUserLoggedIn, storage: .default) ?? false
         }
         set {
-            setValue(key: AuthDataStorageKey.isUserLoggedIn, value: newValue, storage: .standard)
+            setValue(key: Key.isUserLoggedIn, value: newValue, storage: .default)
         }
     }
 }
 
 extension DataStorage: @retroactive AuthDataStorage { }
 
-private enum AuthDataStorageKey: String, DataStorageKey {
+private enum Key: String, DataStorageKey {
     case isUserLoggedIn
 }

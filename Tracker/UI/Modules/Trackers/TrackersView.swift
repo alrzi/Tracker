@@ -48,6 +48,10 @@ extension TrackersView: View {
                         ErrorView(onRetry: { })
                     }
                 }
+                .toolbar {
+                    ToolbarItem(placement: .topBarLeading) { FilterMenuView(filter: $viewModel.filter) }
+                    ToolbarItem(placement: .topBarTrailing) { DatePickerMenuView(date: $viewModel.currentDate) }
+                }
                 .safeAreaInset(edge: .bottom, alignment: .trailing) {
                     SafeAreaBottomView(
                         isToday: viewModel.isToday,
@@ -58,16 +62,26 @@ extension TrackersView: View {
                         }
                     )
                 }
-                .toolbar {
-                    ToolbarItemGroup(placement: .topBarTrailing) {
-                        DatePicker("", selection: $viewModel.currentDate, displayedComponents: .date)
-                        FilterMenuView(filter: $viewModel.filter)
-                    }
-                }
             }
         }
         .searchable(text: $viewModel.queryString) { }
         .onAppear(perform: viewModel.onAppear)
+    }
+}
+
+private struct DatePickerMenuView: View {
+    @Binding var date: Date
+
+    var body: some View {
+        VStack {
+            Text(date.formatted(.dateTime.day().month().year()))
+                .padding()
+        }
+        .overlay {
+            DatePicker("", selection: $date, displayedComponents: .date)
+                .labelsHidden()
+                .colorMultiply(.clear)
+        }
     }
 }
 
@@ -88,17 +102,6 @@ private struct FilterMenuView: View {
                 .resizable()
                 .scaledToFit()
                 .frame(width: 24, height: 24)
-                .overlay(alignment: .topTrailing) {
-                    if filter != .forCurrentWeekDay {
-                        Circle()
-                            .frame(width: 8)
-                            .tint(.red)
-                            .offset(x: 6, y: -6)
-                    }
-                }
-                .padding(16)
-                .background(Color.clear)
-                .contentShape(Rectangle())
         }
     }
 }

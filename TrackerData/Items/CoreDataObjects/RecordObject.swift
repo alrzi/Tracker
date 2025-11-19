@@ -19,12 +19,6 @@ extension RecordObject: Entity {
     public static let entityName = String(describing: RecordObject.self)
 }
 
-extension RecordObject: ValueAddable {
-    func addValue(_ value: TrackerObject) {
-        tracker = value
-    }
-}
-
 extension RecordObject: CopyableEntity {
     func copy(from record: TrackerRecord) {
         self.id = record.id

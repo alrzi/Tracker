@@ -12,7 +12,9 @@ struct PersistencyService: Sendable {
         managedObjectContext.mergePolicy = NSMergePolicy(merge: .mergeByPropertyStoreTrumpMergePolicyType)
         managedObjectContext.automaticallyMergesChangesFromParent = true
     }
-    
+
+    // MARK: - Observe
+
     func observe(_ changeTypes: Set<ChangeType>) -> AsyncPublisher<Publishers.CompactMap<NotificationCenter.Publisher, Set<ChangeType>>> {
         NotificationCenter.default.publisher(
             for: NSManagedObjectContext.didSaveObjectIDsNotification,
@@ -34,164 +36,52 @@ struct PersistencyService: Sendable {
     }
     
     // MARK: - Create
-    
-    func createObject<T, C>(_ type: T.Type, from domain: C) async throws
-    where T: NSManagedObject & CopyableEntity<C> {
+
+    func performCreate(_ block: @Sendable @escaping (ContextInitializable) throws -> Void) async throws {
         try await managedObjectContext.perform {
-            let newObject = T(context: self.managedObjectContext)
-            newObject.copy(from: domain)
-            
+            try block(managedObjectContext)
             try self.saveContext()
         }
     }
-    
-    func createObjectAddObjectToIt<T, C, E, R>(_ type: T.Type, from domain: C, _ subType: E.Type, entityToAddTo: R) async throws
-    where
-    T: NSManagedObject & CopyableEntity<C> & ValueAddable<E>,
-    E: NSManagedObject & CopyableEntity<R> {
-        try await managedObjectContext.perform {
-            let newObject = T(context: self.managedObjectContext)
-            newObject.copy(from: domain)
-            
-            let parentObject = E(context: self.managedObjectContext)
-            parentObject.copy(from: entityToAddTo)
-            
-            newObject.addValue(parentObject)
-            
-            try self.saveContext()
-        }
-    }
-    
-    func createObjectAndAddToEntity<T, C, E, R>(_ type: T.Type, from domain: [C], _ subType: E.Type, entityToAddTo: R) async throws
-    where
-    T: NSManagedObject & CopyableEntity<C>,
-    E: NSManagedObject & CopyableEntity<R> & SetAddable<T> {
-        try await managedObjectContext.perform {
-            var objects: Set<T> = []
-            for i in domain {
-                let newObject = T(context: self.managedObjectContext)
-                newObject.copy(from: i)
-                objects.insert(newObject)
-            }
-            
-            let parentObject = E(context: self.managedObjectContext)
-            parentObject.copy(from: entityToAddTo)
-            parentObject.addElement(objects)
-            
-            try self.saveContext()
-        }
-    }
-    
-    func createObject<T, C, D>(_ type: T.Type, from domain: C, andAddObjectFor request: NSFetchRequest<D>) async throws
-    where
-    T: NSManagedObject & ValueAddable<D> & CopyableEntity<C> {
-        try await managedObjectContext.perform {
-            guard let objectToAdd = try self.managedObjectContext.fetch(request).first else {
-                throw PersistencyError.noObjectFound
-            }
-            
-            let object = T(context: self.managedObjectContext)
-            object.copy(from: domain)
-            object.addValue(objectToAdd)
-            
-            try self.saveContext()
-        }
-    }
-    
+
     // MARK: - Read
-    
-    func fetchObjects<T, R>(with fetchRequest: NSFetchRequest<T>) async throws -> [R]
-    where R: Initable<T> {
+
+    func perform<T>(_ block: @Sendable @escaping (Fetchable) throws -> [T]) async throws -> [T] {
         try await managedObjectContext.perform {
-            try self.managedObjectContext.fetch(fetchRequest).map { .init(object: $0) }
+            try block(managedObjectContext)
         }
     }
-    
-    func fetchObject<T, R>(with fetchRequest: NSFetchRequest<T>) async throws -> R?
-    where R: Initable<T> {
+
+    func perform<T>(_ block: @Sendable @escaping (Fetchable) throws -> T) async throws -> T {
         try await managedObjectContext.perform {
-            try self.managedObjectContext.fetch(fetchRequest).first.map { .init(object: $0) }
+            try block(managedObjectContext)
         }
     }
-    
-    func fetchObjects<T: NSManagedObject, R>(_ type: T.Type) async throws -> [R]
-    where
-    T: Entity,
-    R: Initable<T> {
+
+    func performCount(_ block: @Sendable @escaping (Countable) throws -> Int) async throws -> Int {
         try await managedObjectContext.perform {
-            try self.managedObjectContext.fetch(NSFetchRequest<T>(entityName: type.entityName)).map { .init(object: $0) }
+            try block(managedObjectContext)
         }
     }
-    
-    func fetchCount<T: NSManagedObject>(with fetchRequest: NSFetchRequest<T>) async throws -> Int {
-        try await managedObjectContext.perform {
-            try self.managedObjectContext.count(for: fetchRequest)
-        }
-    }
-    
+
     // MARK: - Update
-    
-    func updateObject<T, C>(for request: NSFetchRequest<T>, with info: C) async throws
-    where T: CopyableEntity<C> {
+
+    func performUpdateOrCreate(_ block: @Sendable @escaping (ContextInitializable & Fetchable) throws -> Void) async throws {
         try await managedObjectContext.perform {
-            guard let object = try self.managedObjectContext.fetch(request).first else {
-                throw PersistencyError.noObjectFound
-            }
-            
-            object.copy(from: info)
-            
+            try block(managedObjectContext)
             try self.saveContext()
         }
     }
-    
-    func updateObject<T, A, C>(for request: NSFetchRequest<T>, with info: C, addEntityForRequest anotherRequest: NSFetchRequest<A>) async throws
-    where T: ValueAddable<A>, T: CopyableEntity<C> {
-        try await managedObjectContext.perform {
-            guard let object = try self.managedObjectContext.fetch(request).first else {
-                throw PersistencyError.noObjectFound
-            }
-            
-            guard let anotherObject = try self.managedObjectContext.fetch(anotherRequest).first else {
-                throw PersistencyError.noObjectFound
-            }
-            
-            object.copy(from: info)
-            object.addValue(anotherObject)
-            
-            try self.saveContext()
-        }
-    }
-    
-    func updateObject<T, A>(for request: NSFetchRequest<T>, withObjectForRequest anotherRequest: NSFetchRequest<A>) async throws
-    where T: ValueAddable<A> {
-        try await managedObjectContext.perform {
-            guard let object = try self.managedObjectContext.fetch(request).first else {
-                throw PersistencyError.noObjectFound
-            }
-            
-            guard let anotherObject = try self.managedObjectContext.fetch(anotherRequest).first else {
-                throw PersistencyError.noObjectFound
-            }
-            
-            object.addValue(anotherObject)
-            
-            try self.saveContext()
-        }
-    }
-    
+
     // MARK: - Delete
-    
-    func removeObject<T: NSManagedObject>(for request: NSFetchRequest<T>) async throws {
+
+    func performRemove(_ block: @Sendable @escaping (Removable & Fetchable) throws -> Void) async throws {
         try await managedObjectContext.perform {
-            guard let object = try self.managedObjectContext.fetch(request).first else {
-                throw PersistencyError.noObjectFound
-            }
-            
-            self.managedObjectContext.delete(object)
+            try block(managedObjectContext)
             try self.saveContext()
         }
     }
-    
+
     func deleteAllObjects<T: NSManagedObject>(_ type: T.Type) async throws where T: Entity {
         try await managedObjectContext.perform {
             let fetchRequest = NSFetchRequest<T>(entityName: type.entityName) as? NSFetchRequest<NSFetchRequestResult>
@@ -215,14 +105,18 @@ private extension PersistencyService {
         catch {
             self.managedObjectContext.rollback()
             debugPrint(error)
-            throw PersistencyError.failedToSave
+            throw NSError(
+                domain: "PersistencyServiceError",
+                code: 1,
+                userInfo: [
+                    NSLocalizedDescriptionKey:
+                        "Failed to persist changes to the Core Data store.",
+                    "ContextName": managedObjectContext.name ?? "UnnamedContext",
+                    "HasChanges": managedObjectContext.hasChanges
+                ]
+            )
         }
     }
-}
-
-private enum PersistencyError: Error {
-    case noObjectFound
-    case failedToSave
 }
 
 private extension ChangeType {

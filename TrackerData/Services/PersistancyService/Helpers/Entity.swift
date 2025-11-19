@@ -15,15 +15,3 @@ protocol Initable<Object> {
     
     init(object: Object)
 }
-
-protocol SetAddable<ElementType> {
-    associatedtype ElementType: NSManagedObject
-    
-    func addElement(_ elements: Set<ElementType>)
-}
-
-protocol ValueAddable<AddableValue> {
-    associatedtype AddableValue: NSManagedObject
-    
-    func addValue(_ value: AddableValue)
-}

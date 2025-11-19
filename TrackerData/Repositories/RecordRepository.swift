@@ -26,98 +26,120 @@ final class RecordRepository: RecordRepositoryProtocol {
         let interval = record.date.fullDayInterval()
         
         if try await isCompletedFor(selectedDay: record.date, trackerWithId: record.id) {
-            let request = FetchRequestBuilder<RecordObject>()
-                .setPredicates(
-                    [
-                        Query(key: \.date, that: .between(interval.start, interval.end)),
-                        Query(key: \.id, that: .equal(to: record.id))
-                    ]
+            try await persistencyService.performRemove {
+                $0.delete(
+                    try $0.fetchOneRaw(
+                        FetchRequestBuilder<RecordObject>()
+                            .setPredicates(
+                                [
+                                    Query(key: \.date, that: .between(interval.start, interval.end)),
+                                    Query(key: \.id, that: .equal(to: record.id))
+                                ]
+                            )
+                            .build()
+                    )
                 )
-                .build()
-            
-            try await persistencyService.removeObject(for: request)
+            }
         }
         else {
-            let request = FetchRequestBuilder<TrackerObject>()
-                .setPredicates([Query(key: \.id, that: .equal(to: record.id))])
-                .build()
-            
-            try await persistencyService.createObject(RecordObject.self, from: record, andAddObjectFor: request)
+            try await persistencyService.performUpdateOrCreate { context in
+                let trackerObject: TrackerObject = try context.fetchOneRaw(
+                    FetchRequestBuilder<TrackerObject>()
+                        .setPredicates([Query(key: \.id, that: .equal(to: record.id))])
+                        .build()
+                )
+
+                let recordObject: RecordObject = context.make(RecordObject.self)
+                recordObject.copy(from: record)
+                recordObject.tracker = trackerObject
+            }
         }
     }
     
     // Read
     
     func fetchRecords() async throws -> [TrackerRecord] {
-        let request = FetchRequestBuilder<RecordObject>()
-            .setSortDescriptors([.init(keyPath: \.date)])
-            .build()
-        
-        return try await persistencyService.fetchObjects(with: request)
+        try await persistencyService.perform { context in
+            try context.fetchAll(
+                FetchRequestBuilder<RecordObject>()
+                    .setSortDescriptors([.init(keyPath: \.date)])
+                    .build()
+            )
+        }
     }
     
     func fetchRecords(for sectionId: UUID, for date: Date, weekDay: WeekDay, query: String, isPinned: Bool) async throws -> [TrackerRecord] {
-        let interval = date.fullDayInterval()
-        
-        let request = FetchRequestBuilder<RecordObject>()
-            .setPredicates(
-                [
-                    Query(key: \.date, that: .between(interval.start, interval.end)),
-                    Query(key: \.tracker.isPinned, that: .equal(to: isPinned)),
-                    Query(key: \.tracker.weekDays, that: .contains(weekDay.toNumberString())),
-                    Query(key: \.tracker.category.id, that: .equal(to: sectionId)),
-                ]
-                + (!query.isEmpty ? [Query(key: \.tracker.name, that: .contains(query))] : [])
+        try await persistencyService.perform { context in
+            let interval = date.fullDayInterval()
+
+            return try context.fetchAll(
+                FetchRequestBuilder<RecordObject>()
+                    .setPredicates(
+                        [
+                            Query(key: \.date, that: .between(interval.start, interval.end)),
+                            Query(key: \.tracker.isPinned, that: .equal(to: isPinned)),
+                            Query(key: \.tracker.weekDays, that: .contains(weekDay.toNumberString())),
+                            Query(key: \.tracker.category.id, that: .equal(to: sectionId)),
+                        ]
+                        + (!query.isEmpty ? [Query(key: \.tracker.name, that: .contains(query))] : [])
+                    )
+                    .build()
             )
-            .build()
-        
-        return try await persistencyService.fetchObjects(with: request)
+        }
     }
     
     func fetchRecords(for date: Date, weekDay: WeekDay, query: String, isPinned: Bool) async throws -> [TrackerRecord] {
-        let interval = date.fullDayInterval()
-        
-        let request = FetchRequestBuilder<RecordObject>()
-            .setPredicates(
-                [
-                    Query(key: \.date, that: .between(interval.start, interval.end)),
-                    Query(key: \.tracker.isPinned, that: .equal(to: isPinned)),
-                    Query(key: \.tracker.weekDays, that: .contains(weekDay.toNumberString())),
-                ]
-                + (!query.isEmpty ? [Query(key: \.tracker.name, that: .contains(query))] : [])
+        try await persistencyService.perform { context in
+            let interval = date.fullDayInterval()
+
+            return try context.fetchAll(
+                FetchRequestBuilder<RecordObject>()
+                    .setPredicates(
+                        [
+                            Query(key: \.date, that: .between(interval.start, interval.end)),
+                            Query(key: \.tracker.isPinned, that: .equal(to: isPinned)),
+                            Query(key: \.tracker.weekDays, that: .contains(weekDay.toNumberString())),
+                        ]
+                        + (!query.isEmpty ? [Query(key: \.tracker.name, that: .contains(query))] : [])
+                    )
+                    .build()
             )
-            .build()
-        
-        return try await persistencyService.fetchObjects(with: request)
+        }
     }
     
     func getTrackedDaysFor(id: UUID) async throws -> Int {
-        let request = FetchRequestBuilder<RecordObject>()
-            .setPredicates([Query(key: \.id, that: .equal(to: id))])
-            .build()
-        
-        return try await persistencyService.fetchCount(with: request)
+        try await persistencyService.performCount { context in
+            try context.fetchCount(
+                FetchRequestBuilder<RecordObject>()
+                    .setPredicates([Query(key: \.id, that: .equal(to: id))])
+                    .build()
+            )
+        }
     }
     
     func getCompletedTrackersCount() async throws -> Int {
-        let request = FetchRequestBuilder<RecordObject>()
-            .build()
-        
-        return try await persistencyService.fetchCount(with: request)
+        try await persistencyService.performCount { context in
+            try context.fetchCount(
+                FetchRequestBuilder<RecordObject>()
+                    .build()
+            )
+        }
     }
     
     func isCompletedFor(selectedDay date: Date, trackerWithId id: UUID) async throws -> Bool {
-        let interval = date.fullDayInterval()
-        
-        let request = FetchRequestBuilder<RecordObject>()
-            .setPredicates(
-                [
-                    Query(key: \.id, that: .equal(to: id)),
-                    Query(key: \.date, that: .between(interval.start, interval.end)),
-                ]
+        try await persistencyService.performCount { context in
+            let interval = date.fullDayInterval()
+
+            return try context.fetchCount(
+                FetchRequestBuilder<RecordObject>()
+                    .setPredicates(
+                        [
+                            Query(key: \.id, that: .equal(to: id)),
+                            Query(key: \.date, that: .between(interval.start, interval.end)),
+                        ]
+                    )
+                    .build()
             )
-            .build()
-        
-        return try await persistencyService.fetchCount(with: request) != .zero
+        } != .zero
     }
 }

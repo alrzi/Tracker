@@ -24,12 +24,6 @@ extension TrackerObject: Entity {
     public static let entityName = String(describing: TrackerObject.self)
 }
 
-extension TrackerObject: ValueAddable {
-    func addValue(_ value: CategoryObject) {
-        category = value
-    }
-}
-
 extension TrackerObject: CopyableEntity {
     func copy(from tracker: Tracker) {
         self.id = tracker.id

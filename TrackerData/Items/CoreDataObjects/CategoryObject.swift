@@ -19,12 +19,6 @@ extension CategoryObject: Entity {
     public static let entityName = String(describing: CategoryObject.self)
 }
 
-extension CategoryObject: SetAddable {
-    func addElement(_ elements: Set<TrackerObject>) {
-        addToTrackers(elements)
-    }
-}
-
 extension CategoryObject: CopyableEntity {
     func copy(from section: TrackerSection) {
         self.id = section.id

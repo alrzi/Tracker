@@ -37,7 +37,7 @@ public final class TrackerDataAssembly: Assembly {
             )
         }
         .inObjectScope(.container)
-        .implements(DataStorageProtocol.self)
+        .implements((any DataStorageProtocol).self)
         .implements(AuthDataStorage.self)
         
         container.register(AnalyticsProtocol.self) { _ in

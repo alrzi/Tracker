@@ -19,19 +19,17 @@ final class SectionRepository: SectionRepositoryProtocol {
     
     func createSection(_ section: TrackerSection) async throws {
         try await persistencyService.performCreate {
-            $0.make(CategoryObject.self).copy(from: section)
+            $0.make(CategoryObject.self, from: section)
         }
     }
     
     func createSections(_ sections: [TrackerSection]) async throws {
-        for section in sections {
-            try await persistencyService.performCreate {
-                let categoryObject = $0.make(CategoryObject.self)
-                categoryObject.copy(from: section)
+        try await persistencyService.performCreate {
+            for section in sections {
+                let categoryObject = $0.create(CategoryObject.self, from: section)
 
                 for tracker in section.trackers {
-                    let trackerObject = $0.make(TrackerObject.self)
-                    trackerObject.copy(from: tracker)
+                    let trackerObject = $0.create(TrackerObject.self, from: tracker)
                     categoryObject.addToTrackers(trackerObject)
                 }
             }

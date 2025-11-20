@@ -46,13 +46,13 @@ struct PersistencyService: Sendable {
 
     // MARK: - Read
 
-    func perform<T>(_ block: @Sendable @escaping (Fetchable) throws -> [T]) async throws -> [T] {
+    func perform<T>(_ block: @Sendable @escaping (FetchingAll) throws -> [T]) async throws -> [T] {
         try await managedObjectContext.perform {
             try block(managedObjectContext)
         }
     }
 
-    func perform<T>(_ block: @Sendable @escaping (Fetchable) throws -> T) async throws -> T {
+    func perform<T>(_ block: @Sendable @escaping (FetchingOne) throws -> T) async throws -> T {
         try await managedObjectContext.perform {
             try block(managedObjectContext)
         }
@@ -66,7 +66,7 @@ struct PersistencyService: Sendable {
 
     // MARK: - Update
 
-    func performUpdateOrCreate(_ block: @Sendable @escaping (ContextInitializable & Fetchable) throws -> Void) async throws {
+    func performUpdateOrCreate(_ block: @Sendable @escaping (ContextInitializable & FetchingOne) throws -> Void) async throws {
         try await managedObjectContext.perform {
             try block(managedObjectContext)
             try self.saveContext()
@@ -75,7 +75,7 @@ struct PersistencyService: Sendable {
 
     // MARK: - Delete
 
-    func performRemove(_ block: @Sendable @escaping (Removable & Fetchable) throws -> Void) async throws {
+    func performRemove(_ block: @Sendable @escaping (Removable & FetchingOne) throws -> Void) async throws {
         try await managedObjectContext.perform {
             try block(managedObjectContext)
             try self.saveContext()

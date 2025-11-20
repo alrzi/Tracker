@@ -42,15 +42,14 @@ final class RecordRepository: RecordRepositoryProtocol {
             }
         }
         else {
-            try await persistencyService.performUpdateOrCreate { context in
-                let trackerObject: TrackerObject = try context.fetchOneRaw(
+            try await persistencyService.performUpdateOrCreate {
+                let trackerObject: TrackerObject = try $0.fetchOneRaw(
                     FetchRequestBuilder<TrackerObject>()
                         .setPredicates([Query(key: \.id, that: .equal(to: record.id))])
                         .build()
                 )
 
-                let recordObject: RecordObject = context.make(RecordObject.self)
-                recordObject.copy(from: record)
+                let recordObject = $0.create(RecordObject.self, from: record)
                 recordObject.tracker = trackerObject
             }
         }

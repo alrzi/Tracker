@@ -16,11 +16,7 @@ import CoreData
         let service = PersistencyService(provider: containerProvider)
 
         // When
-        try await service.performCreate {
-            let entity: MockItemCoreData = $0.make(MockItemCoreData.self)
-            entity.id = UUID()
-            entity.title = "Test"
-        }
+        try await service.performCreate { $0.make(MockItemCoreData.self, from: MockItem(title: "Test")) }
 
         // Then
         let results = try containerProvider.persistentContainer.viewContext.fetch(MockItemCoreData.request())
@@ -35,9 +31,7 @@ import CoreData
 
         try await service.performCreate {
             for i in 0..<3 {
-                let entity: MockItemCoreData = $0.make(MockItemCoreData.self)
-                entity.id = UUID()
-                entity.title = "Item \(i)"
+                $0.make(MockItemCoreData.self, from: MockItem(title: "Item \(i)"))
             }
         }
 
@@ -59,16 +53,12 @@ import CoreData
 
         // Insert first object
         try await service.performCreate {
-            let e: MockItemCoreData = $0.make(MockItemCoreData.self)
-            e.id = duplicateID
-            e.title = "Original"
+            $0.make(MockItemCoreData.self, from: MockItem(id: duplicateID, title: "Original"))
         }
 
         // Insert second object with the same id
         try await service.performCreate {
-            let e: MockItemCoreData = $0.make(MockItemCoreData.self)
-            e.id = duplicateID
-            e.title = "Duplicate"
+            $0.make(MockItemCoreData.self, from: MockItem(id: duplicateID, title: "Duplicate"))
         }
 
         // Verify both rows exist
@@ -117,23 +107,21 @@ import CoreData
         let service = PersistencyService(provider: containerProvider)
 
         // Create a dummy object to obtain a reference type, then delete it immediately
-        let dummy = try await service.performCreate { ctx in
-            let obj: MockItemCoreData = ctx.make(MockItemCoreData.self)
-            obj.id = UUID()
-            obj.title = "Temp"
+        try await service.performCreate {
+            $0.make(MockItemCoreData.self, from: MockItem(title: "Temp"))
         }
 
         // Delete the object
-        try await service.performRemove { ctx in
-            if let toDelete = try? ctx.fetchOneRaw(MockItemCoreData.request()) {
-                ctx.delete(toDelete)
+        try await service.performRemove {
+            if let toDelete = try? $0.fetchOneRaw(MockItemCoreData.request()) {
+                $0.delete(toDelete)
             }
         }
 
         // Attempt to delete again – should not throw
-        try await service.performRemove { ctx in
-            if let toDelete = try? ctx.fetchOneRaw(MockItemCoreData.request()) {
-                ctx.delete(toDelete)
+        try await service.performRemove {
+            if let toDelete = try? $0.fetchOneRaw(MockItemCoreData.request()) {
+                $0.delete(toDelete)
             }
         }
 
@@ -148,8 +136,8 @@ import CoreData
         let service = PersistencyService(provider: containerProvider)
 
         // When
-        let count = try await service.performCount { ctx in
-            try ctx.fetchCount(MockItemCoreData.request())
+        let count = try await service.performCount {
+            try $0.fetchCount(MockItemCoreData.request())
         }
 
         // Then
@@ -161,17 +149,15 @@ import CoreData
         let containerProvider = InMemoryPersistentContainer()
         let service = PersistencyService(provider: containerProvider)
 
-        try await service.performCreate { ctx in
+        try await service.performCreate {
             for i in 0..<5 {
-                let entity: MockItemCoreData = ctx.make(MockItemCoreData.self)
-                entity.id = UUID()
-                entity.title = "Item \(i)"
+                $0.make(MockItemCoreData.self, from: MockItem(title: "Item \(i)"))
             }
         }
 
         // When
-        let count = try await service.performCount { ctx in
-            try ctx.fetchCount(MockItemCoreData.request())
+        let count = try await service.performCount {
+            try $0.fetchCount(MockItemCoreData.request())
         }
 
         // Then

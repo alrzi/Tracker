@@ -23,22 +23,20 @@ final class TrackerRepository: TrackerRepositoryProtocol {
     // MARK: - Create
 
     func createTracker(_ tracker: Tracker) async throws {
-        try await persistencyService.performCreate { context in
-            let trackerObject: TrackerObject = context.make(TrackerObject.self)
-            trackerObject.copy(from: tracker)
+        try await persistencyService.performCreate {
+            $0.make(TrackerObject.self, from: tracker)
         }
     }
 
     func createTrackerAndAddToSection(with id: UUID, tracker: Tracker) async throws {
-        try await persistencyService.performUpdateOrCreate { context in
-            let category: CategoryObject = try context.fetchOneRaw(
+        try await persistencyService.performUpdateOrCreate {
+            let category: CategoryObject = try $0.fetchOneRaw(
                 FetchRequestBuilder<CategoryObject>()
                     .setPredicates([Query(key: \.id, that: .equal(to: id))])
                     .build()
             )
 
-            let trackerObject: TrackerObject = context.make(TrackerObject.self)
-            trackerObject.copy(from: tracker)
+            let trackerObject = $0.create(TrackerObject.self, from: tracker)
             trackerObject.category = category
         }
     }

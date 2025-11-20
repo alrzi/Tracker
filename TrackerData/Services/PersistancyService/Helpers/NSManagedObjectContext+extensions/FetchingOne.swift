@@ -9,50 +9,52 @@ import Foundation
 import CoreData
 
 protocol FetchingOne: Sendable {
-    func fetchOne<R, T>(_ request: NSFetchRequest<R>) throws -> T
+    func fetchOne<R, T>(_ request: NSFetchRequest<R>) throws(PersistencyError) -> T
     where R : NSFetchRequestResult, T : Sendable & Initable<R>
 
-    func fetchOneRaw<R>(_ request: NSFetchRequest<R>) throws -> R
+    func fetchOneRaw<R>(_ request: NSFetchRequest<R>) throws(PersistencyError) -> R
     where R : NSFetchRequestResult
 }
 
 extension NSManagedObjectContext: FetchingOne {
-    func fetchOne<R, T>(_ request: NSFetchRequest<R>) throws -> T
+    func fetchOne<R, T>(_ request: NSFetchRequest<R>) throws(PersistencyError) -> T
     where R : NSFetchRequestResult, T : Sendable & Initable<R> {
-        let obj = try fetch(request)
-            .first
-            .map { T(object: $0) }
+        do {
+            let obj = try fetch(request)
+                .first
+                .map { T(object: $0) }
 
-        guard let obj else {
-            throw NSError(
-                domain: "CoreDataFetchError",
-                code: 404,
-                userInfo: [
-                    NSLocalizedDescriptionKey: "No object of type \(T.self) matches the supplied fetch request.",
-                    "FetchPredicate": request.predicate?.description ?? "none"
-                ]
-            )
+            guard let obj else {
+                throw PersistencyError.missingObject(predicate: request.predicate.debugDescription)
+            }
+
+            return obj
         }
-
-        return obj
+        catch let e as PersistencyError {
+            throw e
+        }
+        catch {
+            throw .coreDataError(error)
+        }
     }
 
-    func fetchOneRaw<R>(_ request: NSFetchRequest<R>) throws -> R
+    func fetchOneRaw<R>(_ request: NSFetchRequest<R>) throws(PersistencyError) -> R
     where R : NSFetchRequestResult {
-        let obj = try fetch(request)
-            .first
+        do {
+            let obj = try fetch(request)
+                .first
 
-        guard let obj else {
-            throw NSError(
-                domain: "CoreDataFetchError",
-                code: 404,
-                userInfo: [
-                    NSLocalizedDescriptionKey: "No object of type \(R.self) matches the supplied fetch request.",
-                    "FetchPredicate": request.predicate?.description ?? "none"
-                ]
-            )
+            guard let obj else {
+                throw PersistencyError.missingObject(predicate: request.predicate.debugDescription)
+            }
+
+            return obj
         }
-
-        return obj
+        catch let e as PersistencyError {
+            throw e
+        }
+        catch {
+            throw .coreDataError(error)
+        }
     }
 }

@@ -73,7 +73,7 @@ import CoreData
         #expect(fetched.isEmpty)
     }
 
-    @Test func performRead_fetchOneRaw_missingObject_throws404() async throws {
+    @Test func performRead_fetchOneRaw_missingObject_throws() async throws {
         // Given
         let sut = PersistencyService(provider: InMemoryPersistentContainer())
 
@@ -83,9 +83,10 @@ import CoreData
 
             #expect(Bool(false), "Expected fetchOneRaw to throw, but it succeeded")
         }
-        catch let err as NSError {
-            #expect(err.domain == "CoreDataFetchError")
-            #expect(err.code == 404)
+        catch {
+            if case .missingObject = error {
+                #expect(Bool(true))
+            }
         }
     }
 

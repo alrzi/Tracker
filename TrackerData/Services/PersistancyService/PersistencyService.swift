@@ -37,73 +37,141 @@ struct PersistencyService: Sendable {
     
     // MARK: - Create
 
-    func performCreate(_ block: @Sendable @escaping (ContextInitializable) -> Void) async throws {
-        try await managedObjectContext.perform {
-            block(managedObjectContext)
-            try saveContext()
+    func performCreate(
+        _ block: @Sendable @escaping (ManagedObjectInitializing) -> Void
+    ) async throws(PersistencyError) {
+        do {
+            try await managedObjectContext.perform {
+                block(managedObjectContext)
+                try saveContext()
+            }
+        }
+        catch let e as PersistencyError {
+            throw e
+        }
+        catch {
+            throw .coreDataError(error)
         }
     }
 
     // MARK: - Read
 
-    func perform<T>(_ block: @Sendable @escaping (FetchingAll) throws -> [T]) async throws -> [T] {
-        try await managedObjectContext.perform {
-            try block(managedObjectContext)
+    func perform<T>(
+        _ block: @Sendable @escaping (FetchingAll) throws -> [T]
+    ) async throws(PersistencyError) -> [T] {
+        do {
+            return try await managedObjectContext.perform {
+                try block(managedObjectContext)
+            }
+        }
+        catch let e as PersistencyError {
+            throw e
+        }
+        catch {
+            throw .coreDataError(error)
         }
     }
 
-    func perform<T>(_ block: @Sendable @escaping (FetchingOne) throws -> T) async throws -> T {
-        try await managedObjectContext.perform {
-            try block(managedObjectContext)
+    func perform<T>(
+        _ block: @Sendable @escaping (FetchingOne) throws -> T
+    ) async throws(PersistencyError) -> T {
+        do {
+            return try await managedObjectContext.perform {
+                try block(managedObjectContext)
+            }
+        }
+        catch let e as PersistencyError {
+            throw e
+        }
+        catch {
+            throw .coreDataError(error)
         }
     }
 
-    func performCount(_ block: @Sendable @escaping (Countable) throws -> Int) async throws -> Int {
-        try await managedObjectContext.perform {
-            try block(managedObjectContext)
+    func performCount(
+        _ block: @Sendable @escaping (Countable) throws -> Int
+    ) async throws(PersistencyError) -> Int {
+        do {
+            return try await managedObjectContext.perform {
+                try block(managedObjectContext)
+            }
+        }
+        catch let e as PersistencyError {
+            throw e
+        }
+        catch {
+            throw .coreDataError(error)
         }
     }
 
     // MARK: - Update
 
-    func performUpdateOrCreate(_ block: @Sendable @escaping (ContextInitializable & FetchingOne) throws -> Void) async throws {
-        try await managedObjectContext.perform {
-            do {
-                try block(managedObjectContext)
-                try saveContext()
+    func performUpdateOrCreate(
+        _ block: @Sendable @escaping (ManagedObjectInitializing & FetchingOne) throws -> Void
+    ) async throws(PersistencyError) {
+        do {
+            return try await managedObjectContext.perform {
+                do {
+                    try block(managedObjectContext)
+                    try saveContext()
+                }
+                catch {
+                    try rollback()
+                }
             }
-            catch {
-                try rollback()
-            }
+        }
+        catch let e as PersistencyError {
+            throw e
+        }
+        catch {
+            throw .coreDataError(error)
         }
     }
 
     // MARK: - Delete
 
-    func performRemove(_ block: @Sendable @escaping (Removable & FetchingOne) throws -> Void) async throws {
-        try await managedObjectContext.perform {
-            try block(managedObjectContext)
-            try saveContext()
+    func performRemove(
+        _ block: @Sendable @escaping (Removable & FetchingOne) throws -> Void
+    ) async throws(PersistencyError) {
+        do {
+            return try await managedObjectContext.perform {
+                try block(managedObjectContext)
+                try saveContext()
+            }
+        }
+        catch let e as PersistencyError {
+            throw e
+        }
+        catch {
+            throw .coreDataError(error)
         }
     }
 
-    func deleteAllObjects<T: NSManagedObject>(_ type: T.Type) async throws where T: Entity {
-        try await managedObjectContext.perform {
-            let fetchRequest = NSFetchRequest<T>(entityName: type.entityName) as? NSFetchRequest<NSFetchRequestResult>
-            let deleteRequest = NSBatchDeleteRequest(fetchRequest: fetchRequest ?? .init(entityName: type.entityName))
-            
-            try managedObjectContext.execute(deleteRequest)
-            try saveContext()
+    func deleteAllObjects<T: NSManagedObject>(_ type: T.Type) async throws(PersistencyError) where T: Entity {
+        do {
+            try await managedObjectContext.perform {
+                let fetchRequest = NSFetchRequest<T>(entityName: type.entityName) as? NSFetchRequest<NSFetchRequestResult>
+                let deleteRequest = NSBatchDeleteRequest(fetchRequest: fetchRequest ?? .init(entityName: type.entityName))
+
+                try managedObjectContext.execute(deleteRequest)
+                try saveContext()
+            }
+        }
+        catch let e as PersistencyError {
+            throw e
+        }
+        catch {
+            throw .coreDataError(error)
         }
     }
 }
 
 private extension PersistencyService {
-    func saveContext() throws {
+    func saveContext() throws(PersistencyError) {
         guard managedObjectContext.hasChanges else {
             return
         }
-        
+
         do {
             try managedObjectContext.save()
         }
@@ -112,17 +180,12 @@ private extension PersistencyService {
         }
     }
 
-    func rollback() throws {
+    func rollback() throws(PersistencyError) {
         managedObjectContext.rollback()
 
-        throw NSError(
-            domain: "PersistencyServiceError",
-            code: 1,
-            userInfo: [
-                NSLocalizedDescriptionKey: "Roll back error",
-                "ContextName": managedObjectContext.name ?? "UnnamedContext",
-                "HasChanges": managedObjectContext.hasChanges
-            ]
+        throw PersistencyError.rollback(
+            contextName: managedObjectContext.name ?? "UnnamedContext",
+            hasChanges: managedObjectContext.hasChanges
         )
     }
 }

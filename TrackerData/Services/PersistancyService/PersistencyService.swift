@@ -40,7 +40,7 @@ struct PersistencyService: Sendable {
     func performCreate(_ block: @Sendable @escaping (ContextInitializable) -> Void) async throws {
         try await managedObjectContext.perform {
             block(managedObjectContext)
-            try self.saveContext()
+            try saveContext()
         }
     }
 
@@ -70,7 +70,7 @@ struct PersistencyService: Sendable {
         try await managedObjectContext.perform {
             do {
                 try block(managedObjectContext)
-                try self.saveContext()
+                try saveContext()
             }
             catch {
                 try rollback()
@@ -83,7 +83,7 @@ struct PersistencyService: Sendable {
     func performRemove(_ block: @Sendable @escaping (Removable & FetchingOne) throws -> Void) async throws {
         try await managedObjectContext.perform {
             try block(managedObjectContext)
-            try self.saveContext()
+            try saveContext()
         }
     }
 
@@ -92,8 +92,8 @@ struct PersistencyService: Sendable {
             let fetchRequest = NSFetchRequest<T>(entityName: type.entityName) as? NSFetchRequest<NSFetchRequestResult>
             let deleteRequest = NSBatchDeleteRequest(fetchRequest: fetchRequest ?? .init(entityName: type.entityName))
             
-            try self.managedObjectContext.execute(deleteRequest)
-            try self.saveContext()
+            try managedObjectContext.execute(deleteRequest)
+            try saveContext()
         }
     }
 }
@@ -105,7 +105,7 @@ private extension PersistencyService {
         }
         
         do {
-            try self.managedObjectContext.save()
+            try managedObjectContext.save()
         }
         catch {
             try rollback()

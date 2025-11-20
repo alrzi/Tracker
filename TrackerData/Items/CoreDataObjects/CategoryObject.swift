@@ -15,9 +15,7 @@ public class CategoryObject: NSManagedObject {
     @NSManaged public var trackers: Set<TrackerObject>
 }
 
-extension CategoryObject: Entity {
-    public static let entityName = String(describing: CategoryObject.self)
-}
+extension CategoryObject: Entity { }
 
 extension CategoryObject: CopyableEntity {
     func copy(from section: TrackerSection) {

@@ -104,13 +104,12 @@ private extension PersistencyService {
         }
         catch {
             self.managedObjectContext.rollback()
-            debugPrint(error)
+
             throw NSError(
                 domain: "PersistencyServiceError",
                 code: 1,
                 userInfo: [
-                    NSLocalizedDescriptionKey:
-                        "Failed to persist changes to the Core Data store.",
+                    NSLocalizedDescriptionKey: "Failed to persist changes to the Core Data store.",
                     "ContextName": managedObjectContext.name ?? "UnnamedContext",
                     "HasChanges": managedObjectContext.hasChanges
                 ]

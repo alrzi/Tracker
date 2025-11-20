@@ -20,9 +20,7 @@ public class TrackerObject: NSManagedObject {
     @NSManaged public var trackerRecord: Set<RecordObject>
 }
 
-extension TrackerObject: Entity {
-    public static let entityName = String(describing: TrackerObject.self)
-}
+extension TrackerObject: Entity { }
 
 extension TrackerObject: CopyableEntity {
     func copy(from tracker: Tracker) {

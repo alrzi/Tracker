@@ -37,9 +37,9 @@ struct PersistencyService: Sendable {
     
     // MARK: - Create
 
-    func performCreate(_ block: @Sendable @escaping (ContextInitializable) throws -> Void) async throws {
+    func performCreate(_ block: @Sendable @escaping (ContextInitializable) -> Void) async throws {
         try await managedObjectContext.perform {
-            try block(managedObjectContext)
+            block(managedObjectContext)
             try self.saveContext()
         }
     }
@@ -68,8 +68,13 @@ struct PersistencyService: Sendable {
 
     func performUpdateOrCreate(_ block: @Sendable @escaping (ContextInitializable & FetchingOne) throws -> Void) async throws {
         try await managedObjectContext.perform {
-            try block(managedObjectContext)
-            try self.saveContext()
+            do {
+                try block(managedObjectContext)
+                try self.saveContext()
+            }
+            catch {
+                try rollback()
+            }
         }
     }
 
@@ -95,7 +100,7 @@ struct PersistencyService: Sendable {
 
 private extension PersistencyService {
     func saveContext() throws {
-        guard self.managedObjectContext.hasChanges else {
+        guard managedObjectContext.hasChanges else {
             return
         }
         
@@ -103,18 +108,22 @@ private extension PersistencyService {
             try self.managedObjectContext.save()
         }
         catch {
-            self.managedObjectContext.rollback()
-
-            throw NSError(
-                domain: "PersistencyServiceError",
-                code: 1,
-                userInfo: [
-                    NSLocalizedDescriptionKey: "Failed to persist changes to the Core Data store.",
-                    "ContextName": managedObjectContext.name ?? "UnnamedContext",
-                    "HasChanges": managedObjectContext.hasChanges
-                ]
-            )
+            try rollback()
         }
+    }
+
+    func rollback() throws {
+        managedObjectContext.rollback()
+
+        throw NSError(
+            domain: "PersistencyServiceError",
+            code: 1,
+            userInfo: [
+                NSLocalizedDescriptionKey: "Roll back error",
+                "ContextName": managedObjectContext.name ?? "UnnamedContext",
+                "HasChanges": managedObjectContext.hasChanges
+            ]
+        )
     }
 }
 

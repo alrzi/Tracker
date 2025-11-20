@@ -1,4 +1,9 @@
-import CoreData
+//
+//  Entity.swift
+//  TrackerData
+//
+//  Created by Александр Зиновьев on 19.11.2025.
+//
 
 protocol Entity {
     static var entityName: String { get }

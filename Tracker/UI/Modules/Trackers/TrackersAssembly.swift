@@ -51,23 +51,4 @@ final class TrackersAssembly {
         let viewController = UIHostingController(rootView: view)
         return viewController
     }
-    
-    @MainActor
-    func assembleView() -> some View {
-        let viewModel = TrackersViewModel(
-            trackerManager: trackerManager,
-            hapticManager: hapticManager,
-            notificationDeepLinkService: notificationDeepLinkService,
-            trackersViewModelsFactory: trackersViewModelsFactory
-        )
-        
-        let view = TrackersNavigator(
-            trackerFormAssembly: trackerFormAssembly,
-            navigationState: viewModel
-        ) {
-            TrackersView(viewModel: viewModel)
-        }
-                
-        return view
-    }
 }

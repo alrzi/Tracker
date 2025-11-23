@@ -90,7 +90,7 @@ final class SectionRepository: SectionRepositoryProtocol {
     }
     
     func getSection(by id: UUID) async throws -> TrackerSection {
-        try await persistencyService.perform {
+        try await persistencyService.performOne {
             try $0.fetchOne(
                 FetchRequestBuilder<CategoryObject>()
                     .setPredicates([Query(key: \.id, that: .equal(to: id))])

@@ -117,8 +117,8 @@ final class RecordRepository: RecordRepositoryProtocol {
     }
     
     func getCompletedTrackersCount() async throws -> Int {
-        try await persistencyService.performCount { context in
-            try context.fetchCount(
+        try await persistencyService.performCount {
+            try $0.fetchCount(
                 FetchRequestBuilder<RecordObject>()
                     .build()
             )

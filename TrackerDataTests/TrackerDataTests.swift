@@ -79,7 +79,7 @@ import CoreData
 
         // When / Then
         do {
-            let _: MockItemCoreData = try await sut.perform { try $0.fetchOneRaw(MockItemCoreData.request()) }
+            let _: MockItem = try await sut.performOne { try $0.fetchOne(MockItemCoreData.request()) }
 
             #expect(Bool(false), "Expected fetchOneRaw to throw, but it succeeded")
         }

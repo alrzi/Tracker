@@ -38,7 +38,7 @@ struct PersistencyService: Sendable {
     // MARK: - Create
 
     func performCreate(
-        _ block: @Sendable @escaping (ManagedObjectInitializing) -> Void
+        _ block: @Sendable @escaping (PersistManagedObjectInitializable & PersistRawCreatable) -> Void
     ) async throws(PersistencyError) {
         do {
             try await managedObjectContext.perform {
@@ -57,7 +57,7 @@ struct PersistencyService: Sendable {
     // MARK: - Read
 
     func perform<T>(
-        _ block: @Sendable @escaping (FetchingAll) throws -> [T]
+        _ block: @Sendable @escaping (PersistFetchableRecords) throws -> [T]
     ) async throws(PersistencyError) -> [T] {
         do {
             return try await managedObjectContext.perform {
@@ -72,8 +72,8 @@ struct PersistencyService: Sendable {
         }
     }
 
-    func perform<T>(
-        _ block: @Sendable @escaping (FetchingOne) throws -> T
+    func performOne<T>(
+        _ block: @Sendable @escaping (PersistFetchableRecord) throws -> T
     ) async throws(PersistencyError) -> T {
         do {
             return try await managedObjectContext.perform {
@@ -89,7 +89,7 @@ struct PersistencyService: Sendable {
     }
 
     func performCount(
-        _ block: @Sendable @escaping (Countable) throws -> Int
+        _ block: @Sendable @escaping (PersistCountable) throws -> Int
     ) async throws(PersistencyError) -> Int {
         do {
             return try await managedObjectContext.perform {
@@ -107,7 +107,7 @@ struct PersistencyService: Sendable {
     // MARK: - Update
 
     func performUpdateOrCreate(
-        _ block: @Sendable @escaping (ManagedObjectInitializing & FetchingOne) throws -> Void
+        _ block: @Sendable @escaping (PersistRawCreatable & PersistRawFetchable) throws -> Void
     ) async throws(PersistencyError) {
         do {
             return try await managedObjectContext.perform {
@@ -131,7 +131,7 @@ struct PersistencyService: Sendable {
     // MARK: - Delete
 
     func performRemove(
-        _ block: @Sendable @escaping (Removable & FetchingOne) throws -> Void
+        _ block: @Sendable @escaping (PersistRemovable & PersistRawFetchable) throws -> Void
     ) async throws(PersistencyError) {
         do {
             return try await managedObjectContext.perform {

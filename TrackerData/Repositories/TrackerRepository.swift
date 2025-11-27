@@ -168,8 +168,6 @@ final class TrackerRepository: TrackerRepositoryProtocol {
         }
     }
     
-    // MARK: - Delete
-    
     func deleteTracker(with id: UUID) async throws {
        try await persistencyService.performRemove {
             $0.delete(

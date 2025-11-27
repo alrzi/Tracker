@@ -147,8 +147,6 @@ final class TrackerRepository: TrackerRepositoryProtocol {
         }
     }
     
-    // MARK: - Update
-    
     func updateTracker(_ tracker: Tracker) async throws {
         try await persistencyService.performUpdateOrCreate { context in
             let trackerObject: TrackerObject = try context.fetchOneRaw(

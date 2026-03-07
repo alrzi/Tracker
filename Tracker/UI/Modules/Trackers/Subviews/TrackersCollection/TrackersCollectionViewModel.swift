@@ -10,7 +10,6 @@ import TrackerDomain
 
 @MainActor
 protocol TrackersCollectionViewModelProtocol: ObservableObject, Identifiable {
-    var id: UUID { get }
     var title: String { get }
     var trackers: [Tracker] { get }
     
@@ -40,7 +39,7 @@ final class TrackersCollectionViewModel: TrackersCollectionViewModelProtocol {
     @Published var isDeleteTrackerConfirmationAlertPresented = false
     @Published var isCompletionConfirmationAlertPresented = false
     
-    let id: UUID
+    nonisolated let id: UUID
     let title: String
     
     init(

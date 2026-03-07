@@ -19,7 +19,7 @@ final class StatisticViewModel: StatisticViewModelProtocol {
     @Published private(set) var title: String
     @Published private(set) var subtitle: String
     
-    let id: UUID = .init()
+    nonisolated let id: UUID = .init()
     
     init(
         count: Int = 0,

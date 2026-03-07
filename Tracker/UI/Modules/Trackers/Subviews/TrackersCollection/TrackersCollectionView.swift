@@ -83,7 +83,7 @@ extension TrackersCollectionView: View {
 }
 
 final class CollectionViewModel: TrackersCollectionViewModelProtocol {
-    let id: UUID = .init()
+    nonisolated let id: UUID = .init()
     let title: String = "Pinned"
     let trackers: [Tracker] = []
     let deleteTrackerConfirmationAlert: ErrorInfo? = nil

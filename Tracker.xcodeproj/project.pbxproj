@@ -8,7 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		29395D132EA3DE4E00469352 /* DataStorage in Frameworks */ = {isa = PBXBuildFile; productRef = 29395D122EA3DE4E00469352 /* DataStorage */; };
-		29395D152EA3DE7700469352 /* DataStorage in Frameworks */ = {isa = PBXBuildFile; productRef = 29395D142EA3DE7700469352 /* DataStorage */; };
+		29F22C632F55C3040060CA05 /* DataStorage in Frameworks */ = {isa = PBXBuildFile; productRef = 29F22C622F55C3040060CA05 /* DataStorage */; };
 		F96D33262D7F6D82009208B9 /* TrackerDomain.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F96D331E2D7F6D82009208B9 /* TrackerDomain.framework */; };
 		F96D33592D7F6F56009208B9 /* TrackerData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F96D33512D7F6F55009208B9 /* TrackerData.framework */; };
 		F988578F2DB112770054DE44 /* TrackerDomain.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F96D331E2D7F6D82009208B9 /* TrackerDomain.framework */; };
@@ -156,7 +156,7 @@
 			files = (
 				F98863002DB119A50054DE44 /* AppMetricaCore in Frameworks */,
 				F9C4B73F2E5F76E400AA6BD8 /* Swinject in Frameworks */,
-				29395D152EA3DE7700469352 /* DataStorage in Frameworks */,
+				29F22C632F55C3040060CA05 /* DataStorage in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -321,7 +321,7 @@
 			packageProductDependencies = (
 				F98862FF2DB119A50054DE44 /* AppMetricaCore */,
 				F9C4B73E2E5F76E400AA6BD8 /* Swinject */,
-				29395D142EA3DE7700469352 /* DataStorage */,
+				29F22C622F55C3040060CA05 /* DataStorage */,
 			);
 			productName = TrackerData;
 			productReference = F96D33512D7F6F55009208B9 /* TrackerData.framework */;
@@ -396,7 +396,7 @@
 				F93160B12A2F3A8B003A96EC /* XCRemoteSwiftPackageReference "swift-snapshot-testing" */,
 				F98862FE2DB119A50054DE44 /* XCRemoteSwiftPackageReference "appmetrica-sdk-ios" */,
 				F9C4AD062E5F730900AA6BD8 /* XCRemoteSwiftPackageReference "Swinject" */,
-				29395D112EA3DE4E00469352 /* XCLocalSwiftPackageReference "../../../MyPackages/DataStorage" */,
+				29F22C612F55C3040060CA05 /* XCLocalSwiftPackageReference "../../MyPackages/DataStorage" */,
 			);
 			productRefGroup = F918018329CEECCB00767F16 /* Products */;
 			projectDirPath = "";
@@ -602,6 +602,8 @@
 				SDKROOT = iphoneos;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = nonisolated;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
@@ -658,7 +660,9 @@
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = nonisolated;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				VALIDATE_PRODUCT = YES;
@@ -691,6 +695,7 @@
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = nonisolated;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_STRICT_CONCURRENCY = complete;
 				SWIFT_VERSION = 6.0;
@@ -724,6 +729,7 @@
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = nonisolated;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_STRICT_CONCURRENCY = complete;
 				SWIFT_VERSION = 6.0;
@@ -767,6 +773,7 @@
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_DEFAULT_ACTOR_ISOLATION = nonisolated;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_INSTALL_OBJC_HEADER = NO;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -812,6 +819,7 @@
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = nonisolated;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_INSTALL_OBJC_HEADER = NO;
 				SWIFT_VERSION = 6.0;
@@ -906,6 +914,7 @@
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_DEFAULT_ACTOR_ISOLATION = nonisolated;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_INSTALL_OBJC_HEADER = NO;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -951,6 +960,7 @@
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = nonisolated;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_INSTALL_OBJC_HEADER = NO;
 				SWIFT_VERSION = 6.0;
@@ -1069,9 +1079,9 @@
 /* End XCConfigurationList section */
 
 /* Begin XCLocalSwiftPackageReference section */
-		29395D112EA3DE4E00469352 /* XCLocalSwiftPackageReference "../../../MyPackages/DataStorage" */ = {
+		29F22C612F55C3040060CA05 /* XCLocalSwiftPackageReference "../../MyPackages/DataStorage" */ = {
 			isa = XCLocalSwiftPackageReference;
-			relativePath = ../../../MyPackages/DataStorage;
+			relativePath = ../../MyPackages/DataStorage;
 		};
 /* End XCLocalSwiftPackageReference section */
 
@@ -1107,9 +1117,8 @@
 			isa = XCSwiftPackageProductDependency;
 			productName = DataStorage;
 		};
-		29395D142EA3DE7700469352 /* DataStorage */ = {
+		29F22C622F55C3040060CA05 /* DataStorage */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 29395D112EA3DE4E00469352 /* XCLocalSwiftPackageReference "../../../MyPackages/DataStorage" */;
 			productName = DataStorage;
 		};
 		F98862FF2DB119A50054DE44 /* AppMetricaCore */ = {

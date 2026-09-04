@@ -1,0 +1,60 @@
+{
+  "originHash" : "d9932f16c545bb6eaedb55a78729c76cc470101c83bdd780fd569b56cb556d7b",
+  "pins" : [
+    {
+      "identity" : "appmetrica-sdk-ios",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/appmetrica/appmetrica-sdk-ios.git",
+      "state" : {
+        "revision" : "ed6c1a73eb2dae875a0d7801390eb6f0ee7bc12e",
+        "version" : "5.16.1"
+      }
+    },
+    {
+      "identity" : "keyvaluestorage",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/alrzi/KeyValueStorage.git",
+      "state" : {
+        "revision" : "d9f3f79b16c58242a6a34a571515a9cc6737adb8",
+        "version" : "1.0.0"
+      }
+    },
+    {
+      "identity" : "kscrash",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/kstenerud/KSCrash",
+      "state" : {
+        "revision" : "c0177658fc771ae833b6d3b8f5f3f5a14d59ec03",
+        "version" : "2.1.2"
+      }
+    },
+    {
+      "identity" : "notifications",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/alrzi/Notifications.git",
+      "state" : {
+        "branch" : "main",
+        "revision" : "e553b7f06c43345a4ec4345defc55f2a00548297"
+      }
+    },
+    {
+      "identity" : "swinject",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/Swinject/Swinject.git",
+      "state" : {
+        "revision" : "b685b549fe4d8ae265fc7a2f27d0789720425d69",
+        "version" : "2.10.0"
+      }
+    },
+    {
+      "identity" : "utils",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/alrzi/Utils.git",
+      "state" : {
+        "branch" : "main",
+        "revision" : "b7c31f5bb5c3dda9cc66c3f771d0b0c09d65f3a4"
+      }
+    }
+  ],
+  "version" : 3
+}

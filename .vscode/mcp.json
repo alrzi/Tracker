@@ -1,0 +1,11 @@
+{
+    "servers": {
+        "cocoindex": {
+            "command": "sh",
+            "args": [
+                "-c",
+                "cd /Users/alrzi/Work/Projects/1.Tracker && /Users/alrzi/.local/bin/ccc mcp"
+            ]
+        }
+    }
+}

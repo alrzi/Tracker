@@ -13,6 +13,7 @@ import HapticFeedback
 protocol TrackersCollectionViewModelProtocol: ObservableObject, Identifiable {
     var title: String { get }
     var trackers: [Tracker] { get }
+    var allowsTrackerDrop: Bool { get }
     
     var deleteTrackerConfirmationAlert: ErrorInfo? { get }
     var isDeleteTrackerConfirmationAlertPresented: Bool { get set }
@@ -22,6 +23,7 @@ protocol TrackersCollectionViewModelProtocol: ObservableObject, Identifiable {
     func onTogglePin(at index: Int)
     func onEdit(at index: Int)
     func onDelete(at index: Int)
+    func onMove(trackerID: UUID)
 }
 
 final class TrackersCollectionViewModel: TrackersCollectionViewModelProtocol {
@@ -42,6 +44,7 @@ final class TrackersCollectionViewModel: TrackersCollectionViewModelProtocol {
     
     nonisolated let id: UUID
     let title: String
+    let allowsTrackerDrop: Bool
     
     init(
         trackerRepository: some TrackerRepositoryProtocol,
@@ -49,6 +52,7 @@ final class TrackersCollectionViewModel: TrackersCollectionViewModelProtocol {
         trackerManager: some TrackerManaging,
         hapticManager: some VibrationFeedbackManaging,
         collection: TrackerSection,
+        allowsTrackerDrop: Bool,
         currentDate: Date,
         eventsHandler: @escaping (TrackersCollectionOutput) -> Void
     ) {
@@ -59,6 +63,7 @@ final class TrackersCollectionViewModel: TrackersCollectionViewModelProtocol {
         self.currentDate = currentDate
         self.id = collection.id
         self.title = collection.title
+        self.allowsTrackerDrop = allowsTrackerDrop
         self.trackers = collection.trackers
         self.eventsHandler = eventsHandler
         
@@ -99,6 +104,14 @@ final class TrackersCollectionViewModel: TrackersCollectionViewModelProtocol {
         }
         
         deleteTrackerConfirmationAlert = .deleteTrackerConfirmationAlert { [eventsHandler] in eventsHandler(.delete(tracker)) }
+    }
+
+    func onMove(trackerID: UUID) {
+        guard allowsTrackerDrop else {
+            return
+        }
+
+        eventsHandler(.move(trackerID: trackerID, toSectionID: id))
     }
 }
 

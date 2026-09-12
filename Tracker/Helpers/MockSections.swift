@@ -10,7 +10,45 @@ import TrackerDomain
 
 #if DEBUG
 func createSectionsWithTrackers() -> [TrackerSection] {
-    createMultipleTrackerSections(numSections: 20, numTrackersPerSection: 10)
+    [
+        makeSection(title: "Спорт", trackers: [
+            ("Бег", "🏃‍♂️", "#FF6B6B"),
+            ("Зарядка", "🤸‍♀️", "#4ECDC4"),
+            ("Тренировка", "🏋️‍♀️", "#45B7D1"),
+        ]),
+        makeSection(title: "Учёба", trackers: [
+            ("Swift", "📱", "#5B8DEF"),
+            ("Чтение", "📖", "#9B59B6"),
+            ("Английский", "🗣️", "#F5A623"),
+        ]),
+        makeSection(title: "Здоровье", trackers: [
+            ("Выпить воду", "💧", "#3498DB"),
+            ("Медитация", "🧘", "#2ECC71"),
+            ("Сон до 23:00", "😴", "#34495E"),
+        ]),
+    ]
+}
+
+private func makeSection(
+    title: String,
+    trackers: [(name: String, emoji: String, color: String)]
+) -> TrackerSection {
+    let sectionID = UUID()
+
+    return TrackerSection(
+        id: sectionID,
+        title: title,
+        trackers: trackers.map {
+            Tracker(
+                name: $0.name,
+                emoji: $0.emoji,
+                color: $0.color,
+                schedule: Set(WeekDay.allCases),
+                sectionId: sectionID,
+                notificationInformation: nil
+            )
+        }
+    )
 }
 
 func createMultipleTrackerSections(

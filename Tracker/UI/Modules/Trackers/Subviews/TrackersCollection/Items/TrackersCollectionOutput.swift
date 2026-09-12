@@ -12,4 +12,5 @@ enum TrackersCollectionOutput {
     case togglePin(Tracker)
     case delete(Tracker)
     case edit(Tracker)
+    case move(trackerID: UUID, toSectionID: UUID)
 }

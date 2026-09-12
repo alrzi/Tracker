@@ -10,6 +10,7 @@ public protocol TrackerManaging: Sendable {
     func createTrackerAndAddToSection(with id: UUID, tracker: Tracker) async throws
     
     // Read
+    func fetchAll() async throws -> [Tracker]
     func fetchAllWithNotificationsInfo() async throws -> [Tracker]
     func fetchCompletedSections(params: RequestParameters, isPaginating: Bool) async throws -> ([TrackerSection], [Tracker])
     func fetchUnCompletedSections(params: RequestParameters, isPaginating: Bool) async throws -> ([TrackerSection], [Tracker])
@@ -55,6 +56,10 @@ final class TrackerManager: TrackerManaging {
     }
     
     // MARK: - Read
+
+    func fetchAll() async throws -> [Tracker] {
+        try await trackerRepository.getTrackers()
+    }
 
     func fetchAllWithNotificationsInfo() async throws -> [Tracker] {
         try await trackerRepository.getAllWithNotificationsInfo()
@@ -144,22 +149,23 @@ final class TrackerManager: TrackerManaging {
 
 private extension TrackerManager {
     func fetchTrackers(for sections: [TrackerSection], params: RequestParameters) async throws -> [TrackerSection] {
-        try await fetchTrackers(
-            for: sections,
-            fetchTask: { [trackerRepository] section in
-                try await trackerRepository.getTrackers(for: section.id, isPinned: false, weekDay: params.weekDay, query: params.query)
-            },
-            mapToTrackerSection: { [recordRepository] section, trackers in
-                var updatedTrackers: [Tracker] = []
-                
-                for tracker in trackers {
-                    let isCompleted = try await recordRepository.isCompletedFor(selectedDay: params.currentDate, trackerWithId: tracker.id)
-                    updatedTrackers.append(tracker.with(isCompleted: isCompleted))
-                }
-                
-                return TrackerSection(id: section.id, title: section.title, trackers: updatedTrackers)
-            }
+        let trackers = try await trackerRepository.getTrackers(
+            isPinned: false,
+            weekDay: params.weekDay,
+            query: params.query
         )
+
+        var updatedTrackers: [Tracker] = []
+
+        for tracker in trackers {
+            let isCompleted = try await recordRepository.isCompletedFor(
+                selectedDay: params.currentDate,
+                trackerWithId: tracker.id
+            )
+            updatedTrackers.append(tracker.with(isCompleted: isCompleted))
+        }
+
+        return makeSections(from: sections, trackers: updatedTrackers)
     }
     
     func fetchCompletedTrackers(for sections: [TrackerSection], params: RequestParameters) async throws -> [TrackerSection] {
@@ -188,15 +194,30 @@ private extension TrackerManager {
     }
     
     func fetchUnCompletedTrackers(for sections: [TrackerSection], params: RequestParameters) async throws -> [TrackerSection] {
-        try await fetchTrackers(
-            for: sections,
-            fetchTask: { [trackerRepository] section in
-                try await trackerRepository.getTrackers(for: section.id, isPinned: false, weekDay: params.weekDay, query: params.query, date: params.currentDate)
-            },
-            mapToTrackerSection: { section, trackers in
-                TrackerSection(id: section.id, title: section.title, trackers: trackers)
-            }
+        let trackers = try await trackerRepository.getTrackers(
+            isPinned: false,
+            weekDay: params.weekDay,
+            query: params.query,
+            date: params.currentDate
         )
+
+        return makeSections(from: sections, trackers: trackers)
+    }
+
+    func makeSections(from sections: [TrackerSection], trackers: [Tracker]) -> [TrackerSection] {
+        let trackersBySection = Dictionary(grouping: trackers, by: \.sectionId)
+
+        return sections.compactMap { section in
+            guard let trackers = trackersBySection[section.id], !trackers.isEmpty else {
+                return nil
+            }
+
+            return TrackerSection(
+                id: section.id,
+                title: section.title,
+                trackers: trackers.sorted { $0.name < $1.name }
+            )
+        }
     }
     
     func fetchTrackers<T>(

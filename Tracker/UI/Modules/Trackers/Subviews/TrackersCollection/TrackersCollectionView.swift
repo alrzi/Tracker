@@ -45,8 +45,19 @@ extension TrackersCollectionView: View {
                         onEdit: { viewModel.onEdit(at: index) },
                         onDelete: { viewModel.onDelete(at: index) }
                     )
+                    .draggable(tracker.id.uuidString)
                 }
             }
+        }
+        .dropDestination(for: String.self) { items, _ in
+            guard viewModel.allowsTrackerDrop,
+                  let trackerID = items.compactMap(UUID.init(uuidString:)).first
+            else {
+                return false
+            }
+
+            viewModel.onMove(trackerID: trackerID)
+            return true
         }
         .alert(
             "Ошибка пометки трекера завершенным",
@@ -86,6 +97,7 @@ final class CollectionViewModel: TrackersCollectionViewModelProtocol {
     nonisolated let id: UUID = .init()
     let title: String = "Pinned"
     let trackers: [Tracker] = []
+    let allowsTrackerDrop = true
     let deleteTrackerConfirmationAlert: ErrorInfo? = nil
     
     var isDeleteTrackerConfirmationAlertPresented = false
@@ -95,5 +107,6 @@ final class CollectionViewModel: TrackersCollectionViewModelProtocol {
     func onTogglePin(at index: Int) { }
     func onEdit(at index: Int) { }
     func onDelete(at index: Int) { }
+    func onMove(trackerID: UUID) { }
 }
 #endif

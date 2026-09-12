@@ -81,4 +81,19 @@ public extension Tracker {
             notificationInformation: notificationInformation,
         )
     }
+
+    func with(sectionId: UUID) -> Self {
+        Tracker(
+            id: id,
+            name: name,
+            emoji: emoji,
+            color: color,
+            schedule: weekDays,
+            isPinned: isPinned,
+            trackedDays: trackedDays,
+            sectionId: sectionId,
+            isCompleted: isCompleted,
+            notificationInformation: notificationInformation,
+        )
+    }
 }

@@ -11,6 +11,20 @@ import Foundation
 @MainActor
 struct StatisticsView<ViewModel: StatisticsViewModelProtocol> {
     @ObservedObject private var viewModel: ViewModel
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+    @Environment(\.verticalSizeClass) private var verticalSizeClass
+
+    private var columns: [GridItem] {
+        let count = dynamicTypeSize.isAccessibilitySize
+            ? 1
+            : (verticalSizeClass == .compact || horizontalSizeClass == .regular ? 2 : 1)
+
+        return Array(
+            repeating: GridItem(.flexible(), alignment: .top),
+            count: count
+        )
+    }
     
     init(viewModel: ViewModel) {
         self.viewModel = viewModel
@@ -27,10 +41,14 @@ extension StatisticsView: View {
                     PlaceholderView(placeholder: .emptyStatistic)
                 }
                 else {
-                    ScrollableLazyVStack(spacing: 12) {
-                        ForEach(viewModel.statisticData) { data in
-                            StatisticView(viewModel: data.viewModel)
+                    ScrollView {
+                        LazyVGrid(columns: columns, spacing: 12) {
+                            ForEach(viewModel.statisticData) { data in
+                                StatisticView(viewModel: data.viewModel)
+                            }
                         }
+                        .padding(.horizontal)
+                        .padding(.top)
                     }
                 }
             }
@@ -41,12 +59,22 @@ extension StatisticsView: View {
 }
 
 #if DEBUG
-#Preview {
+#Preview("Portrait") {
     StatisticsView(viewModel: ViewModel())
 }
 
+#Preview("Accessibility") {
+    StatisticsView(viewModel: ViewModel())
+        .environment(\.dynamicTypeSize, .accessibility3)
+}
+
 private final class ViewModel: StatisticsViewModelProtocol {
-    let statisticData: [StatisticTableData] = []
+    let statisticData: [StatisticTableData] = [
+        .bestPeriod(.init(count: 18, title: "Лучший период", subtitle: "Максимальное количество дней без перерыва")),
+        .idealDays(.init(count: 7, title: "Идеальные дни", subtitle: "Дни, когда были выполнены все запланированные привычки")),
+        .completedTrackers(.init(count: 128, title: "Трекеры завершены", subtitle: "Общее количество выполненных трекеров")),
+        .averageValue(.init(count: 4, title: "Среднее значение", subtitle: "Среднее количество выполненных трекеров в день")),
+    ]
     
     func onAppear() { }
 }

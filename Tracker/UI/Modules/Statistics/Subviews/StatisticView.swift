@@ -24,12 +24,15 @@ extension StatisticView: View {
             VStack(alignment: .leading, spacing: 12) {
                 Text(viewModel.count.formatted(.number))
                     .font(.largeTitle)
+                    .fixedSize(horizontal: false, vertical: true)
                 
                 Text(viewModel.title)
                     .font(.headline)
+                    .fixedSize(horizontal: false, vertical: true)
                 
                 Text(viewModel.subtitle)
                     .font(.subheadline)
+                    .fixedSize(horizontal: false, vertical: true)
             }
             .padding(16)
             .layoutPriority(1)
@@ -40,6 +43,7 @@ extension StatisticView: View {
             RoundedRectangle(cornerRadius: 16)
                 .stroke(borderAngularGradient, lineWidth: 1)
         )
+        .accessibilityElement(children: .combine)
     }
     
     private var borderAngularGradient: AngularGradient {

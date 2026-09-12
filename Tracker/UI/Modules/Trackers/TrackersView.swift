@@ -98,25 +98,28 @@ private struct EdgeSwipeHints: View {
     var body: some View {
         let isHorizontal = abs(translation.width) > abs(translation.height) * 1.25
         let progress = isHorizontal ? min(abs(translation.width) / 70, 1) : 0
+        let leadingProgress = translation.width > 0 ? progress : 0
+        let trailingProgress = translation.width < 0 ? progress : 0
 
-        HStack {
-            EdgeSwipeArc(
+        ZStack {
+            EdgeArcShape(
                 edge: .leading,
-                progress: translation.width > 0 ? progress : 0
+                progress: leadingProgress
             )
+            .fill(Color.accentColor.opacity(0.4))
+            .opacity(leadingProgress * 0.8)
 
-            Spacer()
-
-            EdgeSwipeArc(
+            EdgeArcShape(
                 edge: .trailing,
-                progress: translation.width < 0 ? progress : 0
+                progress: trailingProgress
             )
+            .fill(Color.accentColor.opacity(0.4))
+            .opacity(trailingProgress * 0.8)
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 }
 
-private struct EdgeSwipeArc: View {
+private struct EdgeArcShape: Shape {
     enum Edge {
         case leading
         case trailing
@@ -125,52 +128,20 @@ private struct EdgeSwipeArc: View {
     let edge: Edge
     let progress: CGFloat
 
-    var body: some View {
-        EdgeArcShape(edge: edge)
-            .fill(Color.accentColor.opacity(0.12))
-            .overlay {
-                EdgeArcShape(edge: edge)
-                    .stroke(
-                        Color.accentColor.opacity(0.35),
-                        style: StrokeStyle(lineWidth: 3, lineCap: .round)
-                    )
-            }
-            .frame(width: 18, height: 72)
-            .opacity(progress * 0.8)
-            .scaleEffect(0.8 + progress * 0.2)
-            .offset(x: edge == .leading ? -18 * (1 - progress) : 18 * (1 - progress))
-    }
-}
-
-private struct EdgeArcShape: Shape {
-    let edge: EdgeSwipeArc.Edge
-
     func path(in rect: CGRect) -> Path {
-        let radius: CGFloat = 44
-        let center = CGPoint(
-            x: edge == .leading ? -radius * 0.65 : rect.width + radius * 0.65,
-            y: rect.midY
-        )
-        let angles: (start: Angle, end: Angle) = switch edge {
-        case .leading: (.degrees(-45), .degrees(45))
-        case .trailing: (.degrees(135), .degrees(225))
-        }
+        let halfHeight = rect.height * 0.045
+        let maximumDepth = min(rect.width * 0.035, halfHeight * 0.4)
+        let depth = maximumDepth * progress
+        let edgeX = edge == .leading ? rect.minX : rect.maxX
+        let tipX = edge == .leading ? edgeX + depth : edgeX - depth
 
         var path = Path()
-        path.move(to: center)
-        path.addLine(
-            to: CGPoint(
-                x: center.x + radius * CGFloat(cos(angles.start.radians)),
-                y: center.y + radius * CGFloat(sin(angles.start.radians))
-            )
+        path.move(to: CGPoint(x: edgeX, y: rect.midY - halfHeight))
+        path.addQuadCurve(
+            to: CGPoint(x: edgeX, y: rect.midY + halfHeight),
+            control: CGPoint(x: tipX, y: rect.midY)
         )
-        path.addArc(
-            center: center,
-            radius: radius,
-            startAngle: angles.start,
-            endAngle: angles.end,
-            clockwise: false
-        )
+        path.addLine(to: CGPoint(x: edgeX, y: rect.midY - halfHeight))
         path.closeSubpath()
         return path
     }
@@ -206,9 +177,7 @@ private struct FilterMenuView: View {
             .backDeployedLabelsVisibility(.visible)
         } label: {
             Image(systemName: "line.3.horizontal.decrease")
-                .resizable()
-                .scaledToFit()
-                .frame(width: 24, height: 24)
+                .font(.title3)
         }
     }
 }
@@ -225,23 +194,25 @@ private struct SafeAreaBottomView: View, KeyboardReadable {
             if !isToday && !isKeyboardShown {
                 Button(action: onToday) {
                     Text("Today")
-                        .font(.system(size: 24, weight: .semibold))
+                        .font(.title2.weight(.semibold))
                         .foregroundStyle(.white)
                         .padding(.horizontal, 20)
+                        .padding(.vertical, 14)
                 }
-                .frame(height: 60)
                 .background(.blue, in: .rect(cornerRadius: 12))
                 .transition(.opacity)
             }
             
             Button(action: onCreate) {
                 Image(systemName: "plus")
-                    .resizable()
+                    .font(.largeTitle)
+                    .imageScale(.large)
                     .symbolVariant(.circle.fill)
                     .symbolRenderingMode(.palette)
                     .foregroundStyle(.white, .blue)
             }
-            .frame(width: 60, height: 60)
+            .padding(16)
+            .contentShape(.circle)
         }
         .animation(.easeIn, value: isToday)
         .padding(20)

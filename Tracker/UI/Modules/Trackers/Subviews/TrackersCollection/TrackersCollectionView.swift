@@ -16,14 +16,25 @@ struct TrackersCollectionView<ViewModel: TrackersCollectionViewModelProtocol> {
     @Environment(\.verticalSizeClass) private var verticalSizeClass
 
     private var columns: [GridItem] {
-        let count = dynamicTypeSize.isAccessibilitySize
-            ? 1
-            : (verticalSizeClass == .compact || horizontalSizeClass == .regular ? 3 : 2)
-
         return Array(
             repeating: GridItem(.flexible(), spacing: 5),
-            count: count
+            count: columnCount
         )
+    }
+
+    private var columnCount: Int {
+        let hasWideLayout = verticalSizeClass == .compact || horizontalSizeClass == .regular
+
+        switch dynamicTypeSize {
+        case .accessibility1, .accessibility2, .accessibility3:
+            return hasWideLayout ? 2 : 1
+
+        case .accessibility4, .accessibility5:
+            return 1
+
+        default:
+            return hasWideLayout ? 3 : 2
+        }
     }
 
     init(viewModel: ViewModel) {

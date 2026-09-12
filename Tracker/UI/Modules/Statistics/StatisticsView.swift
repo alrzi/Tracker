@@ -16,14 +16,25 @@ struct StatisticsView<ViewModel: StatisticsViewModelProtocol> {
     @Environment(\.verticalSizeClass) private var verticalSizeClass
 
     private var columns: [GridItem] {
-        let count = dynamicTypeSize.isAccessibilitySize
-            ? 1
-            : (verticalSizeClass == .compact || horizontalSizeClass == .regular ? 2 : 1)
-
         return Array(
             repeating: GridItem(.flexible(), alignment: .top),
-            count: count
+            count: columnCount
         )
+    }
+
+    private var columnCount: Int {
+        let hasWideLayout = verticalSizeClass == .compact || horizontalSizeClass == .regular
+
+        switch dynamicTypeSize {
+        case .accessibility1, .accessibility2:
+            return hasWideLayout ? 2 : 1
+
+        case .accessibility3, .accessibility4, .accessibility5:
+            return 1
+
+        default:
+            return hasWideLayout ? 2 : 1
+        }
     }
     
     init(viewModel: ViewModel) {

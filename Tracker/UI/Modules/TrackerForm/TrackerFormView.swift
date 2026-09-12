@@ -12,6 +12,22 @@ import TrackerDomain
 @MainActor
 struct TrackerFormView<ViewModel: TrackerFormViewModelProtocol> {
     @ObservedObject private var viewModel: ViewModel
+    @Environment(\.dismiss) private var dismiss
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+    @Environment(\.verticalSizeClass) private var verticalSizeClass
+
+    private var gridColumnsCount: Int {
+        switch dynamicTypeSize {
+        case .accessibility3, .accessibility4, .accessibility5:
+            return 3
+
+        case .accessibility1, .accessibility2:
+            return verticalSizeClass == .compact ? 5 : 4
+
+        default:
+            return verticalSizeClass == .compact ? 4 : 6
+        }
+    }
     
     init(viewModel: ViewModel) {
         self.viewModel = viewModel
@@ -22,54 +38,123 @@ struct TrackerFormView<ViewModel: TrackerFormViewModelProtocol> {
 
 extension TrackerFormView: View {
     var body: some View {
+        let usesTwoPaneLayout = verticalSizeClass == .compact && !dynamicTypeSize.isAccessibilitySize
+        let layout = usesTwoPaneLayout
+            ? AnyLayout(HStackLayout(alignment: .top, spacing: 24))
+            : AnyLayout(VStackLayout(spacing: 24))
+
         NavigationStack {
-            ScrollableLazyVStack(spacing: 24) {
-                TextFieldView(text: $viewModel.tackerTitle)
-                    .shake(if: viewModel.invalidComponent == .title)
-                
-                VStack(spacing: 0) {
-                    ButtonView(
-                        title: String(localized: .categoryCategory),
-                        subtitle: viewModel.sectionTitle,
-                        onTap: viewModel.onSectionSelection
+            ScrollView {
+                layout {
+                    TrackerFormDetailsView(
+                        title: $viewModel.tackerTitle,
+                        sectionTitle: viewModel.sectionTitle,
+                        invalidComponent: viewModel.invalidComponent,
+                        habitScheduleViewModel: viewModel.habitScheduleViewModel,
+                        onSectionSelection: viewModel.onSectionSelection
                     )
-                    .shake(if: viewModel.invalidComponent == .section)
-                    
-                    Divider().padding(.horizontal, 16)
-                    
-                    TrackerFormHabitScheduleView(viewModel: viewModel.habitScheduleViewModel)
-                        .shake(if: viewModel.invalidComponent == .weekDays)
+                    .frame(maxWidth: .infinity, alignment: .top)
+
+                    TrackerFormAppearanceView(
+                        emojiViewModel: viewModel.emojiViewModel,
+                        colorsViewModel: viewModel.colorsViewModel,
+                        columnsCount: gridColumnsCount,
+                        invalidComponent: viewModel.invalidComponent
+                    )
+                    .frame(maxWidth: .infinity, alignment: .top)
                 }
-                .background(.tertiary.opacity(0.3), in: .rect(cornerRadius: 16))
-                
-                Section {
-                    GridView(
-                        viewModel: viewModel.emojiViewModel,
-                        columns: 6,
-                        spacing: 5,
-                        content: { item, isSelected in EmojiItemView(item: item.value, isSelected: isSelected) }
-                    )
-                    .shake(if: viewModel.invalidComponent == .emoji)
-                } header: { SectionHeaderView(text: String(localized: .createEmoji)) }
-                
-                Section {
-                    GridView(
-                        viewModel: viewModel.colorsViewModel,
-                        columns: 6,
-                        spacing: 5,
-                        content: { item, isSelected in ColorItemView(item: item.value, isSelected: isSelected) }
-                    )
-                    .shake(if: viewModel.invalidComponent == .color)
-                } header: { SectionHeaderView(text: String(localized: .createColor)) }
-            }
-            .safeAreaInset(edge: .bottom, spacing: 16) {
-                MainFooterView(
-                    title: viewModel.completeFormButtonTitle,
-                    onCompleteFrom: viewModel.onCompleteFrom
-                )
+                .padding(.horizontal, 16)
+                .padding(.top, 16)
             }
             .ignoresSafeArea(.keyboard, edges: .bottom)
             .navigationTitle(viewModel.title)
+            .toolbar {
+                ToolbarItemGroup(placement: .bottomBar) {
+                    Button {
+                        dismiss()
+                    } label: {
+                        Image(systemName: "xmark")
+                            .font(.headline)
+                    }
+                    .accessibilityLabel(String(localized: .createCancel))
+
+                    Spacer()
+
+                    Button {
+                        Task { await viewModel.onCompleteFrom() }
+                    } label: {
+                        Image(systemName: "checkmark")
+                            .font(.headline)
+                    }
+                    .accessibilityLabel(viewModel.completeFormButtonTitle)
+                }
+            }
+        }
+    }
+}
+
+private struct TrackerFormDetailsView: View {
+    @Binding var title: String
+
+    let sectionTitle: String?
+    let invalidComponent: TrackerFormInvalidComponent?
+    let habitScheduleViewModel: TrackerFormHabitScheduleViewModel
+    let onSectionSelection: () -> Void
+
+    var body: some View {
+        VStack(spacing: 24) {
+            TextFieldView(text: $title)
+                .shake(if: invalidComponent == .title)
+
+            VStack(spacing: 0) {
+                ButtonView(
+                    title: String(localized: .categoryCategory),
+                    subtitle: sectionTitle,
+                    onTap: onSectionSelection
+                )
+                .shake(if: invalidComponent == .section)
+
+                Divider().padding(.horizontal, 16)
+
+                TrackerFormHabitScheduleView(viewModel: habitScheduleViewModel)
+                    .shake(if: invalidComponent == .weekDays)
+            }
+            .background(.tertiary.opacity(0.3), in: .rect(cornerRadius: 16))
+        }
+    }
+}
+
+private struct TrackerFormAppearanceView: View {
+    let emojiViewModel: GridViewModel<TrackerFormGridItem>
+    let colorsViewModel: GridViewModel<TrackerFormGridItem>
+    let columnsCount: Int
+    let invalidComponent: TrackerFormInvalidComponent?
+
+    var body: some View {
+        VStack(spacing: 24) {
+            Section {
+                GridView(
+                    viewModel: emojiViewModel,
+                    columns: columnsCount,
+                    spacing: 5,
+                    content: { item, isSelected in EmojiItemView(item: item.value, isSelected: isSelected) }
+                )
+                .shake(if: invalidComponent == .emoji)
+            } header: {
+                SectionHeaderView(text: String(localized: .createEmoji))
+            }
+
+            Section {
+                GridView(
+                    viewModel: colorsViewModel,
+                    columns: columnsCount,
+                    spacing: 5,
+                    content: { item, isSelected in ColorItemView(item: item.value, isSelected: isSelected) }
+                )
+                .shake(if: invalidComponent == .color)
+            } header: {
+                SectionHeaderView(text: String(localized: .createColor))
+            }
         }
     }
 }
@@ -102,41 +187,6 @@ private struct ColorItemView: View {
     }
 }
 
-private struct MainFooterView: View {
-    @Environment(\.dismiss)
-    private var dismiss
-    
-    let title: String
-    let onCompleteFrom: () async -> Void
-    
-    var body: some View {
-        HStack {
-            Button(action: { dismiss() }) {
-                Text(String(localized: .createCancel))
-                    .frame(maxWidth: .infinity)
-                    .padding(16)
-                    .foregroundStyle(.red)
-                    .background(.clear, in: RoundedRectangle(cornerRadius: 12))
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 12)
-                            .stroke(.red, lineWidth: 1)
-                    )
-            }
-            
-            Button(action: { Task { await onCompleteFrom() } }) {
-                Text(title)
-                    .frame(maxWidth: .infinity)
-                    .foregroundStyle(Color(.cBlack))
-                    .padding(16)
-                    .background(.secondary, in: RoundedRectangle(cornerRadius: 12))
-            }
-            .buttonStyle(.plain)
-        }
-        .padding(16)
-        .background(Color(uiColor: .systemBackground))
-    }
-}
-
 private struct TextFieldView: View {
     @Binding var text: String
     
@@ -158,7 +208,7 @@ private struct SectionHeaderView: View {
     var body: some View {
         HStack {
             Text(text)
-                .font(.system(size: 19, weight: .bold))
+                .font(.headline)
                 .layoutPriority(1)
             
             Spacer()
@@ -181,7 +231,7 @@ private struct ButtonView: View {
                     
                     if let subtitle {
                         Text(subtitle)
-                            .lineLimit(1)
+                            .fixedSize(horizontal: false, vertical: true)
                             .foregroundStyle(.gray)
                     }
                 }
@@ -230,8 +280,13 @@ private extension WeekDay {
 }
 
 #if DEBUG
-#Preview {
+#Preview("Portrait") {
     TrackerFormView(viewModel: ViewModel())
+}
+
+#Preview("Accessibility") {
+    TrackerFormView(viewModel: ViewModel())
+        .environment(\.dynamicTypeSize, .accessibility3)
 }
 
 private final class ViewModel: TrackerFormViewModelProtocol {
@@ -246,12 +301,12 @@ private final class ViewModel: TrackerFormViewModelProtocol {
 
     var route: TrackerFormRoute?
     
-    var tackerTitle: String = ""
+    var tackerTitle: String = "Утренняя тренировка"
     
-    let title: String = ""
-    let sectionTitle: String? = "Sport"
+    let title: String = "Новая привычка"
+    let sectionTitle: String? = "Здоровье и развитие"
     let weekDays: WeekDays = []
-    let completeFormButtonTitle = "Create"
+    let completeFormButtonTitle = "Создать привычку"
     
     let emojiViewModel: GridViewModel<TrackerFormGridItem> = .init(
         items: TrackerFormGridOptions.emojiItems

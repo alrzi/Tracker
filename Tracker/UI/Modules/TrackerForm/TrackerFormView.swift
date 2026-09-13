@@ -165,6 +165,7 @@ private struct EmojiItemView: View {
     
     var body: some View {
         Text(item)
+            .font(.title2)
             .padding(16)
             .aspectRatio(1, contentMode: .fit)
             .background(isSelected ? .gray.opacity(0.3) : Color.clear, in: RoundedRectangle(cornerRadius: 16))
@@ -179,7 +180,7 @@ private struct ColorItemView: View {
         Color(hexString: item)
             .aspectRatio(1, contentMode: .fit)
             .clipShape(RoundedRectangle(cornerRadius: 8))
-            .padding(4)
+            .padding(8)
             .overlay(
                 RoundedRectangle(cornerRadius: 8)
                     .stroke(isSelected ? Color(hexString: item)?.opacity(0.4) ?? .blue : Color.clear, lineWidth: 4)

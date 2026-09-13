@@ -50,6 +50,21 @@ public final class TrackerDataAssembly: Assembly {
         }
         .inObjectScope(.container)
 
+        container.register(StatisticsInsightHistoryProviding.self) { r in
+            StatisticsInsightHistoryProvider(
+                trackerRepository: r.resolve(TrackerRepositoryProtocol.self)!,
+                recordRepository: r.resolve(RecordRepositoryProtocol.self)!
+            )
+        }
+
+        container.register(StatisticsInsightGenerating.self) { _ in
+            if #available(iOS 26.0, *) {
+                FoundationModelsStatisticsInsightGenerator()
+            } else {
+                UnavailableStatisticsInsightGenerator()
+            }
+        }
+
 
         // MARK: - KeyValueStorage
         container.register(AuthDataStorage.self) { _ in UserDefaults.live }

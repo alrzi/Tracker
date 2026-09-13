@@ -7,10 +7,12 @@
 
 import SwiftUI
 import Foundation
+import TrackerDomain
 
 @MainActor
 struct StatisticsView<ViewModel: StatisticsViewModelProtocol> {
     @ObservedObject private var viewModel: ViewModel
+    @ObservedObject private var insightViewModel: StatisticsInsightViewModel
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     @Environment(\.verticalSizeClass) private var verticalSizeClass
@@ -37,8 +39,12 @@ struct StatisticsView<ViewModel: StatisticsViewModelProtocol> {
         }
     }
     
-    init(viewModel: ViewModel) {
+    init(
+        viewModel: ViewModel,
+        insightViewModel: StatisticsInsightViewModel
+    ) {
         self.viewModel = viewModel
+        self.insightViewModel = insightViewModel
     }
 }
 
@@ -53,9 +59,13 @@ extension StatisticsView: View {
                 }
                 else {
                     ScrollView {
-                        LazyVGrid(columns: columns, spacing: 12) {
-                            ForEach(viewModel.statisticData) { data in
-                                StatisticView(viewModel: data.viewModel)
+                        VStack(spacing: 12) {
+                            StatisticsInsightView(viewModel: insightViewModel)
+
+                            LazyVGrid(columns: columns, spacing: 12) {
+                                ForEach(viewModel.statisticData) { data in
+                                    StatisticView(viewModel: data.viewModel)
+                                }
                             }
                         }
                         .padding(.horizontal)
@@ -65,17 +75,33 @@ extension StatisticsView: View {
             }
             .navigationTitle(String(localized: .statisticTitle))
         }
-        .onAppear(perform: viewModel.onAppear)
+        .onAppear {
+            viewModel.onAppear()
+            insightViewModel.screenAppeared()
+        }
+        .onDisappear(perform: insightViewModel.screenDisappeared)
     }
 }
 
 #if DEBUG
 #Preview("Portrait") {
-    StatisticsView(viewModel: ViewModel())
+    StatisticsView(
+        viewModel: ViewModel(),
+        insightViewModel: StatisticsInsightViewModel(
+            generateUseCase: InsightUseCase(),
+            applyUseCase: ApplyInsightUseCase()
+        )
+    )
 }
 
 #Preview("Accessibility") {
-    StatisticsView(viewModel: ViewModel())
+    StatisticsView(
+        viewModel: ViewModel(),
+        insightViewModel: StatisticsInsightViewModel(
+            generateUseCase: InsightUseCase(),
+            applyUseCase: ApplyInsightUseCase()
+        )
+    )
         .environment(\.dynamicTypeSize, .accessibility3)
 }
 
@@ -88,5 +114,13 @@ private final class ViewModel: StatisticsViewModelProtocol {
     ]
     
     func onAppear() { }
+}
+
+private struct InsightUseCase: GenerateStatisticsInsightUseCaseProtocol {
+    func execute() async throws -> StatisticsInsight? { nil }
+}
+
+private struct ApplyInsightUseCase: ApplyStatisticsInsightUseCaseProtocol {
+    func execute(_ insight: StatisticsInsight) async throws { }
 }
 #endif

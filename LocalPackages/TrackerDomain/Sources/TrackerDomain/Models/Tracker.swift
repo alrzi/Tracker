@@ -11,6 +11,8 @@ public struct Tracker: Hashable, Identifiable, Sendable {
     public let sectionId: UUID
     public let isCompleted: Bool
     public let notificationInformation: TrackerNotificationInformation?
+    public let createdAt: Date
+    public let scheduleUpdatedAt: Date
 
     public init(
         id: UUID = UUID(),
@@ -23,6 +25,8 @@ public struct Tracker: Hashable, Identifiable, Sendable {
         sectionId: UUID,
         isCompleted: Bool = false,
         notificationInformation: TrackerNotificationInformation?,
+        createdAt: Date = Date(),
+        scheduleUpdatedAt: Date? = nil,
     ) {
         self.id = id
         self.name = name
@@ -34,6 +38,8 @@ public struct Tracker: Hashable, Identifiable, Sendable {
         self.sectionId = sectionId
         self.isCompleted = isCompleted
         self.notificationInformation = notificationInformation
+        self.createdAt = createdAt
+        self.scheduleUpdatedAt = scheduleUpdatedAt ?? createdAt
     }
 }
 
@@ -49,6 +55,8 @@ public extension Tracker {
             trackedDays: trackedDays,
             sectionId: sectionId,
             notificationInformation: notificationInformation,
+            createdAt: createdAt,
+            scheduleUpdatedAt: scheduleUpdatedAt,
         )
     }
     
@@ -64,6 +72,8 @@ public extension Tracker {
             sectionId: sectionId,
             isCompleted: isCompleted,
             notificationInformation: notificationInformation,
+            createdAt: createdAt,
+            scheduleUpdatedAt: scheduleUpdatedAt,
         )
     }
         
@@ -79,6 +89,8 @@ public extension Tracker {
             sectionId: sectionId,
             isCompleted: isCompleted,
             notificationInformation: notificationInformation,
+            createdAt: createdAt,
+            scheduleUpdatedAt: scheduleUpdatedAt,
         )
     }
 
@@ -94,6 +106,46 @@ public extension Tracker {
             sectionId: sectionId,
             isCompleted: isCompleted,
             notificationInformation: notificationInformation,
+            createdAt: createdAt,
+            scheduleUpdatedAt: scheduleUpdatedAt,
+        )
+    }
+
+    func movingSchedule(from source: WeekDay, to destination: WeekDay, at date: Date = Date()) -> Self {
+        var updatedWeekDays = weekDays
+        updatedWeekDays.remove(source)
+        updatedWeekDays.insert(destination)
+
+        let updatedNotificationInformation = notificationInformation.map { information in
+            var updatedSchedule = information.schedule
+            if let sourceDetails = updatedSchedule.removeValue(forKey: source) {
+                updatedSchedule[destination] = .init(
+                    weekDay: destination,
+                    isEnabled: sourceDetails.isEnabled,
+                    time: sourceDetails.time
+                )
+            }
+
+            return TrackerNotificationInformation(
+                trackerId: information.trackerId,
+                isGlobalEnabled: information.isGlobalEnabled,
+                schedule: updatedSchedule
+            )
+        }
+
+        return Tracker(
+            id: id,
+            name: name,
+            emoji: emoji,
+            color: color,
+            schedule: updatedWeekDays,
+            isPinned: isPinned,
+            trackedDays: trackedDays,
+            sectionId: sectionId,
+            isCompleted: isCompleted,
+            notificationInformation: updatedNotificationInformation,
+            createdAt: createdAt,
+            scheduleUpdatedAt: date
         )
     }
 }

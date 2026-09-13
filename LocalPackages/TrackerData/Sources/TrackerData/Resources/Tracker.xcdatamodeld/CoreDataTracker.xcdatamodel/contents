@@ -18,10 +18,12 @@
     </entity>
     <entity name="TrackerObject" representedClassName="TrackerObject" syncable="YES">
         <attribute name="color" attributeType="String"/>
+        <attribute name="createdAt" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="emoji" attributeType="String"/>
         <attribute name="id" attributeType="UUID" usesScalarValueType="NO"/>
         <attribute name="isPinned" attributeType="Boolean" usesScalarValueType="YES"/>
         <attribute name="name" attributeType="String"/>
+        <attribute name="scheduleUpdatedAt" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="weekDays" attributeType="String"/>
         <relationship name="category" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="CategoryObject" inverseName="trackers" inverseEntity="CategoryObject"/>
         <relationship name="notificationDays" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="NotificationDayObject" inverseName="parentTracker" inverseEntity="NotificationDayObject"/>

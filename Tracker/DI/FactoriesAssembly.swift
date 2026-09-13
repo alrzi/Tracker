@@ -20,5 +20,12 @@ final class FactoriesAssembly: Assembly {
                 hapticManager: r.resolve(VibrationFeedbackManaging.self)!
             )
         }
+
+        container.register(StatisticsInsightViewModelFactory.self) { r in
+            StatisticsInsightViewModelFactory(
+                generateUseCase: r.resolve(GenerateStatisticsInsightUseCaseProtocol.self)!,
+                applyUseCase: r.resolve(ApplyStatisticsInsightUseCaseProtocol.self)!
+            )
+        }
     }
 }

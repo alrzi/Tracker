@@ -1,5 +1,5 @@
 {
-  "originHash" : "da6f77f7f481f4332cb01f881c76debd539d59a96dc021d52036afec162f592a",
+  "originHash" : "a5e0c7d10fdcff350a704575ebeda44ff6e3195aeb957e25c6f59185a4daf51b",
   "pins" : [
     {
       "identity" : "swinject",
@@ -8,6 +8,15 @@
       "state" : {
         "revision" : "b685b549fe4d8ae265fc7a2f27d0789720425d69",
         "version" : "2.10.0"
+      }
+    },
+    {
+      "identity" : "utils",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/alrzi/Utils.git",
+      "state" : {
+        "branch" : "main",
+        "revision" : "b7c31f5bb5c3dda9cc66c3f771d0b0c09d65f3a4"
       }
     }
   ],

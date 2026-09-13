@@ -23,7 +23,8 @@ struct TrackerFormHabitScheduleView: View {
                         GridRow(alignment: .center) {
                             DaySelectionButton(
                                 config: config,
-                                onToggleDay: { viewModel.toggleDay(config.day) }
+                                isActive: config.day == viewModel.activeDay,
+                                onDayTapped: { viewModel.dayTapped(config.day) }
                             )
 
                             DayNotificationControlsView(
@@ -41,7 +42,8 @@ struct TrackerFormHabitScheduleView: View {
                         ForEach(viewModel.configs, id: \.day) { config in
                             DaySelectionButton(
                                 config: config,
-                                onToggleDay: { viewModel.toggleDay(config.day) }
+                                isActive: config.day == viewModel.activeDay,
+                                onDayTapped: { viewModel.dayTapped(config.day) }
                             )
                         }
                     }
@@ -49,7 +51,8 @@ struct TrackerFormHabitScheduleView: View {
                 }
                 .padding(.horizontal, -16)
 
-                if let config = viewModel.configs.first(where: { $0.day == viewModel.activeDay }) {
+                if let activeDay = viewModel.activeDay,
+                   let config = viewModel.configs.first(where: { $0.day == activeDay }) {
                     ActiveDayNotificationView(
                         config: config,
                         usesVerticalLayout: dynamicTypeSize.isAccessibilitySize,
@@ -109,10 +112,11 @@ private struct DayNotificationControlsView: View {
 
 private struct DaySelectionButton: View {
     let config: TrackerHabitDayConfig
-    let onToggleDay: () -> Void
+    let isActive: Bool
+    let onDayTapped: () -> Void
 
     var body: some View {
-        Button(action: onToggleDay) {
+        Button(action: onDayTapped) {
             HStack(spacing: 6) {
                 Text(config.day.abbreviationShort)
                     .font(.callout.bold())
@@ -127,7 +131,13 @@ private struct DaySelectionButton: View {
             .background(config.isSelected ? Color.blue : Color(.systemGray5))
             .foregroundColor(config.isSelected ? .white : .primary)
             .clipShape(RoundedRectangle(cornerRadius: 10))
+            .overlay {
+                RoundedRectangle(cornerRadius: 10)
+                    .stroke(isActive ? Color.orange : Color.clear, lineWidth: 3)
+                    .padding(-3)
+            }
         }
+        .accessibilityAddTraits(isActive ? .isSelected : [])
     }
 }
 

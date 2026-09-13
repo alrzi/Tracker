@@ -4,6 +4,33 @@
     "" : {
 
     },
+    "%@: %@ → %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@: %2$@ → %3$@"
+          }
+        }
+      }
+    },
+    "AI analysis" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "AI analysis"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ИИ-анализ"
+          }
+        }
+      }
+    },
     "alert.cancel" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -471,6 +498,23 @@
                 }
               }
             }
+          }
+        }
+      }
+    },
+    "Edit schedule" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Edit schedule"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Изменить расписание"
           }
         }
       }
@@ -1454,6 +1498,23 @@
     "Today" : {
 
     },
+    "Try this day" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Try this day"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Попробовать"
+          }
+        }
+      }
+    },
     "weeks" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1635,7 +1696,22 @@
     "В настройки" : {
 
     },
+    "Время напоминания" : {
+
+    },
+    "День изменён" : {
+
+    },
     "Дни и напоминания" : {
+
+    },
+    "Добавить напоминание" : {
+
+    },
+    "Изменить день" : {
+
+    },
+    "Напоминание включено" : {
 
     },
     "Не можем загрузить данные проверьте подключение к интернету" : {
@@ -1645,6 +1721,9 @@
 
     },
     "Ошибка пометки трекера завершенным" : {
+
+    },
+    "Повторить изменение" : {
 
     },
     "Подтверждение удаления" : {

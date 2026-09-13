@@ -15,7 +15,8 @@ final class ModulesAssembly: Assembly {
     func assemble(container: Container) {
         container.register(StatisticsAssembly.self) { r in
             StatisticsAssembly(
-                statisticsManager: r.resolve(StatisticsManaging.self)!
+                statisticsManager: r.resolve(StatisticsManaging.self)!,
+                insightViewModelFactory: r.resolve(StatisticsInsightViewModelFactory.self)!
             )
         }
         

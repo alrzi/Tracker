@@ -15,7 +15,7 @@ final class TrackerFormHabitScheduleViewModel: ObservableObject {
     private let permissionManager: any PermissionManagerProtocol
 
     @Published var configs: [TrackerHabitDayConfig] = []
-    @Published private(set) var activeDay: WeekDay
+    @Published private(set) var activeDay: WeekDay?
     @Published var showPermissionAlert = false
 
     init(
@@ -28,13 +28,24 @@ final class TrackerFormHabitScheduleViewModel: ObservableObject {
             .init(day: $0, isSelected: selectedDays.contains($0), details: info?.schedule[$0])
         }
         self.configs = configs
-        self.activeDay = configs.first(where: \.isSelected)?.day ?? configs[0].day
+        self.activeDay = configs.first(where: \.isSelected)?.day
     }
 
-    func toggleDay(_ day: WeekDay) {
+    func dayTapped(_ day: WeekDay) {
         guard let index = configs.firstIndex(where: { $0.day == day }) else { return }
-        activeDay = day
+
+        let isSelected = configs[index].isSelected
+        let wasActive = activeDay == day
+
+        if isSelected && !wasActive {
+            activeDay = day
+            return
+        }
+
         configs[index].toggleSelection()
+        activeDay = configs[index].isSelected
+            ? day
+            : configs.first(where: \.isSelected)?.day
     }
 
     func toggleNotification(for day: WeekDay) {

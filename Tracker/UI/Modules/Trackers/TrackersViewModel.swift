@@ -11,11 +11,6 @@ import Combine
 import Utils
 import HapticFeedback
 
-enum DaySwipeDirection {
-    case previous
-    case next
-}
-
 @MainActor
 protocol TrackersViewModelProtocol: ObservableObject, TrackersNavigationState {
     associatedtype TrackersCollectionModel: TrackersCollectionViewModelProtocol
@@ -108,20 +103,7 @@ final class TrackersViewModel: TrackersViewModelProtocol {
     }
 
     func onDaySwipe(_ direction: DaySwipeDirection) {
-        let dayOffset = switch direction {
-        case .previous: -1
-        case .next: 1
-        }
-
-        guard let date = Calendar.current.date(
-            byAdding: .day,
-            value: dayOffset,
-            to: currentDate
-        ) else {
-            return
-        }
-
-        currentDate = date
+        currentDate = currentDate.advanced(by: direction.dayOffset, .day)
     }
     
     func onAdd() {
@@ -178,11 +160,19 @@ private extension TrackersViewModel {
     #if DEBUG
     func addMockDataIfNeeded() async {
         do {
-            guard try await trackerManager.fetchAll().isEmpty else {
+            let mockData = createSectionsWithTrackers()
+            let mockTrackerIDs = Set(mockData.sections.flatMap(\.trackers).map(\.id))
+            let storedTrackerIDs = Set(try await trackerManager.fetchAll().map(\.id))
+
+            guard mockTrackerIDs.isDisjoint(with: storedTrackerIDs) else {
                 return
             }
 
-            try await trackerManager.addSections(createSectionsWithTrackers())
+            try await trackerManager.addSections(mockData.sections)
+
+            for record in mockData.records {
+                try await trackerManager.toggle(record: record)
+            }
         }
         catch {
             debugPrint(error)

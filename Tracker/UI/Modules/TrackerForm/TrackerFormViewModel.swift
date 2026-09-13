@@ -151,13 +151,14 @@ private extension TrackerFormViewModel {
         tackerTitle = tracker.name
         weekDays = tracker.weekDays
 
-        if let emoji = emojiViewModel.items.first(where: { $0.value == tracker.emoji }) {
-            emojiViewModel.selectItem(emoji)
-        }
-        
-        if let color = colorsViewModel.items.first(where: { $0.value == tracker.color }) {
-            colorsViewModel.selectItem(color)
-        }
+        let emoji = emojiViewModel.items.first(where: { $0.value == tracker.emoji })
+            ?? TrackerFormGridItem(value: tracker.emoji)
+        emojiViewModel.selectItem(emoji)
+
+        let color = colorsViewModel.items.first {
+            $0.value.caseInsensitiveCompare(tracker.color) == .orderedSame
+        } ?? TrackerFormGridItem(value: tracker.color)
+        colorsViewModel.selectItem(color)
 
         Task {
             await updateSection(with: tracker.sectionId)
@@ -224,6 +225,12 @@ private extension TrackerFormViewModel {
             scheduleDict[info.key] = .init(weekDay: info.key, isEnabled: true, time: info.value)
         }
 
+        let timestamp = Date()
+        let createdAt = mode.createdAt ?? timestamp
+        let scheduleUpdatedAt = mode.weekDays == weekDays
+            ? (mode.scheduleUpdatedAt ?? createdAt)
+            : timestamp
+
         let tracker = Tracker(
             id: mode.trackerId,
             name: name,
@@ -238,7 +245,9 @@ private extension TrackerFormViewModel {
                 trackerId: mode.trackerId,
                 isGlobalEnabled: !notificationInfo.isEmpty,
                 schedule: scheduleDict
-            )
+            ),
+            createdAt: createdAt,
+            scheduleUpdatedAt: scheduleUpdatedAt
         )
         
         return (tracker, section)
@@ -246,6 +255,20 @@ private extension TrackerFormViewModel {
 }
 
 private extension TrackerFormMode {
+    var createdAt: Date? {
+        switch self {
+        case .createTracker: nil
+        case .editTracker(let tracker): tracker.createdAt
+        }
+    }
+
+    var scheduleUpdatedAt: Date? {
+        switch self {
+        case .createTracker: nil
+        case .editTracker(let tracker): tracker.scheduleUpdatedAt
+        }
+    }
+
     var screenTitle: String {
         switch self {
         case .createTracker: String(localized: .createNewHabit)

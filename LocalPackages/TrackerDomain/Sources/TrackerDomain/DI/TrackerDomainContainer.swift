@@ -26,6 +26,19 @@ public final class TrackerDomainAssembly: Assembly {
                 recordRepository: r.resolve(RecordRepositoryProtocol.self)!
             )
         }
+
+        container.register(GenerateStatisticsInsightUseCaseProtocol.self) { r in
+            GenerateStatisticsInsightUseCase(
+                historyProvider: r.resolve(StatisticsInsightHistoryProviding.self)!,
+                generator: r.resolve(StatisticsInsightGenerating.self)!
+            )
+        }
+
+        container.register(ApplyStatisticsInsightUseCaseProtocol.self) { r in
+            ApplyStatisticsInsightUseCase(
+                trackerRepository: r.resolve(TrackerRepositoryProtocol.self)!
+            )
+        }
         
         container.register(AuthServiceProtocol.self) { r in
             AuthService(

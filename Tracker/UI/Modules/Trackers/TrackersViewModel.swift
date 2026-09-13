@@ -23,6 +23,7 @@ protocol TrackersViewModelProtocol: ObservableObject, TrackersNavigationState {
     
     func onAppear()
     func onSectionAppear(at index: Int) async
+    func onDaySwipe(_ direction: DaySwipeDirection)
     func onToday()
     func onAdd()
 }
@@ -89,12 +90,20 @@ final class TrackersViewModel: TrackersViewModelProtocol {
     
     func onAppear() {
         Task {
+            #if DEBUG
+            await addMockDataIfNeeded()
+            #endif
+
             await trackersDeepLinksController.didAppear()
         }
     }
     
     func onToday() {
         currentDate = .now
+    }
+
+    func onDaySwipe(_ direction: DaySwipeDirection) {
+        currentDate = currentDate.advanced(by: direction.dayOffset, .day)
     }
     
     func onAdd() {
@@ -139,11 +148,37 @@ private extension TrackersViewModel {
                 
             case .edit(let tracker):
                 route = .update(tracker, onCompletion: { [weak self] _ in self?.route = nil })
+
+            case .move(let trackerID, let sectionID):
+                await move(trackerID: trackerID, toSectionID: sectionID)
             }
         }
     }
     
     // MARK: - Async
+
+    #if DEBUG
+    func addMockDataIfNeeded() async {
+        do {
+            let mockData = createSectionsWithTrackers()
+            let mockTrackerIDs = Set(mockData.sections.flatMap(\.trackers).map(\.id))
+            let storedTrackerIDs = Set(try await trackerManager.fetchAll().map(\.id))
+
+            guard mockTrackerIDs.isDisjoint(with: storedTrackerIDs) else {
+                return
+            }
+
+            try await trackerManager.addSections(mockData.sections)
+
+            for record in mockData.records {
+                try await trackerManager.toggle(record: record)
+            }
+        }
+        catch {
+            debugPrint(error)
+        }
+    }
+    #endif
     
     func updateState() async {
         do {
@@ -176,6 +211,25 @@ private extension TrackersViewModel {
     func delete(tracker: Tracker) async {
         do {
             try await trackerManager.delete(tracker: tracker)
+        }
+        catch {
+            debugPrint(error)
+        }
+    }
+
+    func move(trackerID: UUID, toSectionID sectionID: UUID) async {
+        guard case .loaded(let collections) = state,
+              let tracker = collections
+                .lazy
+                .flatMap(\.trackers)
+                .first(where: { $0.id == trackerID }),
+              tracker.sectionId != sectionID
+        else {
+            return
+        }
+
+        do {
+            try await trackerManager.update(tracker: tracker.with(sectionId: sectionID))
         }
         catch {
             debugPrint(error)
@@ -263,6 +317,7 @@ private extension TrackersViewModel {
         sections.map {
             trackersViewModelsFactory.createTrackersCollectionViewModel(
                 collection: $0,
+                allowsTrackerDrop: $0.id != pinnedSectionID,
                 currentDate: currentDate,
                 eventsHandler: { [weak self] in self?.handleTrackerItem(events: $0) }
             )

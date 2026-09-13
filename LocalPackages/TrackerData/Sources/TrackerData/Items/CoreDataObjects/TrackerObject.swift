@@ -16,6 +16,8 @@ public class TrackerObject: NSManagedObject {
     @NSManaged public var emoji: String
     @NSManaged public var isPinned: Bool
     @NSManaged public var weekDays: String
+    @NSManaged public var createdAt: Date?
+    @NSManaged public var scheduleUpdatedAt: Date?
     @NSManaged public var category: CategoryObject
     @NSManaged public var trackerRecord: Set<RecordObject>
     @NSManaged public var notificationDays: Set<NotificationDayObject>?
@@ -25,6 +27,10 @@ extension TrackerObject: Entity { }
 
 extension Tracker: Initable {
     init(object: TrackerObject) {
+        let persistedCreatedAt = object.createdAt
+            ?? object.trackerRecord.map(\.date).min()
+            ?? Date()
+
         self.init(
             id: object.id,
             name: object.name,
@@ -34,7 +40,9 @@ extension Tracker: Initable {
             isPinned: object.isPinned,
             trackedDays: object.trackerRecord.count,
             sectionId: object.category.id,
-            notificationInformation: object.notificationInformation
+            notificationInformation: object.notificationInformation,
+            createdAt: persistedCreatedAt,
+            scheduleUpdatedAt: object.scheduleUpdatedAt ?? persistedCreatedAt
         )
     }
 }
@@ -47,6 +55,8 @@ extension TrackerObject: CopyableEntity {
         self.emoji = tracker.emoji
         self.isPinned = tracker.isPinned
         self.weekDays = tracker.weekDays.toNumbersString()
+        self.createdAt = tracker.createdAt
+        self.scheduleUpdatedAt = tracker.scheduleUpdatedAt
         self.category = category
         self.trackerRecord = trackerRecord
 

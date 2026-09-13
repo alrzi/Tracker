@@ -14,6 +14,7 @@ struct TrackersView<ViewModel: TrackersViewModelProtocol> {
     @ObservedObject private var viewModel: ViewModel
     
     @Namespace private var topID
+    @GestureState private var swipeTranslation: CGSize = .zero
     
     init(viewModel: ViewModel) {
         self.viewModel = viewModel
@@ -62,10 +63,87 @@ extension TrackersView: View {
                         }
                     )
                 }
+                .simultaneousGesture(
+                    DragGesture(minimumDistance: 30)
+                        .updating($swipeTranslation) { value, translation, _ in
+                            translation = value.translation
+                        }
+                        .onEnded { value in
+                            let translation = value.translation
+
+                            guard abs(translation.width) > 70,
+                                  abs(translation.width) > abs(translation.height) * 1.25
+                            else {
+                                return
+                            }
+
+                            viewModel.onDaySwipe(translation.width < 0 ? .next : .previous)
+                        }
+                )
             }
         }
         .searchable(text: $viewModel.queryString) { }
+        .overlay {
+            EdgeSwipeHints(translation: swipeTranslation)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .allowsHitTesting(false)
+        }
         .onAppear(perform: viewModel.onAppear)
+    }
+}
+
+private struct EdgeSwipeHints: View {
+    let translation: CGSize
+
+    var body: some View {
+        let isHorizontal = abs(translation.width) > abs(translation.height) * 1.25
+        let progress = isHorizontal ? min(abs(translation.width) / 70, 1) : 0
+        let leadingProgress = translation.width > 0 ? progress : 0
+        let trailingProgress = translation.width < 0 ? progress : 0
+
+        ZStack {
+            EdgeArcShape(
+                edge: .leading,
+                progress: leadingProgress
+            )
+            .fill(Color.accentColor.opacity(0.4))
+            .opacity(leadingProgress * 0.8)
+
+            EdgeArcShape(
+                edge: .trailing,
+                progress: trailingProgress
+            )
+            .fill(Color.accentColor.opacity(0.4))
+            .opacity(trailingProgress * 0.8)
+        }
+    }
+}
+
+private struct EdgeArcShape: Shape {
+    enum Edge {
+        case leading
+        case trailing
+    }
+
+    let edge: Edge
+    let progress: CGFloat
+
+    func path(in rect: CGRect) -> Path {
+        let halfHeight = rect.height * 0.045
+        let maximumDepth = min(rect.width * 0.035, halfHeight * 0.4)
+        let depth = maximumDepth * progress
+        let edgeX = edge == .leading ? rect.minX : rect.maxX
+        let tipX = edge == .leading ? edgeX + depth : edgeX - depth
+
+        var path = Path()
+        path.move(to: CGPoint(x: edgeX, y: rect.midY - halfHeight))
+        path.addQuadCurve(
+            to: CGPoint(x: edgeX, y: rect.midY + halfHeight),
+            control: CGPoint(x: tipX, y: rect.midY)
+        )
+        path.addLine(to: CGPoint(x: edgeX, y: rect.midY - halfHeight))
+        path.closeSubpath()
+        return path
     }
 }
 
@@ -99,9 +177,7 @@ private struct FilterMenuView: View {
             .backDeployedLabelsVisibility(.visible)
         } label: {
             Image(systemName: "line.3.horizontal.decrease")
-                .resizable()
-                .scaledToFit()
-                .frame(width: 24, height: 24)
+                .font(.title3)
         }
     }
 }
@@ -118,23 +194,25 @@ private struct SafeAreaBottomView: View, KeyboardReadable {
             if !isToday && !isKeyboardShown {
                 Button(action: onToday) {
                     Text("Today")
-                        .font(.system(size: 24, weight: .semibold))
+                        .font(.title2.weight(.semibold))
                         .foregroundStyle(.white)
                         .padding(.horizontal, 20)
+                        .padding(.vertical, 14)
                 }
-                .frame(height: 60)
                 .background(.blue, in: .rect(cornerRadius: 12))
                 .transition(.opacity)
             }
             
             Button(action: onCreate) {
                 Image(systemName: "plus")
-                    .resizable()
+                    .font(.largeTitle)
+                    .imageScale(.large)
                     .symbolVariant(.circle.fill)
                     .symbolRenderingMode(.palette)
                     .foregroundStyle(.white, .blue)
             }
-            .frame(width: 60, height: 60)
+            .padding(16)
+            .contentShape(.circle)
         }
         .animation(.easeIn, value: isToday)
         .padding(20)
@@ -160,6 +238,7 @@ private final class ViewModel: TrackersViewModelProtocol {
     
     func onAppear() { }
     func onSectionAppear(at index: Int) async { }
+    func onDaySwipe(_ direction: DaySwipeDirection) { }
     func onToday() { }
     func onAdd() { }
 }

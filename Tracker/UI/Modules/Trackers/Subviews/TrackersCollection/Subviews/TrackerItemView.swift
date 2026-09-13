@@ -63,14 +63,14 @@ private struct TrackerView: View {
         HStack {
             VStack(alignment: .leading, spacing: 0) {
                 Text(tracker.emoji)
-                    .font(.system(size: 16))
+                    .font(.body)
                     .padding(8)
                     .background(.white.opacity(0.3), in: .circle)
                 
                 Spacer(minLength: 8)
                 
                 Text(tracker.name)
-                    .font(.system(size: 12))
+                    .font(.subheadline)
                     .foregroundStyle(.white)
                     .layoutPriority(1)
             }
@@ -88,17 +88,16 @@ private struct TrackerView: View {
             Button(action: onTogglePin) {
                 if tracker.isPinned {
                     Image(systemName: "pin")
-                        .resizable()
-                        .frame(width: 8, height: 12)
+                        .font(.caption2)
                         .symbolVariant(.fill)
                         .foregroundStyle(.white)
                 }
             }
-            .frame(width: 24, height: 24)
+            .padding(8)
+            .contentShape(.rect)
             .padding(.top, 12)
             .padding(.trailing, 4)
         }
-        .frame(height: 100)
     }
 }
 
@@ -111,29 +110,24 @@ private struct RecordView: View {
     var body: some View {
         HStack {
             Text(.days(Int32(trackedDays)))
-                .font(.system(size: 12))
+                .font(.subheadline)
                 .multilineTextAlignment(.leading)
-                .lineLimit(1)
+                .fixedSize(horizontal: false, vertical: true)
             
             Spacer()
             
             Button(action: onToggleCompletion) {
-                if isCompleted {
-                    Image(systemName: "checkmark")
-                        .resizable()
-                        .symbolVariant(.circle.fill)
-                        .symbolRenderingMode(.palette)
-                        .foregroundStyle(.white, color.opacity(0.3))
-                }
-                else {
-                    Image(systemName: "plus")
-                        .resizable()
-                        .symbolVariant(.circle.fill)
-                        .symbolRenderingMode(.palette)
-                        .foregroundStyle(.white, color)
-                }
+                Image(systemName: isCompleted ? "checkmark" : "plus")
+                    .font(.largeTitle)
+                    .symbolVariant(.circle.fill)
+                    .symbolRenderingMode(.palette)
+                    .foregroundStyle(
+                        .white,
+                        isCompleted ? color.opacity(0.3) : color
+                    )
             }
-            .frame(width: 34, height: 34)
+            .padding(4)
+            .contentShape(.circle)
         }
         .padding(.top, 8)
         .padding(.bottom, 16)

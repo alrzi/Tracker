@@ -20,6 +20,9 @@ final class GridViewModel<T: Equatable & Hashable & Identifiable>: ObservableObj
     }
     
     func selectItem(_ item: T) {
+        if !items.contains(item) {
+            items.insert(item, at: 0)
+        }
         selectedItem = item
     }
 }

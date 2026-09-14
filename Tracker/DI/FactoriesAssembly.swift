@@ -27,5 +27,39 @@ final class FactoriesAssembly: Assembly {
                 applyUseCase: r.resolve(ApplyStatisticsInsightUseCaseProtocol.self)!
             )
         }
+
+        container.register(TrackerFormFactory.self) { r in
+            TrackerFormFactory(
+                trackerManager: r.resolve(TrackerManaging.self)!,
+                notificationManager: r.resolve((any AppNotificationManaging).self)!,
+                sectionRepository: r.resolve(SectionRepositoryProtocol.self)!
+            )
+        }
+
+        container.register(SectionsListFactory.self) { r in
+            SectionsListFactory(sectionRepository: r.resolve(SectionRepositoryProtocol.self)!)
+        }
+
+        container.register(SectionCreationFactory.self) { r in
+            SectionCreationFactory(
+                sectionRepository: r.resolve(SectionRepositoryProtocol.self)!
+            )
+        }
+
+        container.register(TrackersScreenFactory.self) { r in
+            TrackersScreenFactory(
+                trackerManager: r.resolve(TrackerManaging.self)!,
+                hapticManager: r.resolve(VibrationFeedbackManaging.self)!,
+                notificationDeepLinkService: r.resolve(NotificationDeepLinkServiceProtocol.self)!,
+                viewModelsFactory: r.resolve(TrackersViewModelsFactory.self)!
+            )
+        }
+
+        container.register(StatisticsScreenFactory.self) { r in
+            StatisticsScreenFactory(
+                statisticsManager: r.resolve(StatisticsManaging.self)!,
+                insightViewModelFactory: r.resolve(StatisticsInsightViewModelFactory.self)!
+            )
+        }
     }
 }

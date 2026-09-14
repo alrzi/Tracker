@@ -11,19 +11,23 @@ import TrackerDomain
 @MainActor
 protocol StatisticsViewModelProtocol: ObservableObject {
     var statisticData: [StatisticTableData] { get }
+    var insightViewModel: StatisticsInsightViewModel { get }
     
     func onAppear()
 }
 
 final class StatisticsViewModel: StatisticsViewModelProtocol {
     private let statisticsManager: any StatisticsManaging
+    let insightViewModel: StatisticsInsightViewModel
         
     @Published private(set) var statisticData: [StatisticTableData] = []
     
     init(
-        statisticsManager: some StatisticsManaging
+        statisticsManager: some StatisticsManaging,
+        insightViewModel: StatisticsInsightViewModel
     ) {
         self.statisticsManager = statisticsManager
+        self.insightViewModel = insightViewModel
     }
     
     func onAppear() {

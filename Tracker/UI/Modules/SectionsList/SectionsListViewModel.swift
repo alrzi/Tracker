@@ -9,58 +9,46 @@ import Foundation
 import TrackerDomain
 
 @MainActor
-protocol SectionsListViewModelProtocol: ObservableObject, SectionListNavigationState {
+protocol SectionsListViewModelProtocol: ObservableObject {
     var state: SectionsListState { get }
     var selectedSection: TrackerSection? { get }
     
     func onSection(_ section: TrackerSection)
-    func onSectionCreation()
-    func onSectionUpdate(_ section: TrackerSection)
     func onSectionDelete(_ section: TrackerSection)
+    func onAppear()
 }
 
 final class SectionsListViewModel: SectionsListViewModelProtocol {
     private let sectionRepository: any SectionRepositoryProtocol
-    private let eventsHandler: (TrackerSection) -> Void
-    
+    private let initialSectionID: UUID?
     @Published private(set) var state: SectionsListState = .loading
-    private(set) var selectedSection: TrackerSection?
-    
-    @Published var route: SectionListRoute?
+    @Published private(set) var selectedSection: TrackerSection?
     
     init(
         sectionRepository: some SectionRepositoryProtocol,
-        sectionID: UUID?,
-        eventsHandler: @escaping (TrackerSection) -> Void
+        sectionID: UUID?
     ) {
         self.sectionRepository = sectionRepository
-        self.eventsHandler = eventsHandler
-        
+        self.initialSectionID = sectionID
+    }
+
+    func onAppear() {
         Task {
             await loadSections()
-            
-            selectedSection = state.models.first
-            
-            guard let sectionID else {
-                return
+
+            if let selectedSection {
+                await loadSection(selectedSection.id)
+            } else if let initialSectionID {
+                await loadSection(initialSectionID)
+            } else {
+                selectedSection = state.models.first
             }
-            
-            await loadSection(sectionID)
         }
     }
     
     func onSection(_ section: TrackerSection) {
         selectedSection = section
         
-        eventsHandler(section)
-    }
-    
-    func onSectionCreation() {
-        route = .createSection(onCompletion: { [weak self] in self?.onSectionCreated($0) })
-    }
-    
-    func onSectionUpdate(_ section: TrackerSection) {
-        route = .updateSection(section, onCompletion: { [weak self] in self?.onSectionUpdated($0) })
     }
     
     func onSectionDelete(_ section: TrackerSection) {
@@ -71,49 +59,7 @@ final class SectionsListViewModel: SectionsListViewModelProtocol {
     }
 }
 
-// MARK: - Private
-
 private extension SectionsListViewModel {
-    func onSectionUpdated(_ section: TrackerSection) {
-        route = nil
-        
-        Task {
-            await updateSection(section)
-            await loadSections()
-            await loadSection(section.id)
-        }
-    }
-    
-    func onSectionCreated(_ section: TrackerSection) {
-        route = nil
-        
-        Task {
-            await createSection(section)
-            await loadSections()
-            await loadSection(section.id)
-        }
-    }
-    
-    // Async
-    
-    func createSection(_ section: TrackerSection) async {
-        do {
-            try await sectionRepository.createSection(section)
-        }
-        catch {
-            debugPrint(error)
-        }
-    }
-    
-    func updateSection(_ section: TrackerSection) async {
-        do {
-            try await sectionRepository.updateSection(section)
-        }
-        catch {
-            debugPrint(error)
-        }
-    }
-    
     func deleteSection(_ sectionID: UUID) async {
         do {
             try await sectionRepository.deleteSection(with: sectionID)

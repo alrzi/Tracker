@@ -12,7 +12,7 @@ import Utils
 import HapticFeedback
 
 @MainActor
-protocol TrackersViewModelProtocol: ObservableObject, TrackersNavigationState {
+protocol TrackersViewModelProtocol: ObservableObject {
     associatedtype TrackersCollectionModel: TrackersCollectionViewModelProtocol
 
     var isToday: Bool { get }
@@ -20,12 +20,15 @@ protocol TrackersViewModelProtocol: ObservableObject, TrackersNavigationState {
     var queryString: String { get set }
     var currentDate: Date { get set }
     var filter: TrackerFilter { get set }
+    var createRequests: AnyPublisher<Void, Never> { get }
+    var editRequests: AnyPublisher<Tracker, Never> { get }
     
     func onAppear()
     func onSectionAppear(at index: Int) async
     func onDaySwipe(_ direction: DaySwipeDirection)
     func onToday()
     func onAdd()
+    func handleCollectionEvent(_ event: TrackersCollectionOutput)
 }
 
 final class TrackersViewModel: TrackersViewModelProtocol {
@@ -40,6 +43,8 @@ final class TrackersViewModel: TrackersViewModelProtocol {
     private var fetchParameters: FetchParameters = .init(fetchLimit: 20, fetchOffset: 0)
     private let pinnedSectionID: UUID = .init()
     private var paginationState: LoadingState = .idle
+    private let createRequestSubject = PassthroughSubject<Void, Never>()
+    private let editRequestSubject = PassthroughSubject<Tracker, Never>()
     
     @Published private(set) var state: TrackersState<TrackersCollectionViewModel> = .idle
     
@@ -47,9 +52,9 @@ final class TrackersViewModel: TrackersViewModelProtocol {
     @Published var queryString = ""
     @Published var currentDate: Date = .now
     
-    @Published var route: TrackersRoute?
-    
     var isToday: Bool { currentDate.isInToday }
+    var createRequests: AnyPublisher<Void, Never> { createRequestSubject.eraseToAnyPublisher() }
+    var editRequests: AnyPublisher<Tracker, Never> { editRequestSubject.eraseToAnyPublisher() }
 
     init(
         trackerManager: some TrackerManaging,
@@ -108,11 +113,25 @@ final class TrackersViewModel: TrackersViewModelProtocol {
     
     func onAdd() {
         hapticManager.makeVibration(for: .selection)
-        route = .create(onCompletion: { [weak self] _ in self?.route = nil })
     }
     
     func onSectionAppear(at index: Int) async {
         await paginateMoreSectionsIfNeeded(index: index)
+    }
+
+    func handleCollectionEvent(_ events: TrackersCollectionOutput) {
+        Task {
+            switch events {
+            case .togglePin(let tracker):
+                await togglePin(for: tracker)
+            case .delete(let tracker):
+                await delete(tracker: tracker)
+            case .edit(let tracker):
+                editRequestSubject.send(tracker)
+            case .move(let trackerID, let sectionID):
+                await move(trackerID: trackerID, toSectionID: sectionID)
+            }
+        }
     }
     
     deinit {
@@ -134,24 +153,6 @@ private extension TrackersViewModel {
     func onFilterOrDateTrigger() {
         Task {
             await fetchSections(isSearch: false)
-        }
-    }
-    
-    func handleTrackerItem(events: TrackersCollectionOutput) {
-        Task {
-            switch events {
-            case .togglePin(let tracker):
-                await togglePin(for: tracker)
-                
-            case .delete(let tracker):
-                await delete(tracker: tracker)
-                
-            case .edit(let tracker):
-                route = .update(tracker, onCompletion: { [weak self] _ in self?.route = nil })
-
-            case .move(let trackerID, let sectionID):
-                await move(trackerID: trackerID, toSectionID: sectionID)
-            }
         }
     }
     
@@ -308,7 +309,7 @@ private extension TrackersViewModel {
     
     func handle(destination: TrackersDeepLinkDestination?) {
         switch destination {
-        case .createTracker: route = .create(onCompletion: { [weak self] _ in self?.route = nil })
+        case .createTracker: createRequestSubject.send(())
         case .none: break
         }
     }
@@ -318,8 +319,7 @@ private extension TrackersViewModel {
             trackersViewModelsFactory.createTrackersCollectionViewModel(
                 collection: $0,
                 allowsTrackerDrop: $0.id != pinnedSectionID,
-                currentDate: currentDate,
-                eventsHandler: { [weak self] in self?.handleTrackerItem(events: $0) }
+                currentDate: currentDate
             )
         }
     }

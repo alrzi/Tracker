@@ -20,10 +20,10 @@ protocol TrackersCollectionViewModelProtocol: ObservableObject, Identifiable {
     var isCompletionConfirmationAlertPresented: Bool { get set }
     
     func onToggleCompletion(at index: Int)
-    func onTogglePin(at index: Int)
-    func onEdit(at index: Int)
+    func tracker(at index: Int) -> Tracker?
     func onDelete(at index: Int)
-    func onMove(trackerID: UUID)
+    func confirmDelete() -> Tracker?
+    func moveOutput(trackerID: UUID) -> TrackersCollectionOutput?
 }
 
 final class TrackersCollectionViewModel: TrackersCollectionViewModelProtocol {
@@ -33,7 +33,7 @@ final class TrackersCollectionViewModel: TrackersCollectionViewModelProtocol {
     private let hapticManager: any VibrationFeedbackManaging
     private let currentDate: Date
     
-    private let eventsHandler: (TrackersCollectionOutput) -> Void
+    private var trackerPendingDeletion: Tracker?
     
     @Published private(set) var trackers: [Tracker]
     @Published private(set) var completionState: LoadingState = .idle
@@ -53,8 +53,7 @@ final class TrackersCollectionViewModel: TrackersCollectionViewModelProtocol {
         hapticManager: some VibrationFeedbackManaging,
         collection: TrackerSection,
         allowsTrackerDrop: Bool,
-        currentDate: Date,
-        eventsHandler: @escaping (TrackersCollectionOutput) -> Void
+        currentDate: Date
     ) {
         self.trackerRepository = trackerRepository
         self.recordRepository = recordRepository
@@ -65,7 +64,6 @@ final class TrackersCollectionViewModel: TrackersCollectionViewModelProtocol {
         self.title = collection.title
         self.allowsTrackerDrop = allowsTrackerDrop
         self.trackers = collection.trackers
-        self.eventsHandler = eventsHandler
         
         $deleteTrackerConfirmationAlert
             .map { $0 != nil }
@@ -82,20 +80,8 @@ final class TrackersCollectionViewModel: TrackersCollectionViewModelProtocol {
         }
     }
     
-    func onTogglePin(at index: Int) {
-        guard let tracker = trackers.elementOrNil(at: index) else {
-            return
-        }
-        
-        eventsHandler(.togglePin(tracker))
-    }
-    
-    func onEdit(at index: Int) {
-        guard let tracker = trackers.elementOrNil(at: index) else {
-            return
-        }
-        
-        eventsHandler(.edit(tracker))
+    func tracker(at index: Int) -> Tracker? {
+        trackers.elementOrNil(at: index)
     }
     
     func onDelete(at index: Int) {
@@ -103,15 +89,21 @@ final class TrackersCollectionViewModel: TrackersCollectionViewModelProtocol {
             return
         }
         
-        deleteTrackerConfirmationAlert = .deleteTrackerConfirmationAlert { [eventsHandler] in eventsHandler(.delete(tracker)) }
+        trackerPendingDeletion = tracker
+        deleteTrackerConfirmationAlert = .deleteTrackerConfirmationAlert
     }
 
-    func onMove(trackerID: UUID) {
+    func confirmDelete() -> Tracker? {
+        defer { trackerPendingDeletion = nil }
+        return trackerPendingDeletion
+    }
+
+    func moveOutput(trackerID: UUID) -> TrackersCollectionOutput? {
         guard allowsTrackerDrop else {
-            return
+            return nil
         }
 
-        eventsHandler(.move(trackerID: trackerID, toSectionID: id))
+        return .move(trackerID: trackerID, toSectionID: id)
     }
 }
 
@@ -158,12 +150,12 @@ private extension ErrorInfo {
         )
     }
     
-    static func deleteTrackerConfirmationAlert(onConfirm: @escaping () -> Void) -> Self {
+    static var deleteTrackerConfirmationAlert: Self {
         .init(
             message: String(localized: .alertConfirmationTracker),
             cancelButtonText: String(localized: .alertCancel),
             confirmationButtonText: String(localized: .alertDelete),
-            onConfirm: onConfirm
+            onConfirm: { }
         )
     }
 }

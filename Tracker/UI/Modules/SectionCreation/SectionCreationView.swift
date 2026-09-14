@@ -7,17 +7,21 @@
 
 import SwiftUI
 import Foundation
+import TrackerDomain
 
 @MainActor
 struct SectionCreationView<ViewModel: SectionCreationViewModelProtocol> {
     @ObservedObject private var viewModel: ViewModel
     private let onClose: () -> Void
+    private let onCompleted: (TrackerSection) -> Void
     
     init(
         viewModel: ViewModel,
+        onCompleted: @escaping (TrackerSection) -> Void,
         onClose: @escaping () -> Void
     ) {
         self.viewModel = viewModel
+        self.onCompleted = onCompleted
         self.onClose = onClose
     }
 }
@@ -26,8 +30,7 @@ struct SectionCreationView<ViewModel: SectionCreationViewModelProtocol> {
 
 extension SectionCreationView: View {
     var body: some View {
-        NavigationStack {
-            ScrollableLazyVStack {
+        ScrollableLazyVStack {
                 TextField(String(localized: .createEnterName), text: $viewModel.sectionTitle)
                     .textContentType(.name)
                     .keyboardType(.default)
@@ -40,10 +43,14 @@ extension SectionCreationView: View {
                     .navigationTitle(String(localized: .categoryAddNew))
             }
             .safeAreaInset(edge: .bottom) {
-                Button(String(localized: .scheduleReady), action: viewModel.onPrimary)
+            Button(String(localized: .scheduleReady), action: viewModel.onPrimary)
                     .buttonStyle(CommonButtonStyle(backgroundColor: .black))
                     .padding(.horizontal, 16)
                     .padding(.bottom, 16)
+            }
+            .onChange(of: viewModel.completedSection) { _, section in
+                guard let section else { return }
+                onCompleted(section)
             }
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
@@ -53,17 +60,17 @@ extension SectionCreationView: View {
                     .accessibilityLabel("Close")
                 }
             }
-        }
     }
 }
 
 #if DEBUG
 #Preview {
-    SectionCreationView(viewModel: ViewModel(), onClose: { })
+    SectionCreationView(viewModel: ViewModel(), onCompleted: { _ in }, onClose: { })
 }
 
 private final class ViewModel: SectionCreationViewModelProtocol {
     let invalidComponent: SectionCreationInvalidComponent? = nil
+    let completedSection: TrackerSection? = nil
     
     var sectionTitle: String = ""
     

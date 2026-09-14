@@ -12,6 +12,7 @@ import TrackerDomain
 protocol SectionCreationViewModelProtocol: ObservableObject {
     var sectionTitle: String { get set }
     var invalidComponent: SectionCreationInvalidComponent? { get }
+    var completedSection: TrackerSection? { get }
     
     func onPrimary()
 }
@@ -20,19 +21,20 @@ final class SectionCreationViewModel: SectionCreationViewModelProtocol {
     typealias InvalidComponent = SectionCreationInvalidComponent
     
     private let invalidComponentManager: any InvalidComponentManaging<InvalidComponent>
-    private let eventsHandler: (TrackerSection) -> Void
+    private let sectionRepository: any SectionRepositoryProtocol
     private let section: TrackerSection?
     
     @Published private(set) var invalidComponent: InvalidComponent?
+    @Published private(set) var completedSection: TrackerSection?
     @Published var sectionTitle: String = ""
     
     init(
         invalidComponentManager: some InvalidComponentManaging<InvalidComponent> = InvalidComponentManager(),
-        section: TrackerSection?,
-        eventsHandler: @escaping (TrackerSection) -> Void
+        sectionRepository: some SectionRepositoryProtocol,
+        section: TrackerSection?
     ) {
         self.invalidComponentManager = invalidComponentManager
-        self.eventsHandler = eventsHandler
+        self.sectionRepository = sectionRepository
         self.section = section
         
         if let section {
@@ -45,12 +47,23 @@ final class SectionCreationViewModel: SectionCreationViewModelProtocol {
     func onPrimary() {
         do {
             let sectionTitle = try Self.validate(sectionTitle: sectionTitle)
-            
-            if let section {
-                eventsHandler(.init(id: section.id, title: sectionTitle, trackers: []))
+            let result = if let section {
+                TrackerSection(id: section.id, title: sectionTitle, trackers: section.trackers)
+            } else {
+                TrackerSection(title: sectionTitle, trackers: [])
             }
-            else {
-                eventsHandler(.init(title: sectionTitle, trackers: []))
+
+            Task {
+                do {
+                    if section == nil {
+                        try await sectionRepository.createSection(result)
+                    } else {
+                        try await sectionRepository.updateSection(result)
+                    }
+                    completedSection = result
+                } catch {
+                    debugPrint(error)
+                }
             }
         }
         catch {

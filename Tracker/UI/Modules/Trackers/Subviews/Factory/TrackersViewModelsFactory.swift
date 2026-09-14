@@ -31,8 +31,7 @@ final class TrackersViewModelsFactory {
     func createTrackersCollectionViewModel(
         collection: TrackerSection,
         allowsTrackerDrop: Bool,
-        currentDate: Date,
-        eventsHandler: @escaping (TrackersCollectionOutput) -> Void
+        currentDate: Date
     ) -> TrackersCollectionViewModel {
         TrackersCollectionViewModel(
             trackerRepository: trackerRepository,
@@ -41,8 +40,7 @@ final class TrackersViewModelsFactory {
             hapticManager: hapticManager,
             collection: collection,
             allowsTrackerDrop: allowsTrackerDrop,
-            currentDate: currentDate,
-            eventsHandler: eventsHandler
+            currentDate: currentDate
         )
     }
 }

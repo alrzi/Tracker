@@ -12,9 +12,11 @@ import TrackerDomain
 @MainActor
 struct TrackerFormView<ViewModel: TrackerFormViewModelProtocol> {
     @ObservedObject private var viewModel: ViewModel
-    @Environment(\.dismiss) private var dismiss
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @Environment(\.verticalSizeClass) private var verticalSizeClass
+    private let onClose: () -> Void
+    private let onSectionSelection: (UUID?) -> Void
+    private let onCompleted: (TrackerFormOutput) -> Void
 
     private var gridColumnsCount: Int {
         switch dynamicTypeSize {
@@ -29,8 +31,16 @@ struct TrackerFormView<ViewModel: TrackerFormViewModelProtocol> {
         }
     }
     
-    init(viewModel: ViewModel) {
+    init(
+        viewModel: ViewModel,
+        onSectionSelection: @escaping (UUID?) -> Void,
+        onCompleted: @escaping (TrackerFormOutput) -> Void,
+        onClose: @escaping () -> Void
+    ) {
         self.viewModel = viewModel
+        self.onSectionSelection = onSectionSelection
+        self.onCompleted = onCompleted
+        self.onClose = onClose
     }
 }
 
@@ -43,15 +53,14 @@ extension TrackerFormView: View {
             ? AnyLayout(HStackLayout(alignment: .top, spacing: 24))
             : AnyLayout(VStackLayout(spacing: 24))
 
-        NavigationStack {
-            ScrollView {
+        ScrollView {
                 layout {
                     TrackerFormDetailsView(
                         title: $viewModel.tackerTitle,
                         sectionTitle: viewModel.sectionTitle,
                         invalidComponent: viewModel.invalidComponent,
                         habitScheduleViewModel: viewModel.habitScheduleViewModel,
-                        onSectionSelection: viewModel.onSectionSelection
+                        onSectionSelection: { onSectionSelection(viewModel.selectedSectionID) }
                     )
                     .frame(maxWidth: .infinity, alignment: .top)
 
@@ -71,7 +80,7 @@ extension TrackerFormView: View {
             .toolbar {
                 ToolbarItemGroup(placement: .bottomBar) {
                     Button {
-                        dismiss()
+                        onClose()
                     } label: {
                         Image(systemName: "xmark")
                             .font(.headline)
@@ -81,13 +90,20 @@ extension TrackerFormView: View {
                     Spacer()
 
                     Button {
-                        Task { await viewModel.onCompleteFrom() }
+                        completeForm()
                     } label: {
                         Image(systemName: "checkmark")
                             .font(.headline)
                     }
                     .accessibilityLabel(viewModel.completeFormButtonTitle)
                 }
+        }
+    }
+
+    private func completeForm() {
+        Task {
+            if let output = await viewModel.onCompleteFrom() {
+                onCompleted(output)
             }
         }
     }
@@ -282,11 +298,11 @@ private extension WeekDay {
 
 #if DEBUG
 #Preview("Portrait") {
-    TrackerFormView(viewModel: ViewModel())
+    TrackerFormView(viewModel: ViewModel(), onSectionSelection: { _ in }, onCompleted: { _ in }, onClose: { })
 }
 
 #Preview("Accessibility") {
-    TrackerFormView(viewModel: ViewModel())
+    TrackerFormView(viewModel: ViewModel(), onSectionSelection: { _ in }, onCompleted: { _ in }, onClose: { })
         .environment(\.dynamicTypeSize, .accessibility3)
 }
 
@@ -300,12 +316,11 @@ private final class ViewModel: TrackerFormViewModelProtocol {
         )
     )
 
-    var route: TrackerFormRoute?
-    
     var tackerTitle: String = "Утренняя тренировка"
     
     let title: String = "Новая привычка"
     let sectionTitle: String? = "Здоровье и развитие"
+    let selectedSectionID: UUID? = nil
     let weekDays: WeekDays = []
     let completeFormButtonTitle = "Создать привычку"
     
@@ -318,8 +333,8 @@ private final class ViewModel: TrackerFormViewModelProtocol {
     
     let invalidComponent: TrackerFormInvalidComponent? = nil
     
-    func onSectionSelection() { }
+    func selectSection(_ section: TrackerSection) { }
     func onWeekSelection() { }
-    func onCompleteFrom() { }
+    func onCompleteFrom() async -> TrackerFormOutput? { nil }
 }
 #endif

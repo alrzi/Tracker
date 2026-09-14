@@ -12,7 +12,6 @@ import TrackerDomain
 @MainActor
 struct StatisticsView<ViewModel: StatisticsViewModelProtocol> {
     @ObservedObject private var viewModel: ViewModel
-    @ObservedObject private var insightViewModel: StatisticsInsightViewModel
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     @Environment(\.verticalSizeClass) private var verticalSizeClass
@@ -39,12 +38,8 @@ struct StatisticsView<ViewModel: StatisticsViewModelProtocol> {
         }
     }
     
-    init(
-        viewModel: ViewModel,
-        insightViewModel: StatisticsInsightViewModel
-    ) {
+    init(viewModel: ViewModel) {
         self.viewModel = viewModel
-        self.insightViewModel = insightViewModel
     }
 }
 
@@ -52,15 +47,14 @@ struct StatisticsView<ViewModel: StatisticsViewModelProtocol> {
 
 extension StatisticsView: View {
     var body: some View {
-        NavigationStack {
-            Group {
+        Group {
                 if viewModel.statisticData.isEmpty {
                     PlaceholderView(placeholder: .emptyStatistic)
                 }
                 else {
                     ScrollView {
                         VStack(spacing: 12) {
-                            StatisticsInsightView(viewModel: insightViewModel)
+                            StatisticsInsightView(viewModel: viewModel.insightViewModel)
 
                             LazyVGrid(columns: columns, spacing: 12) {
                                 ForEach(viewModel.statisticData) { data in
@@ -73,39 +67,30 @@ extension StatisticsView: View {
                     }
                 }
             }
-            .navigationTitle(String(localized: .statisticTitle))
-        }
+        .navigationTitle(String(localized: .statisticTitle))
         .onAppear {
             viewModel.onAppear()
-            insightViewModel.screenAppeared()
+            viewModel.insightViewModel.screenAppeared()
         }
-        .onDisappear(perform: insightViewModel.screenDisappeared)
+        .onDisappear(perform: viewModel.insightViewModel.screenDisappeared)
     }
 }
 
 #if DEBUG
 #Preview("Portrait") {
-    StatisticsView(
-        viewModel: ViewModel(),
-        insightViewModel: StatisticsInsightViewModel(
-            generateUseCase: InsightUseCase(),
-            applyUseCase: ApplyInsightUseCase()
-        )
-    )
+    StatisticsView(viewModel: ViewModel())
 }
 
 #Preview("Accessibility") {
-    StatisticsView(
-        viewModel: ViewModel(),
-        insightViewModel: StatisticsInsightViewModel(
-            generateUseCase: InsightUseCase(),
-            applyUseCase: ApplyInsightUseCase()
-        )
-    )
+    StatisticsView(viewModel: ViewModel())
         .environment(\.dynamicTypeSize, .accessibility3)
 }
 
 private final class ViewModel: StatisticsViewModelProtocol {
+    let insightViewModel = StatisticsInsightViewModel(
+        generateUseCase: InsightUseCase(),
+        applyUseCase: ApplyInsightUseCase()
+    )
     let statisticData: [StatisticTableData] = [
         .bestPeriod(.init(count: 18, title: "Лучший период", subtitle: "Максимальное количество дней без перерыва")),
         .idealDays(.init(count: 7, title: "Идеальные дни", subtitle: "Дни, когда были выполнены все запланированные привычки")),

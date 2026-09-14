@@ -11,6 +11,7 @@ import TrackerDomain
 @MainActor
 struct TrackersCollectionView<ViewModel: TrackersCollectionViewModelProtocol> {
     @ObservedObject private var viewModel: ViewModel
+    private let onEvent: (TrackersCollectionOutput) -> Void
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     @Environment(\.verticalSizeClass) private var verticalSizeClass
@@ -37,8 +38,9 @@ struct TrackersCollectionView<ViewModel: TrackersCollectionViewModelProtocol> {
         }
     }
 
-    init(viewModel: ViewModel) {
+    init(viewModel: ViewModel, onEvent: @escaping (TrackersCollectionOutput) -> Void) {
         self.viewModel = viewModel
+        self.onEvent = onEvent
     }
 }
 
@@ -61,8 +63,12 @@ extension TrackersCollectionView: View {
                     TrackerItemView(
                         tracker: tracker,
                         onToggleCompletion: { viewModel.onToggleCompletion(at: index) },
-                        onTogglePin: { viewModel.onTogglePin(at: index) },
-                        onEdit: { viewModel.onEdit(at: index) },
+                        onTogglePin: {
+                            if let tracker = viewModel.tracker(at: index) { onEvent(.togglePin(tracker)) }
+                        },
+                        onEdit: {
+                            if let tracker = viewModel.tracker(at: index) { onEvent(.edit(tracker)) }
+                        },
                         onDelete: { viewModel.onDelete(at: index) }
                     )
                     .draggable(tracker.id.uuidString)
@@ -76,7 +82,8 @@ extension TrackersCollectionView: View {
                 return false
             }
 
-            viewModel.onMove(trackerID: trackerID)
+            guard let output = viewModel.moveOutput(trackerID: trackerID) else { return false }
+            onEvent(output)
             return true
         }
         .alert(
@@ -98,7 +105,9 @@ extension TrackersCollectionView: View {
                 Button(detail.cancelButtonText, role: .cancel) { }
                 
                 Button(detail.confirmationButtonText, role: .destructive) {
-                    detail.onConfirm()
+                    if let tracker = viewModel.confirmDelete() {
+                        onEvent(.delete(tracker))
+                    }
                 }
             },
             message: { detail in
@@ -111,7 +120,7 @@ extension TrackersCollectionView: View {
 #if DEBUG
 #Preview("Rich collection") {
     ScrollView {
-        TrackersCollectionView(viewModel: CollectionViewModel())
+        TrackersCollectionView(viewModel: CollectionViewModel(), onEvent: { _ in })
             .padding(.horizontal, 12)
             .padding(.vertical)
     }
@@ -120,7 +129,7 @@ extension TrackersCollectionView: View {
 
 #Preview("Accessibility text") {
     ScrollView {
-        TrackersCollectionView(viewModel: CollectionViewModel())
+        TrackersCollectionView(viewModel: CollectionViewModel(), onEvent: { _ in })
             .padding(.horizontal, 12)
             .padding(.vertical)
     }
@@ -204,9 +213,9 @@ final class CollectionViewModel: TrackersCollectionViewModelProtocol {
     }
     
     func onToggleCompletion(at index: Int) { }
-    func onTogglePin(at index: Int) { }
-    func onEdit(at index: Int) { }
+    func tracker(at index: Int) -> Tracker? { trackers.elementOrNil(at: index) }
     func onDelete(at index: Int) { }
-    func onMove(trackerID: UUID) { }
+    func confirmDelete() -> Tracker? { nil }
+    func moveOutput(trackerID: UUID) -> TrackersCollectionOutput? { nil }
 }
 #endif

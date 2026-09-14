@@ -10,10 +10,11 @@ import Combine
 import TrackerDomain
 
 @MainActor
-protocol TrackerFormViewModelProtocol: ObservableObject, TrackerFormNavigationState {
+protocol TrackerFormViewModelProtocol: ObservableObject {
     var tackerTitle: String { get set }
     var title: String { get }
     var sectionTitle: String? { get }
+    var selectedSectionID: UUID? { get }
     var weekDays: WeekDays { get }
     var habitScheduleViewModel: TrackerFormHabitScheduleViewModel { get }
     var emojiViewModel: GridViewModel<TrackerFormGridItem> { get }
@@ -21,8 +22,8 @@ protocol TrackerFormViewModelProtocol: ObservableObject, TrackerFormNavigationSt
     var invalidComponent: TrackerFormInvalidComponent? { get }
     var completeFormButtonTitle: String { get }
     
-    func onSectionSelection()
-    func onCompleteFrom() async
+    func onCompleteFrom() async -> TrackerFormOutput?
+    func selectSection(_ section: TrackerSection)
 }
 
 final class TrackerFormViewModel: TrackerFormViewModelProtocol {
@@ -32,8 +33,6 @@ final class TrackerFormViewModel: TrackerFormViewModelProtocol {
     private let notificationManager: any AppNotificationManaging
     private let sectionRepository: SectionRepositoryProtocol
     private let invalidComponentManager: any InvalidComponentManaging<InvalidComponent>
-    private let eventsHandler: (TrackerFormOutput) -> Void
-    
     private let mode: TrackerFormMode
     
     private var section: TrackerSection? {
@@ -46,8 +45,8 @@ final class TrackerFormViewModel: TrackerFormViewModelProtocol {
     @Published private(set) var weekDays: WeekDays = []
     @Published private(set) var invalidComponent: InvalidComponent?
     @Published var tackerTitle = ""
-    
-    @Published var route: TrackerFormRoute?
+
+    var selectedSectionID: UUID? { section?.id }
     
     let title: String
     let habitScheduleViewModel: TrackerFormHabitScheduleViewModel
@@ -60,15 +59,13 @@ final class TrackerFormViewModel: TrackerFormViewModelProtocol {
         notificationManager: some AppNotificationManaging,
         sectionRepository: SectionRepositoryProtocol,
         invalidComponentManager: some InvalidComponentManaging<InvalidComponent> = InvalidComponentManager(),
-        mode: TrackerFormMode,
-        eventsHandler: @escaping (TrackerFormOutput) -> Void
+        mode: TrackerFormMode
     ) {
         self.trackerManager = trackerManager
         self.notificationManager = notificationManager
         self.sectionRepository = sectionRepository
         self.invalidComponentManager = invalidComponentManager
         self.mode = mode
-        self.eventsHandler = eventsHandler
         
         title = mode.screenTitle
         completeFormButtonTitle = mode.completeFormButtonTitle
@@ -90,11 +87,11 @@ final class TrackerFormViewModel: TrackerFormViewModelProtocol {
         invalidComponentManager.invalidComponent.assign(to: &$invalidComponent)
     }
     
-    func onSectionSelection() {
-        route = .section(section?.id, onCompletion: { [weak self] in self?.onSection($0) })
+    func selectSection(_ section: TrackerSection) {
+        self.section = section
     }
     
-    func onCompleteFrom() async {
+    func onCompleteFrom() async -> TrackerFormOutput? {
         do {
             let configs = habitScheduleViewModel.configs.filter({ $0.isSelected })
             let weekDays = Set(configs.map({ $0.day }))
@@ -116,14 +113,16 @@ final class TrackerFormViewModel: TrackerFormViewModelProtocol {
                 try await trackerManager.update(tracker: tracker)
             }
 
-            eventsHandler(.init(tracker: tracker, section: section))
             syncNotifications()
+            return .init(tracker: tracker, section: section)
         }
         catch let error as TrackerFormInvalidComponent {
             invalidComponentManager.markComponentInvalid(error)
+            return nil
         }
         catch {
             debugPrint(error)
+            return nil
         }
     }
 }
@@ -142,11 +141,6 @@ private extension TrackerFormViewModel {
         }
     }
 
-    func onSection(_ updatedSection: TrackerSection) {
-        route = nil
-        section = updatedSection
-    }
-    
     func fillForm(with tracker: Tracker) {
         tackerTitle = tracker.name
         weekDays = tracker.weekDays

@@ -7,17 +7,26 @@
 
 import SwiftUI
 import Foundation
+import Combine
 import TrackerDomain
 
 @MainActor
 struct TrackersView<ViewModel: TrackersViewModelProtocol> {
     @ObservedObject private var viewModel: ViewModel
+    private let onCreate: () -> Void
+    private let onEdit: (Tracker) -> Void
     
     @Namespace private var topID
     @GestureState private var swipeTranslation: CGSize = .zero
     
-    init(viewModel: ViewModel) {
+    init(
+        viewModel: ViewModel,
+        onCreate: @escaping () -> Void,
+        onEdit: @escaping (Tracker) -> Void
+    ) {
         self.viewModel = viewModel
+        self.onCreate = onCreate
+        self.onEdit = onEdit
     }
 }
 
@@ -25,8 +34,7 @@ struct TrackersView<ViewModel: TrackersViewModelProtocol> {
 
 extension TrackersView: View {
     var body: some View {
-        NavigationStack {
-            ScrollViewReader { proxy in
+        ScrollViewReader { proxy in
                 Group {
                     switch viewModel.state {
                     case .idle, .loading:
@@ -35,7 +43,10 @@ extension TrackersView: View {
                     case .loaded(let models):
                         ScrollableLazyVStack(horizontalPadding: 0) {
                             ForEach(Array(models.enumerated()), id: \.element.id) { index, collection in
-                                TrackersCollectionView(viewModel: collection)
+                                TrackersCollectionView(
+                                    viewModel: collection,
+                                    onEvent: viewModel.handleCollectionEvent
+                                )
                                     .padding(.horizontal, 12)
                                     .task { await viewModel.onSectionAppear(at: index) }
                             }
@@ -56,7 +67,10 @@ extension TrackersView: View {
                 .safeAreaInset(edge: .bottom, alignment: .trailing) {
                     SafeAreaBottomView(
                         isToday: viewModel.isToday,
-                        onCreate: viewModel.onAdd,
+                        onCreate: {
+                            viewModel.onAdd()
+                            onCreate()
+                        },
                         onToday: {
                             withAnimation { proxy.scrollTo(topID, anchor: .top) }
                             viewModel.onToday()
@@ -80,7 +94,6 @@ extension TrackersView: View {
                             viewModel.onDaySwipe(translation.width < 0 ? .next : .previous)
                         }
                 )
-            }
         }
         .searchable(text: $viewModel.queryString) { }
         .overlay {
@@ -89,6 +102,8 @@ extension TrackersView: View {
                 .allowsHitTesting(false)
         }
         .onAppear(perform: viewModel.onAppear)
+        .onReceive(viewModel.createRequests) { onCreate() }
+        .onReceive(viewModel.editRequests, perform: onEdit)
     }
 }
 
@@ -224,22 +239,24 @@ private struct SafeAreaBottomView: View, KeyboardReadable {
 
 #if DEBUG
 #Preview {
-    TrackersView(viewModel: ViewModel())
+    TrackersView(viewModel: ViewModel(), onCreate: { }, onEdit: { _ in })
 }
 
 private final class ViewModel: TrackersViewModelProtocol {
-    var route: TrackersRoute?
     var filter: TrackerFilter = .completedForDate
     var queryString: String = ""
     var currentDate: Date = .now
     
     let isToday = false
     let state: TrackersState<CollectionViewModel> = .idle
+    let createRequests = Empty<Void, Never>().eraseToAnyPublisher()
+    let editRequests = Empty<Tracker, Never>().eraseToAnyPublisher()
     
     func onAppear() { }
     func onSectionAppear(at index: Int) async { }
     func onDaySwipe(_ direction: DaySwipeDirection) { }
     func onToday() { }
     func onAdd() { }
+    func handleCollectionEvent(_ event: TrackersCollectionOutput) { }
 }
 #endif
